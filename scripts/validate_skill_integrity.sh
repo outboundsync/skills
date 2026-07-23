@@ -55,6 +55,7 @@ STALE_PATTERN='outboundsync_signals|outboundsync-signals|docs/hubspot_fields\.md
 CANONICAL_FILES=(
   "$ROOT_DIR/README.md"
   "$ROOT_DIR/SECURITY.md"
+  "$ROOT_DIR/skills/preflight/SKILL.md"
   "$CRM_ANALYSIS_DIR/SKILL.md"
   "$ROUTER_MD"
   "$ROUTER_YAML"
@@ -63,28 +64,127 @@ CANONICAL_FILES=(
   "$PROMPT_LIBRARY"
 )
 
+# Include every skill pack SKILL.md so stale-path hygiene covers new skills.
+while IFS= read -r skill_md; do
+  already=0
+  for existing in "${CANONICAL_FILES[@]}"; do
+    if [[ "$existing" == "$skill_md" ]]; then
+      already=1
+      break
+    fi
+  done
+  if [[ "$already" -eq 0 ]]; then
+    CANONICAL_FILES+=("$skill_md")
+  fi
+done < <(find "$ROOT_DIR/skills" -type f -name 'SKILL.md' -not -path '*/.git/*' | sort)
+
 if grep -n -H -E "$STALE_PATTERN" "${CANONICAL_FILES[@]}" >/dev/null 2>&1; then
   echo "ERROR: Found stale references in canonical files:" >&2
   grep -n -H -E "$STALE_PATTERN" "${CANONICAL_FILES[@]}" >&2
   exit 1
 fi
 
-echo "4) Ensuring expected skill packs exist (preflight + crm-analysis)..."
-for skill_md in \
-  "$ROOT_DIR/skills/preflight/SKILL.md" \
-  "$CRM_ANALYSIS_DIR/SKILL.md"
-do
+echo "4) Validating every skills/*/SKILL.md (frontmatter, name==folder, description)..."
+SKILL_COUNT=0
+while IFS= read -r skill_md; do
+  SKILL_COUNT=$((SKILL_COUNT + 1))
+  skill_dir="$(dirname "$skill_md")"
+  folder_name="$(basename "$skill_dir")"
+
   if [[ ! -f "$skill_md" ]]; then
     echo "ERROR: Missing required skill file: $skill_md" >&2
     exit 1
   fi
-done
-SKILL_COUNT="$(find "$ROOT_DIR/skills" -type f -name 'SKILL.md' -not -path '*/.git/*' | wc -l | tr -d '[:space:]')"
-if [[ "$SKILL_COUNT" != "2" ]]; then
-  echo "ERROR: Expected exactly two skills/*/SKILL.md files, found $SKILL_COUNT." >&2
-  find "$ROOT_DIR/skills" -type f -name 'SKILL.md' -not -path '*/.git/*' >&2
+
+  # Require YAML frontmatter delimited by ---
+  if ! awk '
+    BEGIN { ok=0 }
+    NR==1 && $0 == "---" { open=1; next }
+    open && $0 == "---" { ok=1; exit }
+    END { exit ok ? 0 : 1 }
+  ' "$skill_md"; then
+    echo "ERROR: $skill_md is missing YAML frontmatter (--- ... ---)." >&2
+    exit 1
+  fi
+
+  frontmatter_yaml="$TMP_DIR/skill-frontmatter-$SKILL_COUNT.yaml"
+  awk '
+    NR == 1 && $0 == "---" { in_fm=1; next }
+    in_fm && $0 == "---" { exit }
+    in_fm { print }
+  ' "$skill_md" > "$frontmatter_yaml"
+
+  if [[ "$PARSER_BACKEND" == "python" ]]; then
+    if ! python3 -c 'import sys, yaml; data=yaml.safe_load(open(sys.argv[1])); assert isinstance(data, dict)' "$frontmatter_yaml" >/dev/null 2>&1; then
+      echo "ERROR: $skill_md has invalid YAML frontmatter." >&2
+      exit 1
+    fi
+  elif ! ruby -ryaml -e 'data=YAML.load_file(ARGV[0]); exit(data.is_a?(Hash) ? 0 : 1)' "$frontmatter_yaml" >/dev/null 2>&1; then
+    echo "ERROR: $skill_md has invalid YAML frontmatter." >&2
+    exit 1
+  fi
+
+  # Extract name: and description: from frontmatter only
+  name_val="$(awk '
+    BEGIN { in_fm=0 }
+    NR==1 && $0 == "---" { in_fm=1; next }
+    in_fm && $0 == "---" { exit }
+    in_fm && /^name:[[:space:]]*/ {
+      sub(/^name:[[:space:]]*/, "")
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "")
+      gsub(/^["'\'']|["'\'']$/, "")
+      print
+      exit
+    }
+  ' "$skill_md")"
+
+  if [[ -z "$name_val" ]]; then
+    echo "ERROR: $skill_md is missing a non-empty name: in frontmatter." >&2
+    exit 1
+  fi
+  if [[ "$name_val" != "$folder_name" ]]; then
+    echo "ERROR: $skill_md frontmatter name: '$name_val' does not match folder '$folder_name'." >&2
+    exit 1
+  fi
+
+  # description: must be present and non-empty (plain or block scalar)
+  desc_ok="$(awk '
+    BEGIN { in_fm=0; found=0; folded=0 }
+    NR==1 && $0 == "---" { in_fm=1; next }
+    in_fm && $0 == "---" { exit }
+    in_fm && /^description:[[:space:]]*[>|][-+]?[[:space:]]*$/ {
+      folded=1
+      next
+    }
+    in_fm && /^description:[[:space:]]*.+/ {
+      line=$0
+      sub(/^description:[[:space:]]*/, "", line)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+      gsub(/^["'\'']|["'\'']$/, "", line)
+      if (length(line) > 0) found=1
+      next
+    }
+    folded && in_fm && /^[[:space:]]+/ {
+      line=$0
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+      if (length(line) > 0) found=1
+      next
+    }
+    folded && in_fm && /^[^[:space:]]/ { folded=0 }
+    END { print (found ? "yes" : "no") }
+  ' "$skill_md")"
+
+  if [[ "$desc_ok" != "yes" ]]; then
+    echo "ERROR: $skill_md is missing a non-empty description: in frontmatter." >&2
+    exit 1
+  fi
+done < <(find "$ROOT_DIR/skills" -type f -name 'SKILL.md' -not -path '*/.git/*' | sort)
+
+if [[ "$SKILL_COUNT" -lt 1 ]]; then
+  echo "ERROR: No skills/*/SKILL.md files found." >&2
   exit 1
 fi
+echo "   Validated $SKILL_COUNT skill pack(s)."
 
 echo "5) Validating router field references against CRM dictionaries..."
 if [[ "$PARSER_BACKEND" == "python" ]]; then
