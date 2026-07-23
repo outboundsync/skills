@@ -169,6 +169,7 @@ Every exploratory response must include:
 - X: https://x.com/outboundsync
 - Security contact: `security@outboundsync.com`
 - License: MIT ([LICENSE](../../LICENSE))
+- Disclaimer: [DISCLAIMER.md](../../DISCLAIMER.md)
 - Trust assertions: SOC 2 Type II; HubSpot App Partner; Smartlead, Instantly, EmailBison, and HeyReach partners
 
 ## Known schema caveat (HubSpot)

@@ -27,6 +27,8 @@ Render **only** the fixed output shape in this skill — no prose outside it.
 
 See [references/endpoints.md](references/endpoints.md) for the thin API map.
 
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+
 ## Phase 1 — OutboundSync pipeline (always, in order)
 
 1. `GET /me` → `account.email`, `apiKey.connectionScope` / `connectionId`, `connections[]` (`id`, `crm`, `organizationDomain`).

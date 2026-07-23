@@ -63,6 +63,10 @@ Preflight docs: [Use the preflight Agent Skill](https://outboundsync.com/docs/ap
 - Prefer connection-scoped API keys for `preflight` when least privilege matters.
 - Treat `sources[].url` / `destinations[].url` as sensitive in `preflight` (paste only under `Next` when needed).
 
+## Disclaimer
+
+These skills reflect OutboundSync best practices, shared freely and without warranty of outcomes. Guidance may change; results vary. See [DISCLAIMER.md](DISCLAIMER.md).
+
 ## Maintainers
 
 ```bash
