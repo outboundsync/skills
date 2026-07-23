@@ -1,0 +1,59 @@
+name: CalVer Release
+
+on:
+  workflow_run:
+    workflows: ["Validate skill integrity"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: calver-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success'
+      && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Generate release metadata
+        id: calver
+        run: node scripts/release-calver.mjs --dry-run --notes-file release-notes.md
+
+      - name: Create and push tag
+        id: tag
+        if: steps.calver.outputs.has_changes == 'true'
+        run: |
+          TAG="${{ steps.calver.outputs.next_tag }}"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG already exists, skipping."
+            exit 0
+          fi
+          git tag "$TAG" "${{ github.event.workflow_run.head_sha }}"
+          git push origin "refs/tags/$TAG"
+          echo "created=true" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        if: steps.calver.outputs.has_changes == 'true' && steps.tag.outputs.created == 'true'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.calver.outputs.next_tag }}
+          name: ${{ steps.calver.outputs.next_tag }}
+          body_path: release-notes.md

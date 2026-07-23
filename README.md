@@ -69,6 +69,19 @@ Preflight docs: [Use the preflight Agent Skill](https://outboundsync.com/docs/ap
 ./scripts/validate_skill_integrity.sh
 ```
 
+## Releases & Changelog
+
+Releases are created automatically after Validate skill integrity passes on `main` via `.github/workflows/release-calver.yml`.
+
+- Versioning format: `YYYY.MM.DD.N` (CalVer).
+- Changelog: [GitHub Releases page](https://github.com/outboundsync/skills/releases).
+
+To preview the next release locally:
+
+```bash
+node scripts/release-calver.mjs --dry-run
+```
+
 ## Related
 
 - Well-known mirror: https://outboundsync.com/.well-known/skills/index.json
