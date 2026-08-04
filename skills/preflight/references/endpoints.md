@@ -17,11 +17,19 @@ Never print, log, or commit the key. Prefer connection-scoped keys when least pr
 | 1 | `GET /me` | Validate key; list accessible connections (`id`, `crm`, `organizationDomain`); note `apiKey.connectionScope` / `connectionId`. |
 | 2 | `GET /connections` | Per-connection OAuth `status`, `organizationId`, and plan `capabilities{sync, destinations, blocklists}`. |
 | 3 | `GET /account/status` | Top-level `ready`, `blockers[]`, `warnings[]`; per-connection `crmConnection`, `sources`, `destinations`, `blocklists` component statuses. |
-| 4 | `GET /sources` | Inbound paste URLs, platform, config flags, and destination bindings. Paginate until exhausted. |
+| 4 | `GET /sources` | Inbound Sources paste URLs, platform, config flags, forwarding destinations, bound reply relay. Paginate until exhausted. |
+| 5 | `GET /destinations/reply-relays` | Reply-relay catalog (CRM-card advisory only; not a gate). |
 
 Docs: https://outboundsync.com/docs/api/v1/
 
 Creating API keys: https://outboundsync.com/docs/api/authentication/creating-api-keys/
+
+## Related skills (not called here)
+
+| Skill | When |
+| --- | --- |
+| `api` | General API vocabulary, scopes, discovery |
+| `sync-monitoring` | OutboundSync-emitted Sync Monitoring Webhooks (`/webhooks`, `/events`, `sync.failed`) — **not** Sources paste URLs |
 
 ## Sensitive fields
 
@@ -43,6 +51,6 @@ Creating API keys: https://outboundsync.com/docs/api/authentication/creating-api
 
 ## Optional Instantly surface
 
-When Instantly MCP or Instantly API credentials are available, use them for Phase 3 Instantly gates (accounts, campaigns, webhooks). If neither is available, treat Instantly as MANUAL/unverified after confirming the OutboundSync source(s) exist.
+When Instantly MCP or Instantly API credentials are available, use them for Phase 3 Instantly gates (accounts, campaigns, Instantly-side webhooks pointing at the OutboundSync **Source** URL). If neither is available, treat Instantly as MANUAL/unverified after confirming the OutboundSync source(s) exist.
 
-This skill does **not** assume an OutboundSync-hosted MCP exists.
+This skill does **not** assume an OutboundSync-hosted MCP exists. Instantly `webhooks_list` is the SEP’s webhook config — not OutboundSync Sync Monitoring (`sync-monitoring` skill).

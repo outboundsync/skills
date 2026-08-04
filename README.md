@@ -2,11 +2,15 @@
 
 Public [Agent Skills](https://agentskills.io) for OutboundSync — installable with [`npx skills`](https://github.com/vercel-labs/skills).
 
-### Existing
+The pack ships **14** skills.
+
+### API & launch
 
 | Skill | Path | Needs API key? | What it does |
 | --- | --- | --- | --- |
-| `preflight` | [`skills/preflight/`](skills/preflight/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Read-only launch readiness across CRM OAuth, sources/sync, and SEP webhooks/campaigns |
+| `api` | [`skills/api/`](skills/api/) | Yes (`OUTBOUNDSYNC_API_KEY`) | OutboundSync API v1 guide: auth, vocabulary, discovery, routing to specialized skills |
+| `preflight` | [`skills/preflight/`](skills/preflight/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Read-only launch readiness across CRM OAuth, Sources/sync, and SEP inbound wiring |
+| `sync-monitoring` | [`skills/sync-monitoring/`](skills/sync-monitoring/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Diagnose Sync Monitoring Webhooks/events; mutations only after explicit confirmation |
 | `crm-analysis` | [`skills/crm-analysis/`](skills/crm-analysis/) | No | Read-only analysis of OutboundSync engagement signals already in HubSpot or Salesforce |
 
 ### Copy & identity
@@ -18,6 +22,7 @@ Public [Agent Skills](https://agentskills.io) for OutboundSync — installable w
 | `cold-email-body` | [`skills/cold-email-body/`](skills/cold-email-body/) | No | Draft and audit cold email body copy |
 | `connection-requests` | [`skills/connection-requests/`](skills/connection-requests/) | No | Draft and audit professional-social connection requests |
 | `email-aliases` | [`skills/email-aliases/`](skills/email-aliases/) | No | Audit and set up sending mailbox identity / aliases |
+| `omnichannel-campaigns` | [`skills/omnichannel-campaigns/`](skills/omnichannel-campaigns/) | No | Structure email + LinkedIn/social outbound sequences |
 
 ### Deliverability
 
@@ -38,10 +43,10 @@ Public [Agent Skills](https://agentskills.io) for OutboundSync — installable w
 ## Install (primary — all supported harnesses)
 
 ```bash
-# Launch preflight (global recommended)
+# API & launch
+npx skills add outboundsync/skills --skill api -g
 npx skills add outboundsync/skills --skill preflight -g
-
-# CRM engagement analysis
+npx skills add outboundsync/skills --skill sync-monitoring -g
 npx skills add outboundsync/skills --skill crm-analysis
 
 # Copy & identity
@@ -50,6 +55,7 @@ npx skills add outboundsync/skills --skill cold-email-subject-lines
 npx skills add outboundsync/skills --skill cold-email-body
 npx skills add outboundsync/skills --skill connection-requests
 npx skills add outboundsync/skills --skill email-aliases
+npx skills add outboundsync/skills --skill omnichannel-campaigns
 
 # Deliverability (free DNS/RDAP lookups by default)
 npx skills add outboundsync/skills --skill email-authentication
@@ -66,17 +72,10 @@ npx skills add outboundsync/skills --skill crm-analysis -a openclaw -g
 Try without installing:
 
 ```bash
+npx skills use outboundsync/skills --skill api
 npx skills use outboundsync/skills --skill preflight
-npx skills use outboundsync/skills --skill crm-analysis
-npx skills use outboundsync/skills --skill outbound-offer
-npx skills use outboundsync/skills --skill cold-email-subject-lines
-npx skills use outboundsync/skills --skill cold-email-body
-npx skills use outboundsync/skills --skill connection-requests
-npx skills use outboundsync/skills --skill email-aliases
-npx skills use outboundsync/skills --skill email-authentication
-npx skills use outboundsync/skills --skill sending-domain-quality
-npx skills use outboundsync/skills --skill agencies
-npx skills use outboundsync/skills --skill integrations
+npx skills use outboundsync/skills --skill sync-monitoring
+npx skills use outboundsync/skills --skill omnichannel-campaigns
 ```
 
 ## OpenClaw marketplace (optional)
@@ -93,7 +92,7 @@ openclaw skills install @osiharris/crm-analysis
 
 ## Credentials
 
-**`preflight` only** — set before running:
+**`preflight`, `api`, and `sync-monitoring`** — set before running:
 
 ```bash
 export OUTBOUNDSYNC_API_KEY=osapi_...
@@ -101,19 +100,23 @@ export OUTBOUNDSYNC_API_KEY=osapi_...
 
 Or put the same variable in a gitignored `.env`. **Never print, log, or commit the API key.**
 
+- Prefer a **connection-scoped** key for `preflight` when least privilege matters.
+- Sync Monitoring `/webhooks*` needs an **account-scoped** key; mutations also need the **`write`** scope and explicit user confirmation (see [SECURITY.md](SECURITY.md)).
+
 Create a key: [Creating API keys](https://outboundsync.com/docs/api/authentication/creating-api-keys/)  
 API reference: [API v1](https://outboundsync.com/docs/api/v1/)  
-Preflight docs: [Use the preflight Agent Skill](https://outboundsync.com/docs/api/skills-preflight/)
+Skills docs: [Agent Skills](https://outboundsync.com/docs/skills/)
 
-`crm-analysis` and the copy / directory skills do not use an OutboundSync API key.
+`crm-analysis`, copy, omnichannel, and directory skills do not use an OutboundSync API key.
 
 **`email-authentication` / `sending-domain-quality`** — free read-only public DNS / RDAP / DNSBL lookups by default. Optional paid keys (e.g. `MXTOOLBOX_API_KEY`, `GOOGLE_WEB_RISK_KEY`, `VIRUSTOTAL_API_KEY`, `WHOISXML_API_KEY`) enhance checks when present; see each skill's `compatibility:` frontmatter.
 
 ## Security
 
-- All skills are **read-only** by default — see [SECURITY.md](SECURITY.md).
-- Prefer connection-scoped API keys for `preflight` when least privilege matters.
-- Treat `sources[].url` / `destinations[].url` as sensitive in `preflight` (paste only under `Next` when needed).
+- Skills are **read-only by default** — see [SECURITY.md](SECURITY.md).
+- `sync-monitoring` may mutate Sync Monitoring webhooks **only after explicit confirmation**.
+- Treat `sources[].url` / `destinations[].url` as sensitive (paste only under `Next` when needed).
+- Never re-echo webhook signing secrets after create/rotate.
 
 ## Disclaimer
 
