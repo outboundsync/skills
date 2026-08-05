@@ -25,7 +25,7 @@
 ## Example analysis output
 - Partial strict result (email reply data unavailable for HeyReach):
   - Campaign ranking by contact volume only.
-  - `LinkedIn Outreach Q1` -> 87 contacts
+  - `Social Outreach Q1` -> 87 contacts
   - `VP Eng Social Touch` -> 54 contacts
 - Limitation:
   - HeyReach does not sync email reply timestamps for this strict email-focused intent.

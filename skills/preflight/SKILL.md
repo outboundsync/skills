@@ -2,15 +2,17 @@
 name: preflight
 description: >-
   Run a read-only OutboundSync + SEP launch-readiness check across CRM OAuth,
-  sources/sync pipeline, and sales engagement platforms (webhooks, mailboxes,
-  campaigns). Use when the user asks if they are ready to launch, checks
-  outbound/campaign readiness, pastes source or webhook URLs, asks about
-  webhook wiring, or wants CRM sync / account-status readiness.
+  Sources/sync pipeline, and sales engagement platforms (SEP inbound paste URLs,
+  mailboxes, campaigns). Use when the user asks if they are ready to launch,
+  checks outbound/campaign readiness, pastes source URLs, asks about Sources or
+  SEP inbound webhook wiring, or wants CRM sync / account-status readiness. For
+  OutboundSync-emitted Sync Monitoring Webhooks (sync.failed / deliveries), use
+  the sync-monitoring skill instead.
 license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com. Optional Instantly MCP/API for automated Instantly gates.
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # OutboundSync launch preflight
@@ -18,6 +20,8 @@ metadata:
 Run **read-only**. Never write, activate, pause, or re-point anything. Never print, log, or commit the API key. Never print `sources[].url` or `destinations[].url` except as a full paste URL under a `Next` step that needs it. Capabilities and config flags are safe to print.
 
 Render **only** the fixed output shape in this skill — no prose outside it.
+
+**Vocabulary:** “Webhook wiring” in this skill means the SEP → OutboundSync **Sources** paste URL (`sources[].url`). OutboundSync-emitted Sync Monitoring Webhooks (`/api/v1/webhooks`, `sync.failed`) are a different surface — hand off to `sync-monitoring`. API vocabulary bootstrap → `api`.
 
 ## Credentials
 
@@ -34,7 +38,8 @@ See [references/endpoints.md](references/endpoints.md) for the thin API map.
 1. `GET /me` → `account.email`, `apiKey.connectionScope` / `connectionId`, `connections[]` (`id`, `crm`, `organizationDomain`).
 2. `GET /connections` → per connection: `id`, `crm`, `status`, `organizationDomain`, `organizationId`, `capabilities{sync, destinations, blocklists}`, `createdAt`.
 3. `GET /account/status` → top-level `ready`, `blockers[]`, `warnings[]`, per-connection component statuses (`crmConnection`, `sources`, `destinations`, `blocklists`).
-4. `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, createOrUpdateTask, assignContactOwner, salesforceObjectType}`, `destinations[]{url, description, eventTypes, isDelayed}`. Paginate to exhaustion.
+4. `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, createOrUpdateTask, assignContactOwner, salesforceObjectType}`, `destinations[]{url, description, eventTypes, isDelayed}`, bound `replyRelay` when present. Paginate to exhaustion.
+5. `GET /destinations/reply-relays` → reply-relay catalog for accessible connections (advisory on the CRM card; does **not** change gate math). Sources may already embed a bound `replyRelay`.
 
 Join by `connectionId`. Render one CRM card + one OutboundSync (pipeline) card per connection. When >1 connection, disambiguate gauge labels by domain (e.g. `CRM (acme.com)`, `OutboundSync (acme.com)`).
 
@@ -100,6 +105,7 @@ Header: `### CRM — <CRM>` with context `` `Connection <id> · <domain> · org 
 - `· Capabilities: sync <on/off> · destinations <on/off> · blocklists <on/off>` (from `GET /connections`; plan context, not a gate).
 - `· Integration config` — per source under this connection: `<platform> → company <✓/✗> · task <✓/✗> · owner <✓/✗>` (+ `SF object: <type>` only when Salesforce; omit when null).
 - `· Destinations (forwarding, not CRM writes): <n> endpoint(s)` listing `description → eventTypes` from `sources[].destinations[]`, OR `none — events still sync to CRM natively`. Use connection-level `destinations{status,count}` for the count/advisory. Honor ComponentStatus: ready / not_configured (advisory) / disabled on plan (no warning) / error.
+- `· Reply relays: <n> in catalog` (from `/destinations/reply-relays`) and/or bound relays on sources — advisory only; never a launch gate.
 - `· Blocklists: <status>` — map ComponentStatus: ready (`<n> enabled`) / not_configured / disabled on plan / error: `<lastError>`.
 
 Distinguish disabled (feature off on plan → no warning, show "disabled on plan") from not_configured (feature on, nothing set up → advisory) for both destinations and blocklists.

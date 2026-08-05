@@ -25,10 +25,10 @@
 ## Example analysis output
 - `Mode: exploratory`
 - Campaign volume summary:
-  - `LinkedIn Outreach Q1` -> 87 contacts
+  - `Social Outreach Q1` -> 87 contacts
   - `VP Eng Social Touch` -> 54 contacts
 - Social reply recency summary:
-  - Latest social reply activity concentrated in `LinkedIn Outreach Q1`
+  - Latest social reply activity concentrated in `Social Outreach Q1`
 - Activity trend direction:
   - `up` in the last 14 days vs prior 14 days
 - `Observed Signals Used:` `os_last_social_campaign_name`, `os_last_reply_social_time`, `os_last_sent_social_time`
