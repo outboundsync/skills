@@ -24,6 +24,7 @@ This project uses Calendar Versioning with tags in the format `YYYY.MM.DD.N`.
 - Remove named third-party practitioners/agencies from `omnichannel-campaigns` in favor of generic industry-pattern framing.
 - Replace "LinkedIn" with generic "B2B social networking" terms in `omnichannel-campaigns` (docs surfaces use "social").
 - Add a shared score-meter (monospace `█`/`░` bars) to the scorecard skills — `cold-email-body`, `outbound-offer`, `cold-email-subject-lines`, `omnichannel-campaigns`, `list-building` — matching the preflight gauge aesthetic.
+- Document skill output conventions in `CONVENTIONS.md` (marks legend, the required score-meter for scoring skills, disclaimer note, frontmatter) so future skills adopt them by default.
 
 ### Security
 

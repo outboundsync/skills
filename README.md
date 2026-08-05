@@ -147,6 +147,8 @@ These skills reflect OutboundSync best practices, shared freely and without warr
 
 ## Maintainers
 
+New skills follow [CONVENTIONS.md](CONVENTIONS.md) — output styling, the required score-meter, marks legend, and disclaimer note. Validate before pushing:
+
 ```bash
 ./scripts/validate_skill_integrity.sh
 ```
