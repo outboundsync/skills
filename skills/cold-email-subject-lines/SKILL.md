@@ -78,7 +78,7 @@ Quick shape:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · ·
+GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · ·. In `### Scorecard`, the Rubric cell leads with a bar: `<bar> <n>/20`; bar = `█`×round(n/20×10) then `░` to width 10 (monospace glance; no colored emoji).
 
 ### Shape
 
@@ -89,9 +89,9 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 - <Audit | Draft | A/B plan>
 
 ### Scorecard
-| Subject | Chars | Words | Lowercase | Spam hits | Rubric /20 | Verdict |
+| Subject | Chars | Words | Lowercase | Spam hits | Rubric | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
-| `<subject>` | <n> | <n> | ✓/✗ | <n or list> | <n> | keep / rewrite / kill |
+| `<subject>` | <n> | <n> | ✓/✗ | <n or list> | <bar> <n>/20 | keep / rewrite / kill |
 
 ### Findings
 - <✓/✗/· line>

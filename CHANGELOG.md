@@ -19,9 +19,11 @@ This project uses Calendar Versioning with tags in the format `YYYY.MM.DD.N`.
 
 ### Changed
 
-- Restore the full 14-skill "Try without installing" list in the README so account-free skills stay discoverable without an OutboundSync account.
+- Restore the full "Try without installing" list in the README so account-free skills stay discoverable without an OutboundSync account.
 - Standardize the disclaimer note across skills; align the `api` description (verb-led) and output-contract wording with pack conventions.
 - Remove named third-party practitioners/agencies from `omnichannel-campaigns` in favor of generic industry-pattern framing.
+- Replace "LinkedIn" with generic "B2B social networking" terms in `omnichannel-campaigns` (docs surfaces use "social").
+- Add a shared score-meter (monospace `█`/`░` bars) to the scorecard skills — `cold-email-body`, `outbound-offer`, `cold-email-subject-lines`, `omnichannel-campaigns`, `list-building` — matching the preflight gauge aesthetic.
 
 ### Security
 

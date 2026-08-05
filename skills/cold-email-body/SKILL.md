@@ -117,7 +117,7 @@ Quick Complete shape:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · ·
+GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · ·. Lead `### Score` with a fenced `text` meter: `Score  <bar>  <total>/100 · <band>`; bar = `█`×round(total/100×20) then `░` to width 20 (monospace glance; no colored emoji).
 
 ### Shape
 
@@ -128,6 +128,11 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 - <Audit | Draft | Complete>
 
 ### Score
+
+```text
+Score  ███████████████░░░░░  78/100 · solid
+```
+
 - Total: </100>
 - Length/readability: </20>
 - Personalization (removal test): </20>

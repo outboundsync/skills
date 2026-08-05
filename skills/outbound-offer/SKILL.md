@@ -113,7 +113,7 @@ Quick shape:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between every block. Every line under a section is a `-` bullet unless noted. Marks: ✓ pass · ✗ fail · · advisory.
+GitHub-flavored markdown only. Blank line between every block. Every line under a section is a `-` bullet unless noted. Marks: ✓ pass · ✗ fail · · advisory. Lead `### Score / levers` with a fenced `text` meter — one row per lever, bar = `█`×n then `░` to width 5; mark the weakest `✗ weakest`. Bars are a monospace glance only (`█` filled · `░` empty; no colored emoji).
 
 ### Shape
 
@@ -124,12 +124,19 @@ GitHub-flavored markdown only. Blank line between every block. Every line under 
 - <Audit | Draft>
 
 ### Score / levers
-- Dream Outcome: <1–5> — <one-line note>
-- Perceived Likelihood: <1–5> — <one-line note>
-- Speed to Value: <1–5> — <one-line note; higher = faster>
-- Ease: <1–5> — <one-line note; higher = lower effort for prospect>
-- Weakest lever: <name> — <why>
-- Overall: <weak | fair | strong>
+
+```text
+Dream outcome   █████  5/5
+Likelihood      ██░░░  2/5  ✗ weakest
+Speed to value  ███░░  3/5
+Ease            ████░  4/5
+Overall  fair
+```
+
+- Dream Outcome: <one-line note>
+- Perceived Likelihood: <one-line note>
+- Speed to Value: <one-line note; higher = faster>
+- Ease: <one-line note; higher = lower effort for prospect>
 
 ### Findings
 - <✓/✗/· line>

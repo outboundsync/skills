@@ -68,6 +68,8 @@ Collect or mark missing:
 
 ## Output contract
 
+GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗ fail · · advisory. In `### Scorecard`, the Score cell leads with a bar: `<bar> <n>/5`; bar = `█`×n then `░` to width 5 (monospace glance; no colored emoji).
+
 ### Quick (default for “build me a sequence”)
 
 ```markdown
@@ -85,15 +87,15 @@ Collect or mark missing:
 ```markdown
 ## Omnichannel audit
 
-| Lever | Score /5 | Note |
+| Lever | Score | Note |
 | --- | --- | --- |
-| Channel fit | | |
-| One job per touch | | |
-| Familiarity before ask | | |
-| Handoff clarity | | |
-| Volume safety | | |
-| Offer coherence | | |
-| Exit / breakup | | |
+| Channel fit | <bar> n/5 | |
+| One job per touch | <bar> n/5 | |
+| Familiarity before ask | <bar> n/5 | |
+| Handoff clarity | <bar> n/5 | |
+| Volume safety | <bar> n/5 | |
+| Offer coherence | <bar> n/5 | |
+| Exit / breakup | <bar> n/5 | |
 
 **Weakest lever:** <name>
 **Rewrite focus:** <one paragraph>

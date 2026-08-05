@@ -64,7 +64,7 @@ Collect or mark missing:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗ gap · · advisory.
+GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗ gap · · advisory. In `### Scorecard`, the Score cell leads with a bar: `<bar> <n>/5`; bar = `█`×n then `░` to width 5 (monospace glance; no colored emoji).
 
 ### Quick (default for “help me build a list”)
 
@@ -84,14 +84,14 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗
 ```markdown
 ## List-building audit
 
-| Lever | Score /5 | Note |
+| Lever | Score | Note |
 | --- | --- | --- |
-| ICP fit | | |
-| Motion fit | | |
-| Data freshness | | |
-| Coverage vs precision | | |
-| Dedupe / suppression | | |
-| Compliance / consent | | |
+| ICP fit | <bar> n/5 | |
+| Motion fit | <bar> n/5 | |
+| Data freshness | <bar> n/5 | |
+| Coverage vs precision | <bar> n/5 | |
+| Dedupe / suppression | <bar> n/5 | |
+| Compliance / consent | <bar> n/5 | |
 
 **Weakest lever:** <name>
 **Fix focus:** <one paragraph>
