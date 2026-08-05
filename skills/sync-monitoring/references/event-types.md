@@ -4,7 +4,7 @@
 
 | Type | When |
 | --- | --- |
-| `sync.failed` | Source→CRM sync transitions healthy → failing (per incident, not per job) |
+| `sync.failed` | Source→CRM sync transitions healthy → failing — fires after **3 consecutive** failed syncs for a source × connection pair; one alert per incident, not per job |
 | `sync.recovered` | Previously failing sync starts succeeding again |
 
 Empty / omitted `enabledEvents` on create = all **subscribable** active types (not `test.ping`, not reserved).

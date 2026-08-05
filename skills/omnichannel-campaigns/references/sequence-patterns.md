@@ -7,9 +7,9 @@ Templates only — adapt to ICP and constraints. Days are relative, not universa
 | Step | Day | Channel | Job |
 | --- | --- | --- | --- |
 | 1 | 0 | Email | Open loop + soft CTA |
-| 2 | 1–2 | LinkedIn | View/connect (light note or none per `connection-requests`) |
+| 2 | 1–2 | B2B social | View/connect (light note or none per `connection-requests`) |
 | 3 | 3 | Email | Bump with one new signal |
-| 4 | 5 | LinkedIn | Soft bump if connected; else skip |
+| 4 | 5 | B2B social | Soft bump if connected; else skip |
 | 5 | 7 | Email | Value asset / proof |
 | 6 | 10–12 | Email | Breakup |
 
@@ -17,8 +17,8 @@ Templates only — adapt to ICP and constraints. Days are relative, not universa
 
 | Step | Day | Channel | Job |
 | --- | --- | --- | --- |
-| 1 | 0 | LinkedIn | Connect / familiarity |
-| 2 | 2–3 | LinkedIn | Light context (not full pitch) |
+| 1 | 0 | B2B social | Connect / familiarity |
+| 2 | 2–3 | B2B social | Light context (not full pitch) |
 | 3 | 4 | Email | Narrative + soft CTA once familiarity exists |
 | 4 | 7 | Email | Bump |
 | 5 | 10 | Either | Breakup |

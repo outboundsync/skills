@@ -1,12 +1,12 @@
 ---
 name: api
 description: >-
-  OutboundSync API v1 guide for agents: auth, scopes, Sources vs destinations vs
-  Sync Monitoring Webhooks vocabulary, discovery, and which specialized skill to
-  run. Use when the user asks how to use the OutboundSync API, what their API key
-  can access, which endpoint to call, OpenAPI discovery, account vs connection
-  keys, read vs write scopes, or how API work relates to preflight and
-  sync-monitoring skills.
+  Guide agents through the OutboundSync API v1: auth, scopes, Sources vs
+  destinations vs Sync Monitoring Webhooks vocabulary, discovery, and which
+  specialized skill to run. Use when the user asks how to use the OutboundSync
+  API, what their API key can access, which endpoint to call, OpenAPI discovery,
+  account vs connection keys, read vs write scopes, or how API work relates to
+  the preflight and sync-monitoring skills.
 license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls.
 metadata:
@@ -14,13 +14,13 @@ metadata:
   version: "1.0.0"
 ---
 
-# OutboundSync API v1 (agent guide)
+# OutboundSync API v1
 
 Teach and lightly exercise the public API. Default **read-only**. Never print, log, or commit the API key. Never print webhook signing secrets. Treat `sources[].url` and `destinations[].url` as sensitive (full paste only when the user needs to copy them).
 
 Render **only** the fixed output shape below — no prose outside it.
 
-**Note:** Best practices shared freely and without warranty — see [DISCLAIMER.md](../../DISCLAIMER.md).
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## Credentials
 
@@ -105,4 +105,4 @@ GitHub-flavored markdown only:
 - Caution: <OpenAPI gap / secrets / write confirmation — only if relevant>
 ```
 
-Blank line between bullets. Never print the API key or signing secrets.
+Blank line between blocks. Never print the API key or signing secrets.

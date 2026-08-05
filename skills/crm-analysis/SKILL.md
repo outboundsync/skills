@@ -3,21 +3,22 @@ name: crm-analysis
 description: >-
   Analyze outbound campaign performance, reply rates, open-to-reply conversion,
   follow-up prioritization, platform attribution, and deliverability using
-  OutboundSync engagement signals in HubSpot or Salesforce. Use when someone
-  asks about campaign replies, which sequences are working, who to follow up
-  with, bounce or unsubscribe trends, or how platforms like Instantly,
-  Smartlead, EmailBison, or HeyReach are performing. Also handles exploratory
-  HeyReach social signal analysis. Read-only, local-only, deterministic
-  preflight routing.
+  OutboundSync engagement signals in HubSpot or Salesforce — plus lighter-touch,
+  note/activity-based analysis for Attio and Close. Use when someone asks about
+  campaign replies, which sequences are working, who to follow up with, bounce
+  or unsubscribe trends, how platforms like Instantly, Smartlead, EmailBison, or
+  HeyReach are performing, or how OutboundSync engagement lands in HubSpot,
+  Salesforce, Attio, or Close. Also handles exploratory HeyReach social signal
+  analysis. Read-only, local-only, deterministic preflight routing.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
-# CRM analysis (HubSpot + Salesforce)
+# CRM analysis (HubSpot + Salesforce, plus Attio & Close beta)
 
-Analyze OutboundSync engagement signals already present in HubSpot or Salesforce. Read-only and local-only — no CRM mutations, no OutboundSync API key, no remote scripts.
+Analyze OutboundSync engagement signals already present in HubSpot or Salesforce (full `os_*` field dictionaries), or Attio and Close (lighter-touch, note/activity-based — beta). Read-only and local-only — no CRM mutations, no OutboundSync API key, no remote scripts.
 
 ## What you can ask
 
@@ -28,6 +29,7 @@ Analyze OutboundSync engagement signals already present in HubSpot or Salesforce
 - "Is Instantly or Smartlead performing better?" — platform attribution
 - "What are our bounce and unsubscribe issues?" — deliverability
 - "Summarize HeyReach social campaign activity" — exploratory social analysis (requires `Mode: exploratory`)
+- "What OutboundSync engagement is on this Attio person or Close lead?" — Attio/Close run in `exploratory` mode over notes/activities (see below)
 
 ## Scope and safety
 
@@ -38,8 +40,8 @@ Analyze OutboundSync engagement signals already present in HubSpot or Salesforce
 
 ## Operating modes
 
-- `strict` (default): deterministic intent routing and preflight contract from [references/router_contract.yaml](references/router_contract.yaml). Six production intents.
-- `exploratory` (explicit opt-in): best-effort analysis with explicit limitations when strict mode returns `PARTIAL` or `UNSUPPORTED`, or for social-only HeyReach signals.
+- `strict` (default): deterministic intent routing and preflight contract from [references/router_contract.yaml](references/router_contract.yaml). Six production intents. **HubSpot and Salesforce only** — they expose queryable `os_*` fields.
+- `exploratory` (explicit opt-in): best-effort analysis with explicit limitations when strict mode returns `PARTIAL` or `UNSUPPORTED`, for social-only HeyReach signals, or for **Attio and Close** — which store engagement as notes/activities rather than queryable fields (see [references/attio_data_model.md](references/attio_data_model.md) and [references/close_data_model.md](references/close_data_model.md)).
 
 ## Directing your agent
 
@@ -47,7 +49,7 @@ For best results, include CRM, platform, date window, and mode in your request. 
 
 Recommended format:
 
-- `CRM:` HubSpot | Salesforce
+- `CRM:` HubSpot | Salesforce | Attio | Close
 - `Platform:` Instantly | Smartlead | EmailBison | HeyReach
 - `Date window:` explicit range (e.g., `last 30 days`)
 - `Question:` your business question
@@ -97,13 +99,13 @@ Mode: exploratory
 
 ## Prerequisites
 
-- CRM access exists (HubSpot or Salesforce).
-- OutboundSync fields are already present in the CRM.
+- CRM access exists (HubSpot, Salesforce, Attio, or Close).
+- OutboundSync data is present: `os_*` fields (HubSpot / Salesforce) or engagement notes/activities (Attio / Close).
 - Outbound platform scope is known (Instantly, Smartlead, EmailBison, HeyReach).
 
 ## Workflow
 
-1. Identify CRM (HubSpot or Salesforce), platform, date window, and mode (default: `strict`).
+1. Identify CRM (HubSpot, Salesforce, Attio, or Close), platform, date window, and mode (default: `strict`). **Attio and Close always run in `exploratory` mode** — they have no queryable `os_*` fields; read their engagement notes/activities per [references/attio_data_model.md](references/attio_data_model.md) / [references/close_data_model.md](references/close_data_model.md).
 2. Map the question to a strict intent from [references/question_router.md](references/question_router.md). If no intent matches, emit `UNSUPPORTED` with reason `no_matching_intent`, list supported intent categories, and suggest an exploratory handoff.
 3. Run preflight using [references/router_contract.yaml](references/router_contract.yaml): check unsupported conditions first, then required fields, then fallback requirements. In `exploratory` mode, use only exploratory paths defined in the question router.
 4. Emit compact preflight. For `SUPPORTED` verdicts, include preflight as a brief inline header and proceed to analysis. For `PARTIAL`, `UNSUPPORTED`, or `EXPERIMENTAL_LIMITED`, emit the full compact preflight block so the user sees what is missing and what the fallback plan is.
@@ -157,8 +159,8 @@ Every exploratory response must include:
 
 - Always include explicit date window.
 - Never infer missing required values.
-- Use HubSpot internal labels and Salesforce API names.
-- Keep conclusions grounded in observed OutboundSync fields.
+- Use HubSpot internal labels and Salesforce API names. For Attio/Close, reference the note title (`OutboundSync <EVENT_TYPE>`) or Close activity type — these CRMs have no `os_*` field names.
+- Keep conclusions grounded in observed OutboundSync signals (fields, notes, or activities).
 
 ## Trust and credibility
 
@@ -182,5 +184,7 @@ The Help Center mapping for "Last email reply subject" currently appears to use 
 - [router_contract.yaml](references/router_contract.yaml) — machine-readable contract
 - [hubspot_properties.md](references/hubspot_properties.md)
 - [salesforce_fields.md](references/salesforce_fields.md)
+- [attio_data_model.md](references/attio_data_model.md) — Attio beta (note-based, exploratory)
+- [close_data_model.md](references/close_data_model.md) — Close beta (activity-based, exploratory)
 - [prompt_library.md](references/prompt_library.md)
 - [examples/](references/examples/) — end-to-end preflight and analysis examples

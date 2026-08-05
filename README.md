@@ -2,7 +2,7 @@
 
 Public [Agent Skills](https://agentskills.io) for OutboundSync — installable with [`npx skills`](https://github.com/vercel-labs/skills).
 
-The pack ships **14** skills.
+The pack ships **15** skills.
 
 ### API & launch
 
@@ -13,6 +13,12 @@ The pack ships **14** skills.
 | `sync-monitoring` | [`skills/sync-monitoring/`](skills/sync-monitoring/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Diagnose Sync Monitoring Webhooks/events; mutations only after explicit confirmation |
 | `crm-analysis` | [`skills/crm-analysis/`](skills/crm-analysis/) | No | Read-only analysis of OutboundSync engagement signals already in HubSpot or Salesforce |
 
+### Targeting & lists
+
+| Skill | Path | Needs API key? | What it does |
+| --- | --- | --- | --- |
+| `list-building` | [`skills/list-building/`](skills/list-building/) | No | Plan or audit list building — signal, database, and waterfall-enrichment sourcing motions |
+
 ### Copy & identity
 
 | Skill | Path | Needs API key? | What it does |
@@ -22,7 +28,7 @@ The pack ships **14** skills.
 | `cold-email-body` | [`skills/cold-email-body/`](skills/cold-email-body/) | No | Draft and audit cold email body copy |
 | `connection-requests` | [`skills/connection-requests/`](skills/connection-requests/) | No | Draft and audit professional-social connection requests |
 | `email-aliases` | [`skills/email-aliases/`](skills/email-aliases/) | No | Audit and set up sending mailbox identity / aliases |
-| `omnichannel-campaigns` | [`skills/omnichannel-campaigns/`](skills/omnichannel-campaigns/) | No | Structure email + LinkedIn/social outbound sequences |
+| `omnichannel-campaigns` | [`skills/omnichannel-campaigns/`](skills/omnichannel-campaigns/) | No | Structure email + B2B social outbound sequences |
 
 ### Deliverability
 
@@ -49,6 +55,9 @@ npx skills add outboundsync/skills --skill preflight -g
 npx skills add outboundsync/skills --skill sync-monitoring -g
 npx skills add outboundsync/skills --skill crm-analysis
 
+# Targeting & lists
+npx skills add outboundsync/skills --skill list-building
+
 # Copy & identity
 npx skills add outboundsync/skills --skill outbound-offer
 npx skills add outboundsync/skills --skill cold-email-subject-lines
@@ -69,13 +78,27 @@ npx skills add outboundsync/skills --skill integrations
 npx skills add outboundsync/skills --skill crm-analysis -a openclaw -g
 ```
 
-Try without installing:
+Try without installing — every skill runs this way; only the API & launch group needs an OutboundSync account:
 
 ```bash
+# API & launch (need OUTBOUNDSYNC_API_KEY)
 npx skills use outboundsync/skills --skill api
 npx skills use outboundsync/skills --skill preflight
 npx skills use outboundsync/skills --skill sync-monitoring
+
+# Account-free — no OutboundSync API key required
+npx skills use outboundsync/skills --skill crm-analysis
+npx skills use outboundsync/skills --skill list-building
+npx skills use outboundsync/skills --skill outbound-offer
+npx skills use outboundsync/skills --skill cold-email-subject-lines
+npx skills use outboundsync/skills --skill cold-email-body
+npx skills use outboundsync/skills --skill connection-requests
+npx skills use outboundsync/skills --skill email-aliases
 npx skills use outboundsync/skills --skill omnichannel-campaigns
+npx skills use outboundsync/skills --skill email-authentication
+npx skills use outboundsync/skills --skill sending-domain-quality
+npx skills use outboundsync/skills --skill agencies
+npx skills use outboundsync/skills --skill integrations
 ```
 
 ## OpenClaw marketplace (optional)

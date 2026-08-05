@@ -1,11 +1,12 @@
 ---
 name: omnichannel-campaigns
 description: >-
-  Structure omnichannel outbound campaigns across email and LinkedIn/social:
-  channel roles, sequence timing, handoffs, and safe volume. Use when the user
-  asks how to combine email and LinkedIn, build a multi-channel sequence,
-  omnichannel outbound plan, social plus email cadence, or coordinate cold email
-  with connection requests. No OutboundSync API key.
+  Structure omnichannel outbound campaigns across email and B2B social
+  networking: channel roles, sequence timing, handoffs, and safe volume. Use
+  when the user asks how to combine email and B2B social (professional
+  networking sites), build a multi-channel sequence, omnichannel outbound plan,
+  social plus email cadence, or coordinate cold email with connection requests.
+  No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
@@ -14,11 +15,11 @@ metadata:
 
 # Omnichannel campaigns (email + social)
 
-Plan email + LinkedIn/social outbound as one system. Draft plans and scorecards only — never send, schedule, activate campaigns, or mutate CRM/SEP data.
+Plan email + B2B social networking (professional social platforms) outbound as one system. Draft plans and scorecards only — never send, schedule, activate campaigns, or mutate CRM/SEP data.
 
 Render **only** the selected output shape. No invented metrics, scarcity, or case-study numbers the user did not provide.
 
-**Note:** OutboundSync best practices, shared freely and without warranty — see [DISCLAIMER.md](../../DISCLAIMER.md). Cite public patterns from practitioners below; do **not** paste copyrighted course modules or private playbooks.
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## When to use adjacent skills
 
@@ -42,7 +43,7 @@ Infer from the ask. If both needed, Audit then Draft.
 
 ## Design principles (patterns, not prescriptions)
 
-Encode these as checks — attribute as industry patterns inspired by public teaching from practitioners such as Enzo Carasso (C17), Eric Nowoslawski (Growth Engine X), Josh Whitfield, Nikola Velkovski / HeyReach, and Kellen Casebeer (The Deal Lab). Do not invent their metrics.
+Encode these as checks. Treat them as widely-taught industry patterns, not proprietary playbooks — describe the technique itself, and never invent metrics or attribute claims to specific people or companies.
 
 1. **One job per touch** — each step has a single job (open a loop, earn a connect, bump, break up).
 2. **Channel fit** — email for async narrative + CTA; social for familiarity, soft bumps, and relationship context — not a second identical pitch dump.
@@ -61,11 +62,11 @@ Collect or mark missing:
 
 - ICP / persona
 - Offer + soft CTA (or run `outbound-offer` first)
-- Channels in scope (email, LinkedIn, other)
+- Channels in scope (email, B2B social networking sites, other)
 - Assets available (case study, resource, personalization signals)
 - Constraints (daily send caps, seat count, compliance notes the user states)
 
-## Output shapes
+## Output contract
 
 ### Quick (default for “build me a sequence”)
 
@@ -73,7 +74,7 @@ Collect or mark missing:
 ## Omnichannel plan
 
 - Goal: <one line>
-- Channels: <email · LinkedIn · …>
+- Channels: <email · B2B social · …>
 - Spine: <Day/step list — max 8 steps — channel · job · asset>
 - Handoff: <what stops the sequence>
 - Watchouts: <volume / compliance / missing inputs — one line each>

@@ -26,7 +26,7 @@ Product how-to: https://outboundsync.com/docs/webhooks/
 Signatures: https://outboundsync.com/docs/webhooks/payloads-and-signatures/  
 API contract: https://outboundsync.com/docs/api/v1/#platform-webhooks-sync-monitoring
 
-**Note:** Best practices shared freely — see [DISCLAIMER.md](../../DISCLAIMER.md).
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## Credentials
 
@@ -38,6 +38,8 @@ API contract: https://outboundsync.com/docs/api/v1/#platform-webhooks-sync-monit
 See [references/endpoints.md](references/endpoints.md) and [references/event-types.md](references/event-types.md).
 
 ## Write confirmation protocol
+
+This skill follows the repo-wide [write-on-confirm protocol](../../SECURITY.md#write-on-confirm-protocol) — it is currently the only skill in the pack that mutates OutboundSync state.
 
 Mutations = `POST`/`PATCH`/`DELETE` on `/webhooks*`, plus `rotate-secret`, `test`, `replay`.
 

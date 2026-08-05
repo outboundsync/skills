@@ -26,6 +26,18 @@ This repository is documentation-only Agent Skills (instruction packs). It ships
 - Webhook signing secrets (`oswhsec_…`) appear once on create/rotate — instruct the user to store them immediately; never re-echo into logs, commits, or later prompts.
 - Treat `sources[].url` / `destinations[].url` as sensitive in `preflight` and `api` (full paste only under `Next` when needed).
 
+## Write-on-confirm protocol
+
+Skills default to read-only. Any skill that mutates OutboundSync or CRM state MUST follow this protocol — `sync-monitoring` is the first, and the standard exists so every future write-capable skill stays consistent and unsurprising.
+
+1. **Diagnose first.** The default path is read-only (GETs / analysis). Never mutate as a side effect of a read request.
+2. **State the plan.** Before any mutation, print a one-line plan naming the method, path, and effect — e.g. `Will POST /webhooks registering https://example.com/hook for sync.failed + sync.recovered`.
+3. **Require explicit confirmation of that plan.** Proceed only when the user confirms the specific plan shown. Vague asks (“set up webhooks”, “fix deliveries”) are not confirmation — diagnose and propose the plan instead.
+4. **Handle secrets once.** Secrets returned by a mutation (e.g. webhook signing secrets `oswhsec_…`) are shown once with a store-now instruction, then never re-echoed into logs, commits, or later prompts.
+5. **Report real errors.** On `401` / `403` / `429`, explain the response body and the shortest fix. Never invent admin flags, UI probes, or capabilities absent from the response.
+
+A skill that declares write capability must document exactly which calls are mutations and keep that list aligned with its actual behavior.
+
 ## Read-only DNS / HTTP reputation lookups
 
 `email-authentication` and `sending-domain-quality` instruct the agent to perform **read-only** outbound lookups against public resolvers and registries:
