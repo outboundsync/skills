@@ -72,6 +72,7 @@ Light introspection when the user asks what the key can see or how to start:
 3. `GET /account/status`
 4. `GET /sources` (paginate; elide sensitive URLs unless pasting)
 5. `GET /destinations/reply-relays`
+6. `GET /contacts/outreach` (prior-outreach lookup by `email` and/or social `profileUrl`; 600/60s bucket)
 
 Do **not** run the full preflight gauge here. Do **not** mutate webhooks here — hand off to `sync-monitoring`.
 

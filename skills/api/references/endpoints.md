@@ -26,6 +26,7 @@ Also: `GET /health/live`, `GET /health/ready` (host root, not under `/api/v1`).
 | `GET /connections` | OAuth status + `capabilities{sync,destinations,blocklists}` |
 | `GET /sources` | Inbound Sources; config; forwarding destinations; bound reply relay |
 | `GET /destinations/reply-relays` | Reply-relay catalog for accessible connections |
+| `GET /contacts/outreach` | Prior-outreach summary by `email` and/or social `profileUrl` (max 5, OR-unioned); 600/60s bucket |
 
 ## Sync Monitoring (see also `sync-monitoring` skill)
 
