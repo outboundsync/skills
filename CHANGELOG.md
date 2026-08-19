@@ -10,6 +10,8 @@ This project uses Calendar Versioning with tags in the format `YYYY.MM.DD.N`.
 
 ### Features
 
+- Add `GET /contacts/outreach` prior-outreach lookup to the `api` skill (query rules, OR-union, DNC vs reserved blocklists, optional keep/skip only when the user gives a cadence).
+- Catch up the `api` skill GET observability map: destination catalog, account metrics, requests/syncs/deliveries (write retry/replay stay listed as not this skill).
 - Add `api` Agent Skill — OutboundSync API v1 umbrella (auth, vocabulary, discovery, routing).
 - Add `sync-monitoring` Agent Skill — Sync Monitoring Webhooks/events diagnose; mutations only after explicit confirmation.
 - Add `omnichannel-campaigns` Agent Skill — email + B2B social sequence planning.
