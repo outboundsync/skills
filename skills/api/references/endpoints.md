@@ -32,6 +32,8 @@ Also: `GET /health/live`, `GET /health/ready` (host root, not under `/api/v1`).
 | `GET /contacts/outreach` | Prior-outreach summary by `email` and/or `profileUrl` (max 5, OR-unioned); neither / invalid / >5 → **400**; 600/60s bucket. Contract: [contacts-outreach.md](contacts-outreach.md) |
 | `GET /blocklists` | CRM→SEP blocklist **sync configs**; optional `connectionId`; `{ "blocklists": [] }` (**not** 404) when that id is outside access. Zero API-enabled connections → auth **403** (not an empty list). Named wrapper, not a date-range page. Connection-scoped keys may call this (unlike `/webhooks*`). Distinct from `contacts/outreach` `blocklists.*`. |
 
+Each list item: `id`, `connectionId`, `listName`, `crm` (string or null), `platform`, `blockType` (`ADDRESS`\|`DOMAIN`), `status` (`CREATED`\|`FETCHING`\|`SYNCING`\|`SYNCED`\|`SYNCING_NEW_CONTACTS`), `isEnabled`, `clientId`, `syncedCount`, `pendingCount`, `lastFetchedAt`, `lastError`, `lastAttemptedAt`, `createdAt`. Treat `lastError` like `/account/status` operational text — do not dump unless debugging that list.
+
 ## Pipeline observability (read; date range)
 
 | Method + path | Notes |

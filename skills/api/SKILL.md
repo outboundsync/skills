@@ -39,7 +39,7 @@ Thin map: [references/endpoints.md](references/endpoints.md). Prior-outreach con
 | --- | --- |
 | Header | `Authorization: Bearer osapi_…` |
 | Default scope | `read` (GETs) |
-| Mutations | Require `write` on the key (`POST`/`PATCH`/`DELETE`, rotate, test, replay) — **not this skill** |
+| Mutations | Require `write` on the key (`POST`/`PATCH`/`DELETE`, rotate, test, replay, blocklist pause/resync) — **not this skill** |
 | Account-scoped key | Sees all connections; **required** for `/webhooks*` |
 | Connection-scoped key | Sees one connection; fine for introspection + narrowed `/events`; **403** on `/webhooks*` |
 | Rate limits | Honor `429` + `Retry-After`; `GET /contacts/outreach` has a dedicated 600/60s bucket |
@@ -91,7 +91,7 @@ When the user asks about a contact, prior outreach, already contacted, or skip/d
 
 When the user asks about blocklist syncs, suppression lists, pause, or resync:
 
-- `GET /blocklists` (optional `connectionId`). Named `{ "blocklists": [...] }` — not a date-range page. Connection id outside access → empty list, **not** 404. Zero API-enabled connections → auth **403** (same as other authenticated `/api/v1` routes). `lastError` may contain vendor text — do not dump unless debugging that list.
+- `GET /blocklists` (optional `connectionId`). Named `{ "blocklists": [...] }` — not a date-range page. Connection id outside access → empty list, **not** 404. Zero API-enabled connections → auth **403** (same as other authenticated `/api/v1` routes). Resource fields and status enums: [references/endpoints.md](references/endpoints.md). `lastError` may contain vendor text — do not dump unless debugging that list.
 - Do **not** `POST` pause or resync from this skill.
 
 Do **not** run the full preflight gauge here. Do **not** mutate `/webhooks*` here — hand off to `sync-monitoring`.
