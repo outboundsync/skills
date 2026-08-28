@@ -11,7 +11,7 @@ compatibility: >-
   Optional MXTOOLBOX_API_KEY or a DNS MCP for richer checks.
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Email authentication audit
@@ -20,12 +20,18 @@ Run **read-only**. Public DNS lookups only (shell/HTTP). Never mutate DNS, regis
 
 Render **only** the fixed output shape in this skill — no prose outside it.
 
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+
 ## Scope and safety
 
 - Evaluate one or more sending domains supplied by the user (or discovered from context). Ask which domain(s) if ambiguous.
 - Read-only DNS. No zone edits, no ESP writes, no "fix it for me" mutations.
 - Optional paid/API tools are enrichment only — default path is free DoH/`dig`.
 - **Unverified ≠ empty.** If a lookup fails (timeout, NXDOMAIN ambiguity from resolver error, HTTP 5xx, missing key for an optional API you attempted), mark that record **UNVERIFIED**. Never treat a failed lookup as a silent ✓ pass or as "record absent."
+
+## 2024 bulk-sender rules (Gmail / Yahoo)
+
+Google and Yahoo's Feb-2024 requirements make **DMARC** (at minimum `p=none` with alignment) mandatory for bulk senders (~5,000+ messages/day to their users), alongside one-click **List-Unsubscribe** (RFC 8058 `List-Unsubscribe: <mailto>, <https>` + `List-Unsubscribe-Post`) and a spam-complaint rate kept **under 0.3%** (Postmaster Tools). This skill audits the DNS half (SPF/DKIM/DMARC + alignment); the List-Unsubscribe header and complaint rate are set at the **ESP**, not in DNS — report them as **out-of-band checks** (`UNVERIFIED` here), never as DNS records. True 1:1 cold outbound usually sits below the bulk threshold, but DMARC and one-click unsubscribe are still recommended for cold B2B.
 
 ## How to look this up
 

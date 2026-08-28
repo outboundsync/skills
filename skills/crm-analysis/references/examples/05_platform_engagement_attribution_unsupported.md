@@ -9,19 +9,19 @@
 "Is Instantly or Smartlead driving better engagement?"
 
 ## Available fields (sample)
-- `OSLast OpenTime__c`
-- `OSLast ReplyTime__c`
-- Missing: `OSLast UpdateSource__c`
+- `OSLastOpenTime__c`
+- `OSLastReplyTime__c`
+- Missing: `OSLastUpdateSource__c`
 
 ## Compact preflight output
 - `Intent:` platform_engagement_attribution
 - `Mode:` strict
 - `Verdict:` UNSUPPORTED
 - `Confidence:` high
-- `Missing fields:` `OSLast UpdateSource__c`
+- `Missing fields:` `OSLastUpdateSource__c`
 - `Fallback plan:` none
 
 ## Example response output
 - Unsupported for strict platform attribution.
-- Required data to proceed: `OSLast UpdateSource__c`.
+- Required data to proceed: `OSLastUpdateSource__c`.
 - No platform ranking is produced.

@@ -33,7 +33,7 @@
 
 **Removal test:** Delete the personalized line. If the email still stands as a coherent blast, personalization was decorative → cap this category at 12.
 
-Directional: signal-led ≈ **11% reply** vs generic ≈ **2%** (~5×).
+Directional: signal-led personalization tends to materially outperform generic copy — often several-fold on reply rate.
 
 ## Structure (20)
 
@@ -48,7 +48,7 @@ Directional: signal-led ≈ **11% reply** vs generic ≈ **2%** (~5×).
 
 | Score | Rule |
 | --- | --- |
-| 15 | One soft interest CTA; single-ask (~9.1% vs multi ~2.4% directional) |
+| 15 | One soft interest CTA; a single clear ask outperforms stacking multiple asks |
 | 8 | Soft but buried or slightly long |
 | 4 | Hard ask (demo/calendar) alone |
 | 0 | Stacked CTAs, “reply YES”, or no ask |
@@ -57,7 +57,7 @@ Directional: signal-led ≈ **11% reply** vs generic ≈ **2%** (~5×).
 
 | Score | Rule |
 | --- | --- |
-| 15 | Plain text; zero links/images/attachments on touch 1; advise open pixel OFF + link tracking off (+2–10 pts placement) |
+| 15 | Plain text; zero links/images/attachments on touch 1; advise open pixel OFF + link tracking off (tracking tends to dent inbox placement) |
 | 8 | One mild signature link only (still flag for touch 1) |
 | 0 | Images, attachments, tracked links, or pixel-on cold send |
 
@@ -71,7 +71,7 @@ Directional: signal-led ≈ **11% reply** vs generic ≈ **2%** (~5×).
 
 ## Automatic fail flags (annotate even if points remain)
 
-- “I hope this finds you well” (−47% replies directional)
+- “I hope this finds you well” (filler opener that depresses replies)
 - Calendar link on touch 1
 - Congrats-opener flattery with no operational signal
 - Multi-ask CTA block

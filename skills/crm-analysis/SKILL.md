@@ -9,16 +9,18 @@ description: >-
   or unsubscribe trends, how platforms like Instantly, Smartlead, EmailBison, or
   HeyReach are performing, or how OutboundSync engagement lands in HubSpot,
   Salesforce, Attio, or Close. Also handles exploratory HeyReach social signal
-  analysis. Read-only, local-only, deterministic preflight routing.
+  analysis. Read-only, local-only, deterministic preflight routing. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.1.0"
+  version: "1.1.2"
 ---
 
 # CRM analysis (HubSpot + Salesforce, plus Attio & Close beta)
 
 Analyze OutboundSync engagement signals already present in HubSpot or Salesforce (full `os_*` field dictionaries), or Attio and Close (lighter-touch, note/activity-based — beta). Read-only and local-only — no CRM mutations, no OutboundSync API key, no remote scripts.
+
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## What you can ask
 
@@ -41,7 +43,7 @@ Analyze OutboundSync engagement signals already present in HubSpot or Salesforce
 ## Operating modes
 
 - `strict` (default): deterministic intent routing and preflight contract from [references/router_contract.yaml](references/router_contract.yaml). Six production intents. **HubSpot and Salesforce only** — they expose queryable `os_*` fields.
-- `exploratory` (explicit opt-in): best-effort analysis with explicit limitations when strict mode returns `PARTIAL` or `UNSUPPORTED`, for social-only HeyReach signals, or for **Attio and Close** — which store engagement as notes/activities rather than queryable fields (see [references/attio_data_model.md](references/attio_data_model.md) and [references/close_data_model.md](references/close_data_model.md)).
+- `exploratory` (explicit opt-in): best-effort analysis with explicit limitations when strict mode returns `PARTIAL` or `UNSUPPORTED`, for social-only HeyReach signals, or for **Attio and Close** — which store engagement as notes/activities rather than the queryable `os_*` fields HubSpot and Salesforce expose (Attio can optionally also provision a structured engagement object — see [references/attio_data_model.md](references/attio_data_model.md) and [references/close_data_model.md](references/close_data_model.md)).
 
 ## Directing your agent
 

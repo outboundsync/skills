@@ -36,7 +36,7 @@ intents:
           - [os_last_campaign_name, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast CampaignName__c, OSLast ReplyTime__c]
+          - [OSLastCampaignName__c, OSLastReplyTime__c]
     fallback_requirements:
       hubspot:
         any_of:
@@ -44,11 +44,11 @@ intents:
           - [os_last_campaign_name]
       salesforce:
         any_of:
-          - [OSLast CampaignName__c]
+          - [OSLastCampaignName__c]
     unsupported_conditions: []
     optional_fields:
       hubspot: [os_last_update_source, os_last_sent_time]
-      salesforce: [OSLast UpdateSource__c, OSLast SentTime__c]
+      salesforce: [OSLastUpdateSource__c, OSLastSentTime__c]
     fallback_steps:
       - Rank campaigns by contact volume only.
       - State missing reply-time limitation.
@@ -63,7 +63,7 @@ intents:
           - [os_last_campaign_name, os_number_of_email_opens, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast CampaignName__c, OSLast OpenTime__c, OSLast ReplyTime__c]
+          - [OSLastCampaignName__c, OSLastOpenTime__c, OSLastReplyTime__c]
     fallback_requirements:
       hubspot:
         any_of:
@@ -71,12 +71,12 @@ intents:
           - [os_last_campaign_name, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast CampaignName__c, OSLast OpenTime__c]
-          - [OSLast CampaignName__c, OSLast ReplyTime__c]
+          - [OSLastCampaignName__c, OSLastOpenTime__c]
+          - [OSLastCampaignName__c, OSLastReplyTime__c]
     unsupported_conditions: []
     optional_fields:
       hubspot: [os_number_of_email_link_clicks, os_last_link_click_time]
-      salesforce: [OSLast LinkClickTime__c]
+      salesforce: [OSLastLinkClickTime__c]
     fallback_steps:
       - Use available open or reply signal only.
       - In Salesforce, state open-count limitation and use open-time proxy.
@@ -91,14 +91,14 @@ intents:
           - [os_last_campaign_name, os_last_sent_time, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast CampaignName__c, OSLast SentTime__c, OSLast ReplyTime__c]
+          - [OSLastCampaignName__c, OSLastSentTime__c, OSLastReplyTime__c]
     fallback_requirements:
       hubspot:
         any_of:
           - [os_last_campaign_name, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast CampaignName__c, OSLast ReplyTime__c]
+          - [OSLastCampaignName__c, OSLastReplyTime__c]
     unsupported_conditions: []
     optional_fields:
       hubspot: [os_last_email_sequence_step]
@@ -117,7 +117,7 @@ intents:
           - [os_number_of_email_opens, os_last_link_click_time, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast OpenTime__c, OSLast LinkClickTime__c, OSLast ReplyTime__c]
+          - [OSLastOpenTime__c, OSLastLinkClickTime__c, OSLastReplyTime__c]
     fallback_requirements:
       hubspot:
         any_of:
@@ -125,11 +125,11 @@ intents:
           - [os_number_of_email_opens, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast OpenTime__c, OSLast ReplyTime__c]
+          - [OSLastOpenTime__c, OSLastReplyTime__c]
     unsupported_conditions: []
     optional_fields:
       hubspot: [os_last_campaign_name, os_last_sent_time]
-      salesforce: [OSLast CampaignName__c, OSLast SentTime__c]
+      salesforce: [OSLastCampaignName__c, OSLastSentTime__c]
     fallback_steps:
       - Prioritize by opens plus recency when click signals are missing.
       - Exclude recent repliers unless explicitly requested.
@@ -145,8 +145,8 @@ intents:
           - [os_last_update_source, os_last_reply_time]
       salesforce:
         any_of:
-          - [OSLast UpdateSource__c, OSLast OpenTime__c]
-          - [OSLast UpdateSource__c, OSLast ReplyTime__c]
+          - [OSLastUpdateSource__c, OSLastOpenTime__c]
+          - [OSLastUpdateSource__c, OSLastReplyTime__c]
     fallback_requirements:
       hubspot:
         any_of: []
@@ -157,11 +157,11 @@ intents:
           hubspot:
             missing_any: [os_last_update_source]
           salesforce:
-            missing_any: [OSLast UpdateSource__c]
+            missing_any: [OSLastUpdateSource__c]
         reason: missing_update_source
     optional_fields:
       hubspot: [os_number_of_email_link_clicks]
-      salesforce: [OSLast LinkClickTime__c]
+      salesforce: [OSLastLinkClickTime__c]
     fallback_steps:
       - Do not attribute by platform when update source is missing.
       - Return explicit limitation and required field.
@@ -176,7 +176,7 @@ intents:
           - [os_last_bounce_time, os_last_unsubscribe_time, os_last_sent_time, os_last_sent_address]
       salesforce:
         any_of:
-          - [OSLast BounceTime__c, OSLast UnsubscribeTime__c, OSLast SentTime__c, OSLast SentAddress__c]
+          - [OSLastBounceTime__c, OSLastUnsubscribeTime__c, OSLastSentTime__c, OSLastSentAddress__c]
     fallback_requirements:
       hubspot:
         any_of:
@@ -185,13 +185,13 @@ intents:
           - [os_last_unsubscribe_time, os_last_sent_time]
       salesforce:
         any_of:
-          - [OSLast BounceTime__c, OSLast UnsubscribeTime__c, OSLast SentTime__c]
-          - [OSLast BounceTime__c, OSLast SentTime__c]
-          - [OSLast UnsubscribeTime__c, OSLast SentTime__c]
+          - [OSLastBounceTime__c, OSLastUnsubscribeTime__c, OSLastSentTime__c]
+          - [OSLastBounceTime__c, OSLastSentTime__c]
+          - [OSLastUnsubscribeTime__c, OSLastSentTime__c]
     unsupported_conditions: []
     optional_fields:
       hubspot: [os_last_campaign_name]
-      salesforce: [OSLast CampaignName__c]
+      salesforce: [OSLastCampaignName__c]
     fallback_steps:
       - Analyze deliverability at campaign or aggregate level without sent-address breakdown.
       - If only bounce or unsubscribe data is available, analyze the available signal only and state which signal is missing.

@@ -4,11 +4,11 @@ description: >-
   Help choose an outbound integration using OutboundSync's integrations
   directory. Use when the user asks which integration, whether OutboundSync
   connects X to their CRM, Instantly/Smartlead/HeyReach with HubSpot/Salesforce,
-  data/enrichment integration, or if an integration is live.
+  data/enrichment integration, or if an integration is live. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # OutboundSync integrations directory helper
@@ -16,6 +16,8 @@ metadata:
 Read-only advisory. Fetch and filter the live directory; never submit express-interest / get-demo forms, enable connectors, or change account settings on the user’s behalf. Never invent Availability, sync direction, or connection type.
 
 Render **only** the fixed output shape in this skill — no prose outside it.
+
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## Design tenet
 

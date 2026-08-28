@@ -1,7 +1,7 @@
 # Spam / sales word list (subjects)
 
-Directional benchmarks: sales/spam words ≈ **−17.9% opens** and **2+**
-high-risk triggers ≈ **73% lower inbox placement** in the source context.
+Directional: sales/spam words tend to depress opens, and stacking **2+**
+high-risk triggers can sharply reduce inbox placement.
 These are priors, not universal causal rules; sender reputation, audience, and
 message context take precedence.
 

@@ -4,12 +4,13 @@ description: >-
   Audit or draft cold-outreach offers and CTAs using a value-equation rubric,
   micro-commitment ladder, and soft-CTA defaults. Use when the user asks to
   audit my offer, is this a good offer/CTA, why is nobody replying to my offer,
-  write/improve my cold email offer, what should I ask for, or wants a complete
-  cold email and the offer must be established before drafting the body.
+  write/improve my cold email offer, or what should I ask for. For a complete
+  cold email, `cold-email-body` coordinates and calls this skill to establish
+  the offer/CTA first — it is not the entry point for full-email requests. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Outbound offer (audit + draft)
@@ -24,6 +25,8 @@ proof is missing.
 For a full-email request, establish the offer and CTA first, then apply the
 body and subject-line skills when available. Never block if an adjacent skill
 is unavailable; return this skill's part and state the remaining inputs needed.
+
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## Modes
 
@@ -52,8 +55,8 @@ Patterns and ladders: [references/cta-patterns.md](references/cta-patterns.md).
 
 ### Soft CTA defaults
 
-- Soft CTA default (reply ~4.2% vs hard book a demo ~1.4%, ~3×).
-- One CTA only (up to ~371% higher CTR).
+- Soft CTA default — a low-friction reply ask typically outperforms an immediate demo ask, often several-fold.
+- One CTA only — competing CTAs dilute response.
 - CTA < ~15 words, standalone line.
 
 These figures are directional benchmarks, not universal promises. Apply them

@@ -1,0 +1,15 @@
+# Secrets — never commit API keys (see README.md / SECURITY.md)
+.env
+.env.*
+!.env.example
+
+# Node (scripts/release-calver.mjs)
+node_modules/
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/

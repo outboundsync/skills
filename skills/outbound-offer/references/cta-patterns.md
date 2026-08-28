@@ -2,17 +2,17 @@
 
 ## Soft vs hard (defaults)
 
-| Type | Example shape | Observed reply band (directional) |
+| Type | Example shape | Relative reply rate (directional) |
 | --- | --- | --- |
-| Soft | Interest / relevance check | ~4.2% reply |
-| Hard | Book a demo / schedule now | ~1.4% reply |
+| Soft | Interest / relevance check | higher |
+| Hard | Book a demo / schedule now | lower |
 
-Soft default ≈ **~3×** hard on cold touch 1. Prefer soft unless the user explicitly requests a later-touch hard ask.
+Soft asks tend to outperform hard asks on cold touch 1 (often several-fold). Prefer soft unless the user explicitly requests a later-touch hard ask.
 
 ## One CTA only
 
 - Exactly **one** ask per message.
-- One CTA correlates with up to **~371% higher CTR** vs stacked asks (directional).
+- One CTA tends to outperform stacked asks — competing CTAs dilute response (directional).
 - CTA length: **< ~15 words**, on its **own line**.
 
 ## Micro-commitment ladder

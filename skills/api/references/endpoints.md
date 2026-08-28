@@ -39,8 +39,10 @@ Each list item: `id`, `connectionId`, `listName`, `crm` (string or null), `platf
 | Method + path | Notes |
 | --- | --- |
 | `GET /requests` | Inbound receipts; `from`/`to` required (max 31 days); sourceId?, cursor?, limit? |
+| `GET /sources/:id/requests` | Same as `GET /requests` scoped to one source (nested equivalent of the `sourceId` filter) |
 | `GET /requests/metrics` | `{ count }`; `from`/`to` required (max 31 days) |
 | `GET /syncs` | CRM sync attempts; `from`/`to` required (max 31 days); status?, sourceId?, connectionId? |
+| `GET /sources/:id/syncs` | Same as `GET /syncs` scoped to one source (nested equivalent of the `sourceId` filter) |
 | `GET /syncs/metrics` | `{ success, warning, error }`; `from`/`to` required (max 31 days) |
 | `GET /syncs/:id` | One sync (no date range) |
 | `POST /syncs/:id/retry` | **write — not this skill** — Error HubSpot/Salesforce only |

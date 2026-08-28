@@ -20,7 +20,7 @@
 | 8 | Note present but weakly justified |
 | 0 | Generic note (“I’d love to connect / expand my network”) |
 
-Directional: specific note ≈ **+45–72%** acceptance vs weak baselines; ~**2×** post-accept reply. Blank can beat generic.
+Directional: a specific note lifts acceptance markedly vs weak baselines and roughly doubles post-accept reply. Blank can beat generic.
 
 ## Personalization (25)
 

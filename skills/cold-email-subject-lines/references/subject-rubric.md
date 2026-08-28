@@ -8,7 +8,7 @@ Score each subject out of **20**. Verdict bands: **16–20 keep** · **10–15 r
 | --- | --- | --- |
 | 4 | Length | 1–4 words **and** < ~40 characters |
 | 4 | Front-load | Meaningful token in first ~35–38 chars (survives mobile truncate) |
-| 3 | Lowercase | Entirely lowercase (internal-note look; +~21% opens directional) |
+| 3 | Lowercase | Entirely lowercase (internal-note look; tends to lift opens) |
 | 3 | Specificity | Segment or trigger token (role, event, metric, tool) — not only `{{first_name}}` |
 | 3 | Clarity | Clear topic; no manufactured curiosity / clickbait |
 | 3 | Clean | No spam/sales words, ALL CAPS, !!!, emoji, fake Re:/Fwd:, empty |
@@ -18,8 +18,8 @@ Score each subject out of **20**. Verdict bands: **16–20 keep** · **10–15 r
 | Hit | Deduction |
 | --- | --- |
 | Each spam/sales trigger word | −2 (see spam-word-list) |
-| 2+ high-risk spam/sales trigger words | −4 and manual review (≈73% lower inbox placement in a directional benchmark); do not auto-kill clear, relevant language without context |
-| Emoji | −3 (opens ~42%→37% directional) |
+| 2+ high-risk spam/sales trigger words | −4 and manual review (stacking triggers can sharply cut inbox placement); do not auto-kill clear, relevant language without context |
+| Emoji | −3 (tends to lower opens) |
 | ALL CAPS (any word ≥3 letters) | −3 |
 | `!` or `!!!` | −2 |
 | Fake `Re:` / `Fwd:` | −5 + kill |

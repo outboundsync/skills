@@ -9,10 +9,10 @@
 "Which campaigns show high opens but low replies?"
 
 ## Available fields (sample)
-- `OSLast CampaignName__c`
-- `OSLast OpenTime__c`
-- `OSLast ReplyTime__c`
-- `OSLast LinkClickTime__c`
+- `OSLastCampaignName__c`
+- `OSLastOpenTime__c`
+- `OSLastReplyTime__c`
+- `OSLastLinkClickTime__c`
 
 ## Compact preflight output
 - `Intent:` high_opens_low_replies

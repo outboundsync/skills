@@ -23,7 +23,7 @@ PARSER_BACKEND=""
 
 echo "1) Validating router YAML syntax..."
 if command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
-  python3 -c "import yaml, sys; yaml.safe_load(open(sys.argv[1]))" "$ROUTER_YAML" >/dev/null
+  python3 -c "import yaml, sys; yaml.safe_load(open(sys.argv[1], encoding='utf-8'))" "$ROUTER_YAML" >/dev/null
   PARSER_BACKEND="python"
 elif command -v ruby >/dev/null 2>&1; then
   ruby -ryaml -e 'YAML.load_file(ARGV[0])' "$ROUTER_YAML" >/dev/null
@@ -115,7 +115,7 @@ while IFS= read -r skill_md; do
   ' "$skill_md" > "$frontmatter_yaml"
 
   if [[ "$PARSER_BACKEND" == "python" ]]; then
-    if ! python3 -c 'import sys, yaml; data=yaml.safe_load(open(sys.argv[1])); assert isinstance(data, dict)' "$frontmatter_yaml" >/dev/null 2>&1; then
+    if ! python3 -c 'import sys, yaml; data=yaml.safe_load(open(sys.argv[1], encoding="utf-8")); assert isinstance(data, dict)' "$frontmatter_yaml" >/dev/null 2>&1; then
       echo "ERROR: $skill_md has invalid YAML frontmatter." >&2
       exit 1
     fi
@@ -194,9 +194,9 @@ import sys
 import yaml
 
 router_path, hub_path, sf_path = sys.argv[1:4]
-router = yaml.safe_load(open(router_path))
-hub_text = open(hub_path).read()
-sf_text = open(sf_path).read()
+router = yaml.safe_load(open(router_path, encoding='utf-8'))
+hub_text = open(hub_path, encoding='utf-8').read()
+sf_text = open(sf_path, encoding='utf-8').read()
 
 hub_fields = set(re.findall(r'`(os_[a-z0-9_]+)`', hub_text))
 sf_fields = set(re.findall(r'`([^`]*__c)`', sf_text))
@@ -245,8 +245,8 @@ require 'set'
 
 router_path, hub_path, sf_path = ARGV
 router = YAML.load_file(router_path)
-hub_text = File.read(hub_path)
-sf_text = File.read(sf_path)
+hub_text = File.read(hub_path, encoding: 'UTF-8')
+sf_text = File.read(sf_path, encoding: 'UTF-8')
 
 hub_fields = hub_text.scan(/`(os_[a-z0-9_]+)`/).flatten.to_set
 sf_fields = sf_text.scan(/`([^`]*__c)`/).flatten.to_set
@@ -374,4 +374,47 @@ while IFS=$'\t' read -r prompt_id mode mapping_type mapping; do
   fi
 done < "$TMP_DIR/prompt_rows.tsv"
 
-echo "PASS: Router contract, semantic field checks, and prompt registry checks succeeded."
+echo "7) Checking CRM field tokens have no embedded whitespace..."
+# Salesforce API names (...__c) and HubSpot internal labels (os_...) never contain
+# spaces. A find/replace artifact once shipped names like `OSLast AppUrl__c`, which
+# every SOQL/field reference would fail on. Catch that class here.
+FIELD_WS_PATTERN='OS[A-Za-z]+ [A-Za-z0-9]+__c|`os_[^`]* [^`]*`'
+if grep -rnE "$FIELD_WS_PATTERN" "$CRM_ANALYSIS_DIR" >/dev/null 2>&1; then
+  echo "ERROR: CRM field name(s) with embedded whitespace (Salesforce/HubSpot API names cannot contain spaces):" >&2
+  grep -rnE "$FIELD_WS_PATTERN" "$CRM_ANALYSIS_DIR" >&2
+  exit 1
+fi
+
+echo "8) Checking every skill carries the disclaimer note..."
+DISCLAIMER_NEEDLE='without warranty of outcomes'
+NOTE_MISSING=0
+while IFS= read -r skill_md; do
+  if ! grep -qF "$DISCLAIMER_NEEDLE" "$skill_md"; then
+    echo "ERROR: $skill_md is missing the disclaimer note (see CONVENTIONS.md)." >&2
+    NOTE_MISSING=1
+  fi
+done < <(find "$ROOT_DIR/skills" -type f -name 'SKILL.md' -not -path '*/.git/*' | sort)
+[[ "$NOTE_MISSING" -eq 0 ]] || exit 1
+
+echo "9) Checking SKILL.md relative links resolve..."
+: > "$TMP_DIR/broken_links.txt"
+while IFS= read -r skill_md; do
+  skill_dir="$(dirname "$skill_md")"
+  while IFS= read -r target; do
+    case "$target" in
+      http://*|https://*|mailto:*|"#"*) continue ;;
+    esac
+    path="${target%%#*}"
+    [[ -z "$path" ]] && continue
+    if [[ ! -e "$skill_dir/$path" ]]; then
+      echo "$skill_md -> $target" >> "$TMP_DIR/broken_links.txt"
+    fi
+  done < <(grep -oE '\]\([^)]+\)' "$skill_md" | sed -E 's/^\]\(//; s/\)$//')
+done < <(find "$ROOT_DIR/skills" -type f -name 'SKILL.md' -not -path '*/.git/*' | sort)
+if [[ -s "$TMP_DIR/broken_links.txt" ]]; then
+  echo "ERROR: Unresolved relative links in SKILL.md files:" >&2
+  cat "$TMP_DIR/broken_links.txt" >&2
+  exit 1
+fi
+
+echo "PASS: Router contract, semantic field checks, field-name hygiene, disclaimer note, links, and prompt registry checks succeeded."

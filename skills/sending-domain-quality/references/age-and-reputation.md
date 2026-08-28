@@ -18,7 +18,17 @@ No guru names, no trademarked framework labels.
 - Prefer waiting at least 14 days before meaningful volume unless controlled
   testing gives stronger evidence.
 - Use the aging window for warmup / low-risk traffic, not full campaigns.
-- **Age explains &lt;1% of placement variance.** Reputation, authentication, and engagement dominate. Never imply that an old domain alone guarantees inbox placement.
+- **Domain age is a weak signal for placement** — reputation, authentication, and engagement dominate. Never imply that an old domain alone guarantees inbox placement.
+
+### Mailbox send volume & warmup ramp
+
+Domain age is only half the picture — per-mailbox sending volume matters as much:
+
+- Hold cold volume to roughly **20–50 emails per mailbox per day** at steady state; pushing one mailbox harder raises spam-filter risk regardless of domain age.
+- **Ramp** new mailboxes over ~2–4 weeks — start low and increase gradually rather than sending full volume on day one.
+- Spread volume across multiple mailboxes / domains instead of maxing one.
+
+These are conservative operating heuristics, not platform limits; the right number depends on list quality, engagement, and complaint rate.
 
 ## Reputation
 

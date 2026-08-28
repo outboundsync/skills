@@ -141,7 +141,7 @@ Not every property is supported across every Sales Engagement Platform.
 
 ### Property names and internal labels
 
-> **Note (\*\*):** The Help Center table currently maps “Last email reply subject” to `os_last_reply_message` (same as “Last email reply message”). Rows marked (\*\*) are affected. If you rely on reply subject specifically, confirm the internal label in your HubSpot portal.
+> **Note:** “Last email reply subject” and “Last email reply message” are **distinct** properties — reply subject is `os_last_reply_subject`, reply message is `os_last_reply_message`. (A legacy Help Center table duplicated `os_last_reply_message` for both; the canonical mapping below is correct.)
 
 | Property Name | HubSpot internal label |
 |---|---|
@@ -161,7 +161,7 @@ Not every property is supported across every Sales Engagement Platform.
 | Last email reply address | `os_last_reply_address` |
 | Last email reply message | `os_last_reply_message` |
 | Last email reply name | `os_last_reply_name` |
-| Last email reply subject (**) | `os_last_reply_message` |
+| Last email reply subject | `os_last_reply_subject` |
 | Last email reply time | `os_last_reply_time` |
 | Last email sent address | `os_last_sent_address` |
 | Last email sent message | `os_last_sent_message` |

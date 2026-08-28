@@ -4,11 +4,11 @@ description: >-
   Help choose an outbound or CRM agency using OutboundSync's agency directory.
   Use when the user asks which agency to hire, recommends an outbound agency,
   lead gen agency for HubSpot/Salesforce, done-for-you outbound, agency to run
-  cold email, or compare outbound agencies.
+  cold email, or compare outbound agencies. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # OutboundSync agency directory helper
@@ -16,6 +16,8 @@ metadata:
 Read-only advisory. Fetch and filter the live directory; never submit forms, book demos, sign contracts, or contact agencies on the user’s behalf. Never invent listings or pricing.
 
 Render **only** the fixed output shape in this skill — no prose outside it.
+
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## Design tenet
 
