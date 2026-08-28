@@ -4,11 +4,11 @@ description: >-
   Audit or draft professional social network connection notes and invite
   strategy (note vs blank, personalization, warmup, safe volume). Use when the
   user asks about connection requests, connection notes, should I add a note,
-  why low acceptance, social outreach messages, or invite copy.
+  why low acceptance, social outreach messages, or invite copy. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Connection requests (social outreach)
@@ -19,13 +19,15 @@ Default to the **quick** shape when the user asks for a note or "just the
 copy." Use the full contract only for audits or volume/health checks. Render
 only the selected shape.
 
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+
 ## Core rules (encode verbatim)
 
 ### Note vs blank
 
 - Note-vs-blank is a **tested variable**, not a default.
 - Generic note is worst.
-- Specific note lifts acceptance **~45–72%** and ~**2×** post-accept reply.
+- Specific note lifts acceptance markedly and roughly doubles post-accept reply.
 - Blank can beat generic.
 
 ### Note constraints
@@ -44,7 +46,7 @@ only the selected shape.
 
 - ~**100 invites/week**, ~**20/day** (ramp new accounts from **10–20/day**).
 - Acceptance **> 40%** (< **20%** red-flag), pending **< ~500**, withdraw stale.
-- Benchmark by seniority (C-level **18–25%** vs IC **40–55%**).
+- Benchmark by seniority (senior / C-level accept at markedly lower rates than individual contributors).
 
 These are directional operating heuristics, not platform limits or guarantees.
 Current account restrictions, geography, seniority mix, account age, and the

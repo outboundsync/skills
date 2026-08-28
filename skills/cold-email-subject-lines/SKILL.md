@@ -4,12 +4,13 @@ description: >-
   Audit, rewrite, and A/B-test cold email subject lines for length, clarity,
   spam risk, and reply-rate measurement. Use when the user asks about subject
   lines, improve my subject, why low open rate, audit these subjects, or A/B
-  test subjects. Also use for a complete cold email after the offer and body
-  are established.
+  test subjects. For a complete cold email, `cold-email-body` coordinates and
+  calls this skill for the subject once the offer and body are set — it is not
+  the entry point for full-email requests. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Cold email subject lines
@@ -24,19 +25,21 @@ For a full-email request, establish the offer and body before finalizing the
 subject. Use adjacent offer/body skills when available, but never block if they
 are not installed.
 
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+
 ## Core rules (encode verbatim)
 
 ### Length and shape
 
 - Length **1–4 words** / **< ~40 chars**, front-loaded (mobile truncates ~35–38).
-- **All-lowercase** (internal-note look, +~21% opens).
+- **All-lowercase** (internal-note look — tends to lift opens).
 - Segment/trigger-specific token — not just `{{first_name}}`.
 - Clarity over manufactured curiosity.
 
 ### Strip spam and sales tells
 
-- Strip sales/spam words (−17.9% opens; 2+ trigger words ≈ 73% lower inbox placement).
-- Ban **ALL CAPS**, **!!!**, **emoji** (opens ~42%→37%), fake `Re:`/`Fwd:`, empty subject.
+- Strip sales/spam words — they depress opens, and stacking several sharply cuts inbox placement.
+- Ban **ALL CAPS**, **!!!**, **emoji** (tends to lower opens), fake `Re:`/`Fwd:`, empty subject.
 
 Treat these figures as directional benchmarks, not causal guarantees. The
 message, audience, sender reputation, and list quality can dominate; never

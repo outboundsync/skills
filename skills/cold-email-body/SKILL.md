@@ -6,11 +6,11 @@ description: >-
   write a cold email, audit this email, why no replies, make this
   shorter/better, cold email copy, or a complete cold email including offer,
   body, and subject. This is the primary coordinator for complete-email
-  requests.
+  requests. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Cold email body
@@ -29,6 +29,8 @@ when available, but assemble **one user-facing answer** from their results
 rather than emitting three separate audit reports. Never block if they are not
 installed.
 
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+
 ## Core rules (encode verbatim)
 
 ### Length and readability
@@ -38,7 +40,7 @@ installed.
 ### Personalization
 
 - Signal-led personalization + **removal test** (delete personalized line; if email still stands it was decorative).
-- Signal-led ≈ **11% reply** vs generic ≈ **2%** (~5×).
+- Signal-led personalization tends to **materially outperform** generic copy — often several-fold on reply rate.
 
 All performance figures in this skill are directional benchmarks, not promises
 or universal causal effects. Use them as priors; the user's own campaign data,
@@ -49,19 +51,19 @@ ICP, list quality, offer, and sender reputation take precedence.
 - Default: **Signal → Problem+Solution → Proof → soft CTA**
 - Alternates: PAS / BAB — see [references/frameworks.md](references/frameworks.md)
 - **You/your**, not we/our/I-centered product tours
-- Exactly **one** soft interest CTA (single-ask ~9.1% vs multi ~2.4%)
+- Exactly **one** soft interest CTA — a single clear ask outperforms stacking multiple asks
 
 ### Deliverability hygiene
 
 - Plain text, minimal signature
-- Open-tracking pixel **OFF** and link tracking **off** on cold sends (+2–10 pts placement)
+- Open-tracking pixel **OFF** and link tracking **off** on cold sends (tracking pixels/links tend to dent inbox placement)
 - **Zero** links/images/attachments on touch 1
 - Poke-the-bear question option
 - Spintax = deliverability insurance, not reply booster
 
 ### Banned
 
-- “I hope this finds you well” (−47% replies)
+- “I hope this finds you well” (filler opener — signals a template and depresses replies)
 - synergy / leverage / best-in-class
 - circle back / just checking in / just bumping this
 - quick call

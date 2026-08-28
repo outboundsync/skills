@@ -10,7 +10,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # List building (source + enrich)
@@ -50,7 +50,7 @@ Encode these as checks. Treat them as widely-taught industry patterns, not propr
 
 Common blend: a **signal** picks the accounts, a **database** or **waterfall** gets the verified people. Always dedupe against what is already in the CRM/SEP and honor suppression/consent.
 
-Rubric: [references/sourcing-rubric.md](references/sourcing-rubric.md) · Plays: [references/method-patterns.md](references/method-patterns.md) · Tool categories: [references/tool-categories.md](references/tool-categories.md).
+Rubric: [references/sourcing-rubric.md](references/sourcing-rubric.md) · Plays: [references/method-patterns.md](references/method-patterns.md) · Tool categories: [references/tool-categories.md](references/tool-categories.md) · Examples: [references/examples.md](references/examples.md).
 
 ## Required inputs
 

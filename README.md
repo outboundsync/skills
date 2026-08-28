@@ -11,7 +11,7 @@ The pack ships **15** skills.
 | `api` | [`skills/api/`](skills/api/) | Yes (`OUTBOUNDSYNC_API_KEY`) | OutboundSync API v1 guide: auth, vocabulary, discovery, routing to specialized skills |
 | `preflight` | [`skills/preflight/`](skills/preflight/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Read-only launch readiness across CRM OAuth, Sources/sync, and SEP inbound wiring |
 | `sync-monitoring` | [`skills/sync-monitoring/`](skills/sync-monitoring/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Diagnose Sync Monitoring Webhooks/events; mutations only after explicit confirmation |
-| `crm-analysis` | [`skills/crm-analysis/`](skills/crm-analysis/) | No | Read-only analysis of OutboundSync engagement signals already in HubSpot or Salesforce |
+| `crm-analysis` | [`skills/crm-analysis/`](skills/crm-analysis/) | No | Read-only analysis of OutboundSync engagement signals in HubSpot or Salesforce (+ Attio & Close, beta) |
 
 ### Targeting & lists
 

@@ -1,8 +1,8 @@
 # Attio data model in OutboundSync (beta)
 
-Source: OutboundSync Help Center — "Attio CRM beta" (one-way activity sync). Lighter-touch than HubSpot/Salesforce: the analysis surface is the **Notes timeline**, not custom fields.
+Source: OutboundSync Attio integration (beta, one-way sync). Lighter-touch than HubSpot/Salesforce: by **default** the analysis surface is the **Notes timeline**. Connections that enable the engagement object additionally get a queryable structured object — see [Optional: structured engagement object](#optional-structured-engagement-object) below.
 
-> **Note:** Attio does **not** receive the `os_*` custom properties HubSpot and Salesforce get. OutboundSync writes engagement as plaintext **Notes**, so analysis reads a timeline of records rather than querying fields. Which events reach a given workspace is configured during onboarding — confirm coverage before drawing conclusions; treat a missing signal as "not synced here," not "did not happen."
+> **Note:** Attio does **not** receive the `os_*` custom properties HubSpot and Salesforce get. By default OutboundSync writes engagement as plaintext **Notes**, so analysis reads a timeline of records. Connections with the engagement object enabled also get a queryable custom object (below). Which events reach a given workspace is configured during onboarding — confirm coverage before drawing conclusions; treat a missing signal as "not synced here," not "did not happen."
 
 ## Objects OutboundSync writes
 
@@ -31,6 +31,13 @@ Every synced event becomes one plaintext Note on the **Person** record:
 - **Counts** (opens, clicks, replies): count notes by title — there are no numeric counters like HubSpot's `os_number_of_email_opens`.
 - **Recency / latency:** derive from note `created_at` / the `Sent at:` line — there is no "last reply time" field.
 - **Campaign / platform attribution:** read the `Campaign:` and `Platform:` lines.
-- **Not available:** owner/rep attribution, company-level engagement timelines (notes attach to the Person only), and any field-level filtering.
+- **Not available (Notes model):** owner/rep attribution, company-level engagement timelines (notes attach to the Person only), and — unless the structured engagement object is enabled (below) — field-level filtering.
 
-The six strict HubSpot/Salesforce field intents (`references/router_contract.yaml`) do **not** apply to Attio — run these in `exploratory` mode with explicit limitations.
+## Optional: structured engagement object
+
+Some connections enable OutboundSync's structured Attio object (connector setting `createEngagementEvents`, **off by default**). When enabled, OutboundSync provisions a custom object (slug **`outboundsync`**) and writes one **typed record per engagement event** — queryable and filterable like any Attio object, in addition to (not instead of) the Notes timeline.
+
+- **Attributes (~30, typed):** `event_type`, `platform`, `occurred_at`, `campaign_id`, `campaign_name`, `sequence_number`, `subject`, `sent_message`, `reply_message`, `bounce_message`, `link_url`, `message_type`, `lead_category_name`, `connection_status`, `from_email` / `to_email`, `from_profile_url` / `to_profile_url`, `person_record_id` / `company_record_id`, and more. These use **Attio-native** attribute names — **not** `os_*` labels.
+- **When present, prefer it** for counts, filtering, and attribution over parsing Note bodies. When absent (the default), use the Notes timeline above.
+
+The six strict HubSpot/Salesforce field intents (`references/router_contract.yaml`) are shaped around `os_*` fields and do **not** apply to Attio — run Attio analysis in `exploratory` mode with explicit limitations, whether reading Notes or the structured object.

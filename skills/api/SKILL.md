@@ -13,7 +13,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls.
 metadata:
   author: outboundsync
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # OutboundSync API v1

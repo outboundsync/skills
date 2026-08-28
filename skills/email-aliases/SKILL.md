@@ -4,11 +4,11 @@ description: >-
   Audit and prescribe cold-sending mailbox naming, from-name consistency, and
   role-address avoidance. Use when the user asks about email aliases, mailbox
   naming, what address should I send from, audit my sending accounts, is
-  sales@/info@ ok, from name, or jane@example.com.
+  sales@/info@ ok, from name, or jane@example.com. No OutboundSync API key.
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Email aliases and sending identities
@@ -18,6 +18,8 @@ Audit sending mailbox naming and identity consistency only. Draft recommendation
 Default to the **quick** shape for a single-address keep/stop question. Use
 the full inventory only for multi-mailbox audits or scale planning. Render
 only the selected shape.
+
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## Core rules (encode verbatim)
 

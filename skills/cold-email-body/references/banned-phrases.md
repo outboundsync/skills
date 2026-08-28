@@ -6,7 +6,7 @@ If any item appears, Language category → **0** and Findings get an ✗ line. P
 
 | Phrase | Note |
 | --- | --- |
-| I hope this finds you well | ≈ **−47% replies** (directional) |
+| I hope this finds you well | filler opener — signals a template, depresses replies |
 | I hope you're doing well | same class |
 | Hope all is well | same class |
 | Trust you are well | same class |

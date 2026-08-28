@@ -36,10 +36,10 @@ Apply in this order:
   - "Which campaigns got the most replies this month?"
 - Required fields (SUPPORTED):
   - HubSpot: (`os_last_email_campaign_name` OR `os_last_campaign_name`) + `os_last_reply_time`
-  - Salesforce: `OSLast CampaignName__c` + `OSLast ReplyTime__c`
+  - Salesforce: `OSLastCampaignName__c` + `OSLastReplyTime__c`
 - Fallback minimum (PARTIAL):
   - HubSpot: `os_last_email_campaign_name` OR `os_last_campaign_name`
-  - Salesforce: `OSLast CampaignName__c`
+  - Salesforce: `OSLastCampaignName__c`
 - Unsupported conditions:
   - none explicit; unresolved data falls to rule #4
 - Fallback behavior:
@@ -53,10 +53,10 @@ Apply in this order:
   - "Where are opens not converting into replies?"
 - Required fields (SUPPORTED):
   - HubSpot: `os_last_campaign_name`, `os_number_of_email_opens`, `os_last_reply_time`
-  - Salesforce: `OSLast CampaignName__c`, `OSLast OpenTime__c`, `OSLast ReplyTime__c`
+  - Salesforce: `OSLastCampaignName__c`, `OSLastOpenTime__c`, `OSLastReplyTime__c`
 - Fallback minimum (PARTIAL):
   - HubSpot: (`os_last_campaign_name` + `os_number_of_email_opens`) OR (`os_last_campaign_name` + `os_last_reply_time`)
-  - Salesforce: (`OSLast CampaignName__c` + `OSLast OpenTime__c`) OR (`OSLast CampaignName__c` + `OSLast ReplyTime__c`)
+  - Salesforce: (`OSLastCampaignName__c` + `OSLastOpenTime__c`) OR (`OSLastCampaignName__c` + `OSLastReplyTime__c`)
 - Unsupported conditions:
   - none explicit; unresolved data falls to rule #4
 - Fallback behavior:
@@ -70,10 +70,10 @@ Apply in this order:
   - "What is quickest reply latency by campaign?"
 - Required fields (SUPPORTED):
   - HubSpot: `os_last_campaign_name`, `os_last_sent_time`, `os_last_reply_time`
-  - Salesforce: `OSLast CampaignName__c`, `OSLast SentTime__c`, `OSLast ReplyTime__c`
+  - Salesforce: `OSLastCampaignName__c`, `OSLastSentTime__c`, `OSLastReplyTime__c`
 - Fallback minimum (PARTIAL):
   - HubSpot: `os_last_campaign_name` + `os_last_reply_time`
-  - Salesforce: `OSLast CampaignName__c` + `OSLast ReplyTime__c`
+  - Salesforce: `OSLastCampaignName__c` + `OSLastReplyTime__c`
 - Unsupported conditions:
   - none explicit; unresolved data falls to rule #4
 - Fallback behavior:
@@ -86,10 +86,10 @@ Apply in this order:
   - "Which contacts are warm but unanswered?"
 - Required fields (SUPPORTED):
   - HubSpot: (`os_last_open_time` OR `os_number_of_email_opens`) + `os_last_link_click_time` + `os_last_reply_time`
-  - Salesforce: `OSLast OpenTime__c`, `OSLast LinkClickTime__c`, `OSLast ReplyTime__c`
+  - Salesforce: `OSLastOpenTime__c`, `OSLastLinkClickTime__c`, `OSLastReplyTime__c`
 - Fallback minimum (PARTIAL):
   - HubSpot: (`os_last_open_time` OR `os_number_of_email_opens`) + `os_last_reply_time`
-  - Salesforce: `OSLast OpenTime__c` + `OSLast ReplyTime__c`
+  - Salesforce: `OSLastOpenTime__c` + `OSLastReplyTime__c`
 - Unsupported conditions:
   - none explicit; unresolved data falls to rule #4
 - Fallback behavior:
@@ -103,7 +103,7 @@ Apply in this order:
   - "Is Instantly or Smartlead performing better?"
 - Required fields (SUPPORTED):
   - HubSpot: `os_last_update_source` + (`os_number_of_email_opens` OR `os_last_reply_time`)
-  - Salesforce: `OSLast UpdateSource__c` + (`OSLast OpenTime__c` OR `OSLast ReplyTime__c`)
+  - Salesforce: `OSLastUpdateSource__c` + (`OSLastOpenTime__c` OR `OSLastReplyTime__c`)
 - Fallback minimum (PARTIAL):
   - none
 - Unsupported conditions:
@@ -119,10 +119,10 @@ Apply in this order:
   - "Where is deliverability failing?"
 - Required fields (SUPPORTED):
   - HubSpot: `os_last_bounce_time`, `os_last_unsubscribe_time`, `os_last_sent_time`, `os_last_sent_address`
-  - Salesforce: `OSLast BounceTime__c`, `OSLast UnsubscribeTime__c`, `OSLast SentTime__c`, `OSLast SentAddress__c`
+  - Salesforce: `OSLastBounceTime__c`, `OSLastUnsubscribeTime__c`, `OSLastSentTime__c`, `OSLastSentAddress__c`
 - Fallback minimum (PARTIAL):
   - HubSpot: (`os_last_bounce_time` + `os_last_unsubscribe_time` + `os_last_sent_time`) OR (`os_last_bounce_time` + `os_last_sent_time`) OR (`os_last_unsubscribe_time` + `os_last_sent_time`)
-  - Salesforce: (`OSLast BounceTime__c` + `OSLast UnsubscribeTime__c` + `OSLast SentTime__c`) OR (`OSLast BounceTime__c` + `OSLast SentTime__c`) OR (`OSLast UnsubscribeTime__c` + `OSLast SentTime__c`)
+  - Salesforce: (`OSLastBounceTime__c` + `OSLastUnsubscribeTime__c` + `OSLastSentTime__c`) OR (`OSLastBounceTime__c` + `OSLastSentTime__c`) OR (`OSLastUnsubscribeTime__c` + `OSLastSentTime__c`)
 - Unsupported conditions:
   - none explicit; unresolved data falls to rule #4
 - Fallback behavior:

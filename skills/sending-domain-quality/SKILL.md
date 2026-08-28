@@ -11,7 +11,7 @@ compatibility: >-
   VIRUSTOTAL_API_KEY / WHOISXML_API_KEY for reputation scoring.
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Sending domain quality
@@ -19,6 +19,8 @@ metadata:
 Run **read-only**. RDAP + public DNS/DNSBL (and optional reputation APIs). Never buy, transfer, or reconfigure domains. Never print API keys.
 
 Render **only** the fixed output shape in this skill — no prose outside it.
+
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## Scope and safety
 
@@ -31,7 +33,11 @@ Render **only** the fixed output shape in this skill — no prose outside it.
 
 1. **TLD / name** — parse the domain string (no network required for the lexical rubric).
 2. **Age** — RDAP creation/registration date for the domain. See [references/lookup-methods.md](references/lookup-methods.md).
-3. **Reputation** — DNSBL queries (Spamhaus DBL, SURBL, URIBL style) via DNS;
+3. **Reputation** — DNSBL queries (Spamhaus DBL, SURBL, URIBL style) via DNS —
+   **not** through public/open resolvers (Google/Cloudflare/DoH), which these lists
+   block with `127.255.255.x` error codes that are **not** listings; read a listing
+   only from the list's documented range and treat error codes as UNVERIFIED (see
+   [references/lookup-methods.md](references/lookup-methods.md)).
    HTTP check that the cold domain resolves to a legitimate branded property or
    redirects to the brand site (a 301/308 is preferred, not mandatory).
    Optional: Google Web Risk, VirusTotal, WhoisXML/IPQS when keys exist.
