@@ -9,10 +9,10 @@ description: >-
   OutboundSync-emitted Sync Monitoring Webhooks (sync.failed / deliveries), use
   the sync-monitoring skill instead.
 license: MIT
-compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com. Optional Instantly MCP/API for automated Instantly gates.
+compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key. Optional Instantly MCP/API for automated Instantly gates.
 metadata:
   author: outboundsync
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # OutboundSync launch preflight
@@ -25,21 +25,25 @@ Render **only** the fixed output shape in this skill — no prose outside it.
 
 ## Credentials
 
-- Load `$OUTBOUNDSYNC_API_KEY` from the environment (Bearer token).
-- Base URL: `https://app.outboundsync.com/api/v1`
+**Prefer OutboundSync MCP when connected** (`https://mcp.outboundsync.com/mcp`, streamable HTTP, `Authorization: Bearer osapi_...`). Otherwise use REST with `$OUTBOUNDSYNC_API_KEY` from the environment.
+
+- REST base URL: `https://app.outboundsync.com/api/v1`
+- MCP setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
 - Docs: https://outboundsync.com/docs/api/v1/
 
-See [references/endpoints.md](references/endpoints.md) for the thin API map.
+See [references/endpoints.md](references/endpoints.md) for the REST ↔ MCP map. Output contract is identical either way.
 
 **Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
 
 ## Phase 1 — OutboundSync pipeline (always, in order)
 
-1. `GET /me` → `account.email`, `apiKey.connectionScope` / `connectionId`, `connections[]` (`id`, `crm`, `organizationDomain`).
-2. `GET /connections` → per connection: `id`, `crm`, `status`, `organizationDomain`, `organizationId`, `capabilities{sync, destinations, blocklists}`, `createdAt`.
-3. `GET /account/status` → top-level `ready`, `blockers[]`, `warnings[]`, per-connection component statuses (`crmConnection`, `sources`, `destinations`, `blocklists`).
-4. `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, createOrUpdateTask, assignContactOwner, salesforceObjectType}`, `destinations[]{url, description, eventTypes, isDelayed}`, bound `replyRelay` when present. Paginate to exhaustion.
-5. `GET /destinations/reply-relays` → reply-relay catalog for accessible connections (advisory on the CRM card; does **not** change gate math). Sources may already embed a bound `replyRelay`.
+Use MCP tools when OutboundSync MCP is connected; otherwise call the REST paths below. Same fields either way.
+
+1. `get_me` / `GET /me` → `account.email`, `apiKey.connectionScope` / `connectionId`, `connections[]` (`id`, `crm`, `organizationDomain`).
+2. `list_connections` / `GET /connections` → per connection: `id`, `crm`, `status`, `organizationDomain`, `organizationId`, `capabilities{sync, destinations, blocklists}`, `createdAt`.
+3. `get_account_status` / `GET /account/status` → top-level `ready`, `blockers[]`, `warnings[]`, per-connection component statuses (`crmConnection`, `sources`, `destinations`, `blocklists`).
+4. `list_sources` / `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, createOrUpdateTask, assignContactOwner, salesforceObjectType}`, `destinations[]{url, description, eventTypes, isDelayed}`, bound `replyRelay` when present. Paginate to exhaustion.
+5. `list_reply_relays` / `GET /destinations/reply-relays` → reply-relay catalog for accessible connections (advisory on the CRM card; does **not** change gate math). Sources may already embed a bound `replyRelay`.
 
 Join by `connectionId`. Render one CRM card + one OutboundSync (pipeline) card per connection. When >1 connection, disambiguate gauge labels by domain (e.g. `CRM (acme.com)`, `OutboundSync (acme.com)`).
 

@@ -8,10 +8,10 @@ description: >-
   test.ping, GET /api/v1/webhooks, or GET /api/v1/events. Not for SEP Sources
   paste-URL wiring — that is the preflight skill.
 license: MIT
-compatibility: Requires OUTBOUNDSYNC_API_KEY (account-scoped for /webhooks*; write scope for mutations) and HTTPS access to app.outboundsync.com.
+compatibility: Requires OUTBOUNDSYNC_API_KEY (account-scoped for /webhooks*; write scope for mutations) and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key.
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Sync Monitoring (OutboundSync Webhooks + events)
@@ -30,12 +30,25 @@ API contract: https://outboundsync.com/docs/api/v1/#platform-webhooks-sync-monit
 
 ## Credentials
 
+**Prefer OutboundSync MCP when connected** (`https://mcp.outboundsync.com/mcp`, streamable HTTP, `Authorization: Bearer osapi_...`). Otherwise REST:
+
 - `$OUTBOUNDSYNC_API_KEY` Bearer → `https://app.outboundsync.com/api/v1`
-- `/webhooks*` requires an **account-scoped** key (connection-scoped → hard fail with remediation).
+- MCP setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
+- `/webhooks*` requires an **account-scoped** key (connection-scoped → hard fail with remediation) — same on MCP.
 - Mutations require **`write`** scope. Account must have Webhooks enabled (`canUseWebhooks`); otherwise `403`.
 - `/events*` allows connection-scoped keys (narrowed visibility).
 
 See [references/endpoints.md](references/endpoints.md) and [references/event-types.md](references/event-types.md).
+
+### MCP when connected
+
+| REST | MCP tool |
+| --- | --- |
+| `GET /webhooks` | `list_webhooks` |
+| `GET /webhooks/:id` | `get_webhook` |
+| `GET /webhooks/:id/deliveries` | `list_webhook_deliveries` |
+| `GET /events` / `GET /events/:id` | `list_events` / `get_event` |
+| Mutations (`POST`/`PATCH`/`DELETE`, rotate, test, replay) | matching write tools — **write confirmation protocol only** |
 
 ## Write confirmation protocol
 

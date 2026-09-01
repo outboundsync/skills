@@ -115,11 +115,13 @@ openclaw skills install @osiharris/crm-analysis
 
 ## Credentials
 
-**`preflight`, `api`, and `sync-monitoring`** — set before running:
+**`preflight`, `api`, and `sync-monitoring`** — set before running (REST fallback), or connect OutboundSync MCP:
 
 ```bash
 export OUTBOUNDSYNC_API_KEY=osapi_...
 ```
+
+**OutboundSync MCP** (preferred when your harness supports it): `https://mcp.outboundsync.com/mcp` — streamable HTTP with `Authorization: Bearer osapi_...`. Setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
 
 Or put the same variable in a gitignored `.env`. **Never print, log, or commit the API key.**
 
