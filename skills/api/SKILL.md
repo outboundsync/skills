@@ -10,10 +10,10 @@ description: >-
   contacted, skip contacts I already reached, GET /contacts/outreach, blocklist
   syncs, or GET /blocklists.
 license: MIT
-compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls.
+compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key.
 metadata:
   author: outboundsync
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # OutboundSync API v1
@@ -26,12 +26,30 @@ Render **only** the fixed output shape below — no prose outside it.
 
 ## Credentials
 
+**Prefer OutboundSync MCP when connected** (`https://mcp.outboundsync.com/mcp`, streamable HTTP, `Authorization: Bearer osapi_...`). Otherwise REST:
+
 - Load `$OUTBOUNDSYNC_API_KEY` from the environment (Bearer token).
 - Base: `https://app.outboundsync.com/api/v1`
+- MCP setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
 - Docs: https://outboundsync.com/docs/api/v1/
 - Keys: https://outboundsync.com/docs/api/authentication/creating-api-keys/
 
 Thin map: [references/endpoints.md](references/endpoints.md). Prior-outreach contract: [references/contacts-outreach.md](references/contacts-outreach.md).
+
+### MCP when connected (read-only bootstrap)
+
+| REST | MCP tool |
+| --- | --- |
+| `GET /me` | `get_me` |
+| `GET /connections` | `list_connections` |
+| `GET /account/status` | `get_account_status` |
+| `GET /sources` | `list_sources` |
+| `GET /destinations` / `GET /destinations/reply-relays` | `list_destinations` / `list_reply_relays` |
+| `GET /blocklists` | `list_blocklists` |
+| `GET /contacts/outreach` | `get_contact_outreach` |
+| `GET /account/metrics`, `GET /requests`, `GET /syncs`, `GET /deliveries` | matching `get_*` / `list_*` tools |
+
+Write tools exist on MCP (`retry_sync`, replays, blocklist pause/resync, webhook CRUD) — **not this skill**. `/webhooks*` still requires an **account-scoped** key on MCP too.
 
 ## Auth and scopes
 

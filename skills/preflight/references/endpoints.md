@@ -10,6 +10,20 @@ Authorization: Bearer $OUTBOUNDSYNC_API_KEY
 
 Never print, log, or commit the key. Prefer connection-scoped keys when least privilege matters.
 
+## MCP when connected
+
+Hosted OutboundSync MCP: `https://mcp.outboundsync.com/mcp` (streamable HTTP, same Bearer key). Setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
+
+| Order | REST | MCP tool |
+| --- | --- | --- |
+| 1 | `GET /me` | `get_me` |
+| 2 | `GET /connections` | `list_connections` |
+| 3 | `GET /account/status` | `get_account_status` |
+| 4 | `GET /sources` | `list_sources` |
+| 5 | `GET /destinations/reply-relays` | `list_reply_relays` |
+
+Prefer MCP tools when the client has OutboundSync MCP connected; otherwise use REST. Output contract is unchanged.
+
 ## Endpoints used by this skill
 
 | Order | Method + path | Why preflight calls it |
@@ -53,4 +67,4 @@ Creating API keys: https://outboundsync.com/docs/api/authentication/creating-api
 
 When Instantly MCP or Instantly API credentials are available, use them for Phase 3 Instantly gates (accounts, campaigns, Instantly-side webhooks pointing at the OutboundSync **Source** URL). If neither is available, treat Instantly as MANUAL/unverified after confirming the OutboundSync source(s) exist.
 
-This skill does **not** assume an OutboundSync-hosted MCP exists. Instantly `webhooks_list` is the SEP’s webhook config — not OutboundSync Sync Monitoring (`sync-monitoring` skill).
+Instantly `webhooks_list` is the SEP’s webhook config — not OutboundSync Sync Monitoring (`sync-monitoring` skill).

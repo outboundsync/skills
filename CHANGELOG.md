@@ -10,6 +10,7 @@ This project uses Calendar Versioning with tags in the format `YYYY.MM.DD.N`.
 
 ### Features
 
+- **preflight / api / sync-monitoring:** prefer OutboundSync MCP (`https://mcp.outboundsync.com/mcp`) when connected; REST + `OUTBOUNDSYNC_API_KEY` remains the fallback. Preflight output contract unchanged.
 - Document `GET /blocklists` on the `api` skill (CRM→SEP sync configs). Pause/resync exist as `write` and are listed as not this skill (same as retry/replay).
 - Add `GET /contacts/outreach` prior-outreach lookup to the `api` skill (query rules, OR-union, DNC vs reserved blocklists, optional keep/skip only when the user gives a cadence).
 - Catch up the `api` skill GET observability map: destination catalog, account metrics, requests/syncs/deliveries (write retry/replay stay listed as not this skill).
