@@ -12,7 +12,7 @@ Never print, log, or commit the key. Prefer connection-scoped keys when least pr
 
 ## MCP when connected
 
-Hosted OutboundSync MCP: `https://mcp.outboundsync.com/mcp` (streamable HTTP, same Bearer key). Setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
+Hosted OutboundSync MCP: `https://mcp.outboundsync.com/mcp` (streamable HTTP, same Bearer key). Setup: https://outboundsync.com/docs/mcp/setup/
 
 | Order | REST | MCP tool |
 | --- | --- | --- |

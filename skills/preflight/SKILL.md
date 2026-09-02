@@ -28,7 +28,7 @@ Render **only** the fixed output shape in this skill — no prose outside it.
 **Prefer OutboundSync MCP when connected** (`https://mcp.outboundsync.com/mcp`, streamable HTTP, `Authorization: Bearer osapi_...`). Otherwise use REST with `$OUTBOUNDSYNC_API_KEY` from the environment.
 
 - REST base URL: `https://app.outboundsync.com/api/v1`
-- MCP setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
+- MCP setup: https://outboundsync.com/docs/mcp/setup/
 - Docs: https://outboundsync.com/docs/api/v1/
 
 See [references/endpoints.md](references/endpoints.md) for the REST ↔ MCP map. Output contract is identical either way.

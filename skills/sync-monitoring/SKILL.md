@@ -33,7 +33,7 @@ API contract: https://outboundsync.com/docs/api/v1/#platform-webhooks-sync-monit
 **Prefer OutboundSync MCP when connected** (`https://mcp.outboundsync.com/mcp`, streamable HTTP, `Authorization: Bearer osapi_...`). Otherwise REST:
 
 - `$OUTBOUNDSYNC_API_KEY` Bearer → `https://app.outboundsync.com/api/v1`
-- MCP setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
+- MCP setup: https://outboundsync.com/docs/mcp/setup/
 - `/webhooks*` requires an **account-scoped** key (connection-scoped → hard fail with remediation) — same on MCP.
 - Mutations require **`write`** scope. Account must have Webhooks enabled (`canUseWebhooks`); otherwise `403`.
 - `/events*` allows connection-scoped keys (narrowed visibility).
