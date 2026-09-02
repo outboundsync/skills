@@ -30,7 +30,7 @@ Render **only** the fixed output shape below — no prose outside it.
 
 - Load `$OUTBOUNDSYNC_API_KEY` from the environment (Bearer token).
 - Base: `https://app.outboundsync.com/api/v1`
-- MCP setup: https://outboundsync.com/docs/integrations/ai-and-agents/mcp/
+- MCP setup: https://outboundsync.com/docs/mcp/setup/
 - Docs: https://outboundsync.com/docs/api/v1/
 - Keys: https://outboundsync.com/docs/api/authentication/creating-api-keys/
 
