@@ -1,0 +1,38 @@
+name: External links
+
+# Separate from Validate so a flaky third-party site never blocks a release.
+on:
+  pull_request:
+    branches: [main]
+    paths: ['**/*.md']
+  schedule:
+    - cron: '17 6 * * 1' # Mondays
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.sha }}
+          restore-keys: lychee-
+
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --cache --max-cache-age 1d --no-progress
+            --exclude-path node_modules --exclude-path test
+            --exclude '^https://(app|mcp)\.outboundsync\.com/'
+            --exclude 'example\.(com|org)'
+            --exclude '^https://(x|twitter)\.com/'
+            --exclude '^https://github\.com/outboundsync/skills/(blob|tree)/main/'
+            './**/*.md'
+          fail: true

@@ -1,12 +1,25 @@
 # Changelog
 
-All notable changes to this project are documented in this file.
+Curated, human-written notes for the OutboundSync Agent Skills pack. The pack uses Calendar Versioning with tags `YYYY.MM.DD.N` (UTC date); each skill also carries its own `metadata.version`.
 
-This project uses Calendar Versioning with tags in the format `YYYY.MM.DD.N`.
+- Add entries under `## Unreleased` in the PR that makes the change.
+- [GitHub Releases](https://github.com/outboundsync/skills/releases) are published automatically from commit subjects on every merge to `main`.
+- To fold `## Unreleased` into a dated release section, run `npm run release:apply` and commit the result.
 
 <!-- release entries -->
 
 ## Unreleased
+
+### Changed
+
+- **Tooling:** replace `scripts/validate_skill_integrity.sh` (bash + Ruby/Python) with a Node validator (`npm run validate`). It reports every problem in one run, emits GitHub annotations, and is covered by fixture tests (`npm test`). The existing checks are ported unchanged. New checks: output contract, score meter, bar geometry, description style, frontmatter spec limits, exact disclaimer text and position, fence-aware links and anchors across all Markdown, links that escape a skill folder, vague tool wildcards, committed secrets, non-doc files under `skills/`, the README skill index, and version bumps against a PR base (`--base`). Content rules start as warnings (`scripts/validate/config.json`).
+- **Release tooling:** `release-calver.mjs` is importable and tested. `--dry-run` and `--apply` are mutually exclusive, and the preview prints the full notes. `--apply` promotes `## Unreleased` into the new release section instead of inserting above it. `GITHUB_OUTPUT` uses a random delimiter.
+- **CI:** least-privilege `permissions`, SHA-pinned actions with Dependabot, concurrency and timeouts, actionlint, PR version-bump enforcement, a separate weekly external-link check (lychee), annotated release tags, and manual `workflow_dispatch` runs.
+- **Docs:** add `CONTRIBUTING.md` and `templates/SKILL.template.md` (not named `SKILL.md`, so skill installers never pick it up); the README and CONVENTIONS point at the new commands. Cut the long-running `Unreleased` section below into `2026.09.02.1`.
+
+## [2026.09.02.1] - 2026-09-02
+
+Rolls up everything shipped from `2026.07.23.0` through `2026.09.02.1`.
 
 ### Features
 

@@ -5,6 +5,7 @@ on:
     workflows: ["Validate skill integrity"]
     types: [completed]
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,19 +17,23 @@ concurrency:
 jobs:
   release:
     if: >-
-      github.event.workflow_run.conclusion == 'success'
-      && github.event.workflow_run.event == 'push'
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      || (github.event.workflow_run.conclusion == 'success'
+          && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ env.RELEASE_SHA }}
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
 
@@ -41,18 +46,20 @@ jobs:
         if: steps.calver.outputs.has_changes == 'true'
         run: |
           TAG="${{ steps.calver.outputs.next_tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
             echo "created=false" >> "$GITHUB_OUTPUT"
             echo "Tag $TAG already exists, skipping."
             exit 0
           fi
-          git tag "$TAG" "${{ github.event.workflow_run.head_sha }}"
+          git tag -a "$TAG" -m "Release $TAG" "$RELEASE_SHA"
           git push origin "refs/tags/$TAG"
           echo "created=true" >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub release
         if: steps.calver.outputs.has_changes == 'true' && steps.tag.outputs.created == 'true'
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ steps.calver.outputs.next_tag }}
           name: ${{ steps.calver.outputs.next_tag }}

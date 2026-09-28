@@ -3,7 +3,7 @@
 .env.*
 !.env.example
 
-# Node (scripts/release-calver.mjs)
+# Node (validator + release tooling)
 node_modules/
 npm-debug.log*
 
@@ -13,3 +13,7 @@ Thumbs.db
 *.log
 .idea/
 .vscode/
+
+# Release tooling output
+release-notes.md
+.lycheecache

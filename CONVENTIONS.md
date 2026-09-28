@@ -58,7 +58,7 @@ Skills that reference third-party techniques append: *"Treat techniques as widel
 
 ## Frontmatter & naming
 
-Enforced by [`scripts/validate_skill_integrity.sh`](scripts/validate_skill_integrity.sh):
+Checked by `npm run validate` (rules `frontmatter`, `metadata`, `description-style`; see [CONTRIBUTING.md](CONTRIBUTING.md)):
 
 - `name:` must equal the folder name; `description:` present and non-empty.
 - `description` style: **verb-led** first word, then a sentence beginning "Use when the user asks…" listing concrete trigger phrases. Account-free skills end the description with "No OutboundSync API key."

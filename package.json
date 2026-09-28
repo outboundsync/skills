@@ -1,0 +1,19 @@
+{
+  "name": "outboundsync-skills-tooling",
+  "private": true,
+  "description": "Validation and release tooling for the OutboundSync Agent Skills pack. Not shipped with the skills.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "validate": "node scripts/validate/cli.mjs",
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "release:preview": "node scripts/release-calver.mjs --dry-run",
+    "release:apply": "node scripts/release-calver.mjs --apply"
+  },
+  "dependencies": {
+    "yaml": "2.9.1"
+  }
+}
