@@ -32,6 +32,7 @@ jobs:
             --exclude-path node_modules --exclude-path test
             --exclude '^https://(app|mcp)\.outboundsync\.com/'
             --exclude 'example\.(com|org)'
+            --exclude '^https://(x|twitter)\.com/'
             --exclude '^https://github\.com/outboundsync/skills/(blob|tree)/main/'
             './**/*.md'
           fail: true

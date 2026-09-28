@@ -129,7 +129,6 @@ test('templates/SKILL.template.md is a valid skill under every rule', () => {
       'skills/demo/SKILL.md': null,
       'skills/demo/references/rubric.md': null,
       'skills/my-skill/SKILL.md': template,
-      'skills/my-skill/references/.keep.md': '# keep\n',
     }),
     [],
   );

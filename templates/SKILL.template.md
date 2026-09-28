@@ -18,7 +18,7 @@ metadata:
 ## Workflow
 
 1. <Step>
-2. <Step — link any rubric in [references/](references/)>
+2. <Step — link any rubric you add under `references/`>
 
 ## Output contract
 
