@@ -1,6 +1,6 @@
 # Security
 
-This repository is documentation-only Agent Skills (instruction packs). It ships no executables and no remote install payloads.
+This repository is documentation-only Agent Skills (instruction packs). Everything under `skills/` is Markdown or YAML: the installed skills contain no executables and no remote install payloads. `scripts/`, `test/`, and `package.json` are maintainer tooling that is never installed with a skill (`npm run validate` enforces the `skills/` rule).
 
 ## Threat model assumptions
 
@@ -21,6 +21,7 @@ This repository is documentation-only Agent Skills (instruction packs). It ships
 ## API keys and secrets
 
 - Never print, log, or commit `OUTBOUNDSYNC_API_KEY`.
+- The hosted OutboundSync MCP (`https://mcp.outboundsync.com/mcp`) takes the same key as `Authorization: Bearer osapi_...`. Put it in the harness's MCP config through an environment variable, not inline, so it stays out of shell history and committed config.
 - Prefer connection-scoped keys for `preflight` when least privilege matters.
 - Sync Monitoring `/webhooks*` requires an **account-scoped** key; mutations also need the **`write`** scope.
 - Webhook signing secrets (`oswhsec_…`) appear once on create/rotate — instruct the user to store them immediately; never re-echo into logs, commits, or later prompts.

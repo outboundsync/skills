@@ -1,0 +1,73 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import {
+  CHANGELOG_MARKER,
+  classifyCommit,
+  getNextTag,
+  githubOutputLine,
+  parseArgs,
+  planRelease,
+  promoteUnreleased,
+  renderGroupedNotes,
+  sortCalverTags,
+} from '../scripts/release-calver.mjs';
+
+const NOW = new Date('2026-09-28T23:30:00Z');
+
+test('tags sort numerically and ignore non-CalVer tags', () => {
+  assert.deepEqual(sortCalverTags(['2026.09.02.10', 'v1.0.0', '2026.09.02.9', '2026.07.23.0']), ['2026.07.23.0', '2026.09.02.9', '2026.09.02.10']);
+});
+
+test('next tag increments the same UTC day, else starts at .0', () => {
+  assert.equal(getNextTag(['2026.09.28.0', '2026.09.28.1'], NOW), '2026.09.28.2');
+  assert.equal(getNextTag(['2026.09.02.1'], NOW), '2026.09.28.0');
+  assert.equal(getNextTag([], new Date('2026-09-29T00:30:00+02:00')), '2026.09.28.0');
+});
+
+test('commits group by conventional type; breaking changes are marked', () => {
+  assert.deepEqual(classifyCommit('feat(api)!: drop v0'), { typeKey: 'feat', breaking: true });
+  assert.deepEqual(classifyCommit('Point MCP links at /docs'), { typeKey: 'other', breaking: false });
+  const notes = renderGroupedNotes([
+    { subject: 'fix: a', shortSha: 'aaaaaaa' },
+    { subject: 'feat!: b', shortSha: 'bbbbbbb' },
+    { subject: 'Plain c', shortSha: 'ccccccc' },
+  ]);
+  assert.equal(notes, '### Features\n- **Breaking:** feat!: b (bbbbbbb)\n\n### Fixes\n- fix: a (aaaaaaa)\n\n### Other\n- Plain c (ccccccc)');
+});
+
+test('release bookkeeping commits are excluded; no commits means no release', () => {
+  const plan = planRelease({ tags: ['2026.09.02.1'], commitLog: 'abc1234def\tchore(release): 2026.09.02.1', now: NOW });
+  assert.deepEqual(plan, { hasChanges: false, lastTag: '2026.09.02.1' });
+});
+
+test('planRelease builds the tag and notes', () => {
+  const plan = planRelease({ tags: ['2026.09.02.1'], commitLog: 'abc1234def\tfeat: x\n', now: NOW });
+  assert.equal(plan.nextTag, '2026.09.28.0');
+  assert.equal(plan.releaseNotes, '## [2026.09.28.0] - 2026-09-28\n\n### Features\n- feat: x (abc1234)');
+});
+
+test('promoteUnreleased moves curated notes under the new tag and reopens Unreleased', () => {
+  const before = `# Changelog\n\n${CHANGELOG_MARKER}\n\n## Unreleased\n\n### Fixed\n\n- A fix.\n\n## [2026.09.02.1] - 2026-09-02\n\n- Old.\n`;
+  const after = promoteUnreleased(before, '2026.09.28.0', '2026-09-28', 'generated');
+  assert.equal(after, `# Changelog\n\n${CHANGELOG_MARKER}\n\n## Unreleased\n\n## [2026.09.28.0] - 2026-09-28\n\n### Fixed\n\n- A fix.\n\n## [2026.09.02.1] - 2026-09-02\n\n- Old.\n`);
+});
+
+test('promoteUnreleased falls back to generated notes when Unreleased is empty', () => {
+  const before = `# Changelog\n\n${CHANGELOG_MARKER}\n\n## Unreleased\n`;
+  assert.match(promoteUnreleased(before, 't', 'd', '- generated'), /## Unreleased\n\n## \[t\] - d\n\n- generated\n$/);
+  assert.throws(() => promoteUnreleased('# no marker', 't', 'd', 'x'), /marker/);
+});
+
+test('args: --dry-run and --apply are exclusive; file flags need a value', () => {
+  assert.throws(() => parseArgs(['--dry-run', '--apply']), /mutually exclusive/);
+  assert.throws(() => parseArgs(['--notes-file', '--apply']), /needs a file path/);
+  assert.throws(() => parseArgs(['--bogus']), /unknown argument/);
+  assert.deepEqual(parseArgs(['--dry-run', '--notes-file', 'n.md']), { apply: false, notesFile: 'n.md', tagFile: '' });
+});
+
+test('GITHUB_OUTPUT uses a delimiter that cannot collide with the value', () => {
+  const line = githubOutputLine('notes', 'EOF\nmore');
+  const delimiter = line.split('\n')[0].split('<<')[1];
+  assert.notEqual(delimiter, 'EOF');
+  assert.ok(line.endsWith(`\n${delimiter}\n`));
+});

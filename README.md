@@ -132,7 +132,7 @@ Create a key: [Creating API keys](https://outboundsync.com/docs/api/authenticati
 API reference: [API v1](https://outboundsync.com/docs/api/v1/)  
 Skills docs: [Agent Skills](https://outboundsync.com/docs/skills/)
 
-`crm-analysis`, copy, omnichannel, and directory skills do not use an OutboundSync API key.
+`crm-analysis`, `list-building`, copy, omnichannel, and directory skills do not use an OutboundSync API key.
 
 **`email-authentication` / `sending-domain-quality`** — free read-only public DNS / RDAP / DNSBL lookups by default. Optional paid keys (e.g. `MXTOOLBOX_API_KEY`, `GOOGLE_WEB_RISK_KEY`, `VIRUSTOTAL_API_KEY`, `WHOISXML_API_KEY`) enhance checks when present; see each skill's `compatibility:` frontmatter.
 
@@ -149,23 +149,26 @@ These skills reflect OutboundSync best practices, shared freely and without warr
 
 ## Maintainers
 
-New skills follow [CONVENTIONS.md](CONVENTIONS.md) — output styling, the required score-meter, marks legend, and disclaimer note. Validate before pushing:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for adding or changing a skill. New skills follow [CONVENTIONS.md](CONVENTIONS.md): output styling, the required score meter, the marks legend, and the disclaimer note. Validate before pushing (Node 22+):
 
 ```bash
-./scripts/validate_skill_integrity.sh
+npm ci
+npm run validate
+npm test
 ```
 
 ## Releases & Changelog
 
 Releases are created automatically after Validate skill integrity passes on `main` via `.github/workflows/release-calver.yml`.
 
-- Versioning format: `YYYY.MM.DD.N` (CalVer).
-- Changelog: [GitHub Releases page](https://github.com/outboundsync/skills/releases).
+- Versioning format: `YYYY.MM.DD.N` (CalVer). Each skill also has its own `metadata.version`.
+- Release notes: [GitHub Releases](https://github.com/outboundsync/skills/releases), generated from commit subjects.
+- Curated changelog: [CHANGELOG.md](CHANGELOG.md).
 
 To preview the next release locally:
 
 ```bash
-node scripts/release-calver.mjs --dry-run
+npm run release:preview
 ```
 
 ## Related
