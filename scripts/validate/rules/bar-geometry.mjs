@@ -1,6 +1,8 @@
 // Every rendered bar must use a legal width and a fill that matches the
 // number printed after it, so a glance at the meter never disagrees with
 // the score. Widths: /5 → 5 cells, /20 → 10 cells, status gauges and /100 → 20.
+// Inline code (`█░▒` in prose) is a glyph legend, not a rendered bar.
+import { stripInlineCode } from '../markdown.mjs';
 
 const RUN = /[█░▒]{3,}/g;
 const WIDTH_FOR_MAX = { 5: 5, 20: 10 };
@@ -21,9 +23,9 @@ export function checkBarLine(line) {
       continue;
     }
     const after = line.slice(match.index + bar.length);
-    const score = after.match(/^[^0-9█░▒]*?(\d+)\s*\/\s*(\d+)/);
+    const score = after.match(/^[^0-9█░▒]*?(\d[\d,]*)\s*\/\s*(\d[\d,]*)/);
     if (!score) continue;
-    const [n, max] = [Number(score[1]), Number(score[2])];
+    const [n, max] = [Number(score[1].replaceAll(',', '')), Number(score[2].replaceAll(',', ''))];
     if (max === 0 || n > max) continue;
     if (width !== 20 && WIDTH_FOR_MAX[max] !== width) {
       problems.push(`a ${width}-cell bar is for /${width === 5 ? 5 : 20} scores, but this row prints ${n}/${max}`);
@@ -46,7 +48,7 @@ export default {
     for (const file of model.markdownFiles()) {
       const scan = model.scan(file);
       scan.lines.forEach((line, index) => {
-        for (const msg of checkBarLine(line)) out.push({ file, line: index + 1, msg });
+        for (const msg of checkBarLine(stripInlineCode(line))) out.push({ file, line: index + 1, msg });
       });
     }
     return out;

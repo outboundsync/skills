@@ -4,14 +4,16 @@ Public [Agent Skills](https://agentskills.io) for OutboundSync — installable w
 
 The pack ships **15** skills.
 
+**Output style.** Every skill renders a fixed, terminal-friendly Markdown shape. Readiness and health checks (`preflight`, `sync-monitoring`, `email-authentication`, `sending-domain-quality`) lead with a verdict and a `█░▒` status gauge, then one card per system and a `Next` list. Scoring skills lead with a score meter. A failed lookup always shows as `UNVERIFIED`, never as a pass or an empty result. See [CONVENTIONS.md](CONVENTIONS.md) and each skill's `references/examples.md`.
+
 ### API & launch
 
 | Skill | Path | Needs API key? | What it does |
 | --- | --- | --- | --- |
-| `api` | [`skills/api/`](skills/api/) | Yes (`OUTBOUNDSYNC_API_KEY`) | OutboundSync API v1 guide: auth, vocabulary, discovery, routing to specialized skills |
+| `api` | [`skills/api/`](skills/api/) | Yes (`OUTBOUNDSYNC_API_KEY`) | OutboundSync API v1 + MCP guide: key access card, prior-outreach, blocklist, and metrics cards; routing to specialized skills |
 | `preflight` | [`skills/preflight/`](skills/preflight/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Read-only launch readiness across CRM OAuth, Sources/sync, and SEP inbound wiring |
-| `sync-monitoring` | [`skills/sync-monitoring/`](skills/sync-monitoring/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Diagnose Sync Monitoring Webhooks/events; mutations only after explicit confirmation |
-| `crm-analysis` | [`skills/crm-analysis/`](skills/crm-analysis/) | No | Read-only analysis of OutboundSync engagement signals in HubSpot or Salesforce (+ Attio & Close, beta) |
+| `sync-monitoring` | [`skills/sync-monitoring/`](skills/sync-monitoring/) | Yes (`OUTBOUNDSYNC_API_KEY`) | Sync Monitoring health gauge (endpoints, deliveries, events, CRM sync errors); mutations only after explicit confirmation |
+| `crm-analysis` | [`skills/crm-analysis/`](skills/crm-analysis/) | No | Read-only analysis of OutboundSync engagement signals in HubSpot or Salesforce (+ Attio & Close, beta), with a field-coverage gauge and ranked results |
 
 ### Targeting & lists
 

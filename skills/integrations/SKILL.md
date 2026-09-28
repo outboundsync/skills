@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # OutboundSync integrations directory helper
@@ -17,7 +17,7 @@ Read-only advisory. Fetch and filter the live directory; never submit express-in
 
 Render **only** the fixed output shape in this skill — no prose outside it.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md).
 
 ## Design tenet
 
@@ -63,29 +63,44 @@ Surface this block (or equivalent plain language) in every recommendation output
 
 ## Output contract
 
-```markdown
-## Matched integrations
+GitHub-flavored markdown only. Render only this shape; no prose outside it. Blank line between blocks. Availability leads every card as a mark: `✓` Live · `·` Beta · `✗` Planned or Requested (roadmap or demand signal only — not usable today). Order cards by availability first (Live before Beta before Planned/Requested), then fit; tier is only a tie-breaker.
+
+### Shape
+
+````markdown
+## Matched integrations — <n> for <job in a few words>
 
 ### <Name>
-- Availability: <Live|Beta|Planned|Requested>  ← always first
-- Category (type): …
-- Connection: <Direct|Via Partner>
-- Sync: <One-way sync|Two-way sync>
-- Tier: <Gold|Silver|Bronze|Untiered> — <one-line true meaning>
-- Link: https://outboundsync.com/integrations/<slug>/
-- Fit note: <one line>
+`<Category> · <Direct | Via Partner> · <One-way | Two-way> sync · https://outboundsync.com/integrations/<slug>/`
 
-…
+- <✓ Live | · Beta | ✗ Planned | ✗ Requested>
+- <✓ | · | ✗> <CRM or need from the user — e.g. syncs to HubSpot>
+- · Tier: <Gold | Silver | Bronze | Untiered> — <one-line true meaning>
+- · Fit: <one line>
 
-## Disclosures
-- OutboundSync's own directory (integrations OutboundSync works with — not an exhaustive independent ranking).
-- Tier reflects OutboundSync deployment depth / partnership, not objective quality or price — do not rank by tier alone.
-- No pricing, case studies, or vendor contact in the directory — verify independently.
-- Matched to your needs without preferring highest tier; non-listed tools may fit; directory is incomplete.
+### Disclosures
 
-## If not Live
-- Safer Live/Beta alternatives (if any) for the same job…
-- How to proceed: use the listing’s express-interest / get-demo CTAs, or browse https://outboundsync.com/integrations/ and filter Availability — Planned/Requested are roadmap or demand signals only.
-```
+- · OutboundSync's own directory (integrations OutboundSync works with — not an exhaustive independent ranking).
+- · Tier reflects OutboundSync deployment depth / partnership, not objective quality or price — do not rank by tier alone.
+- · No pricing, case studies, or vendor contact in the directory — verify independently.
+- · Matched to your needs without preferring highest tier; non-listed tools may fit; directory is incomplete.
+
+### Next
+1. <only when the best match is not Live: a safer Live/Beta alternative for the same job, if any>
+2. <express interest or get a demo from the listing, or browse https://outboundsync.com/integrations/ filtered by Availability>
+````
+
+### Shape — not listed
+
+````markdown
+## Matched integrations — <X> is not listed
+
+- ✗ <X> — not in the directory<, or only Requested/Planned>
+- · Closest Live option for the same job: <name — or none>
+
+### Disclosures
+
+- · <the four standard disclosures above>
+````
 
 When the user asks “does OutboundSync connect X to my CRM?”: answer from live Availability + detail-page CRM list. If X is absent: say it is not listed (or only Requested/Planned), and do not invent a connector.

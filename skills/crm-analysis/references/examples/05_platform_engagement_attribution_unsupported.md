@@ -13,15 +13,25 @@
 - `OSLastReplyTime__c`
 - Missing: `OSLastUpdateSource__c`
 
-## Compact preflight output
-- `Intent:` platform_engagement_attribution
-- `Mode:` strict
-- `Verdict:` UNSUPPORTED
-- `Confidence:` high
-- `Missing fields:` `OSLastUpdateSource__c`
-- `Fallback plan:` none
+## Rendered output
 
-## Example response output
-- Unsupported for strict platform attribution.
-- Required data to proceed: `OSLastUpdateSource__c`.
-- No platform ranking is produced.
+````markdown
+## Unsupported — platform engagement attribution
+
+```text
+Overall                ██████████░░░░░░░░░░  1/2 · unsupported
+
+OSLastUpdateSource__c  ░░░░░░░░░░░░░░░░░░░░  ✗ missing
+OSLastReplyTime__c     ████████████████████  ✓ present
+```
+
+### Field check
+`platform_engagement_attribution · strict · Salesforce · Instantly, Smartlead · last 30 days`
+
+- · Verdict: UNSUPPORTED · confidence high · reason missing_update_source
+- ✗ Missing: `OSLastUpdateSource__c`
+- · Fallback plan: none — no platform ranking is produced without the update source
+
+### Next
+1. Check why `OSLastUpdateSource__c` is empty in this org (it records which platform wrote each engagement), then re-run
+````

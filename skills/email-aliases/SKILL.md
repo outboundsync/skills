@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # Email aliases and sending identities
@@ -19,7 +19,7 @@ Default to the **quick** shape for a single-address keep/stop question. Use
 the full inventory only for multi-mailbox audits or scale planning. Render
 only the selected shape.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md).
 
 ## Core rules (encode verbatim)
 
@@ -83,18 +83,18 @@ Quick shape:
 
 ```markdown
 ### Verdict
-- <keep | review | stop> — <one line>
+- <✓ keep | · fix | ✗ stop> — <one line>
 
 ### Why
 - <verified evidence and remaining risk>
 
 ### Next
-- <shortest useful check or action>
+1. <shortest useful check or action>
 ```
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · ·
+GitHub-flavored markdown only. Render only the selected shape; no prose outside it. Blank line between blocks. Marks: `✓` pass · `✗` blocker · `·` advisory. Verdicts are always `✓ keep`, `· fix`, or `✗ stop`.
 
 ### Shape
 
@@ -107,7 +107,7 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 ### Inventory
 | Address | Type | Local-part | From-name | Signature | Triad | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
-| `user@domain` | mailbox\|alias\|role | ✓/✗/· | <name> | <name> | ✓/✗/· | keep\|fix\|stop |
+| `user@domain` | mailbox\|alias\|role | ✓/✗/· | <name> | <name> | ✓/✗/· | ✓ keep \| · fix \| ✗ stop |
 
 ### Findings
 - <✓/✗/· line>
@@ -116,14 +116,16 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 ### Prescription
 - Per domain: <dedicated human mailboxes; 2–3 is a conservative starting point>
 - Do not use aliases to manufacture independent capacity or reputation
-- Role senders: remove from cold sending unless the user has a validated,
-  reply-capable exception
+- Role senders: remove from cold sending unless the user has a validated, reply-capable exception
 - Role recipients: suppress operational roles; review department roles
 - Catch-all: <disable / avoid / risk note>
 
 ### Consistency triad
 - From-name = local-part human = signature name
 - Unique identity per mailbox
+
+### Next
+1. <shortest fix tied to a ✗ stop or · fix above>
 ````
 
 ## Safety

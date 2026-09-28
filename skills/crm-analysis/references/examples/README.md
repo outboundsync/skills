@@ -1,11 +1,13 @@
 # Examples
 
-These examples show expected usage shape:
+These examples show the rendered output contract (see `## Output contract` in `SKILL.md`):
 1. choose mode,
-2. map question to strict intent or exploratory path,
-3. run compact preflight,
-4. emit verdict,
-5. run analysis constrained by verdict.
+2. map the question to a strict intent or exploratory path,
+3. run the field check (the router contract's `preflight_schema`),
+4. render the verdict heading, field gauge, and Field check card,
+5. run analysis constrained by the verdict into Results.
+
+Illustrative data only; the layout is the contract, not the values.
 
 Files:
 - `01_top_campaigns_by_replies_30d.md` (strict SUPPORTED)

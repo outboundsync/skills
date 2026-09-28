@@ -1,6 +1,6 @@
 # Preflight output examples
 
-Use these as the fixed output contract. Each example includes a CRM gauge row and a CRM card.
+Use these as the fixed output contract. Each example includes a CRM gauge row and a CRM card. Illustrative data; the layout is the contract, not the values.
 
 ## Not ready (Instantly blocked)
 
@@ -8,11 +8,11 @@ Use these as the fixed output contract. Each example includes a CRM gauge row an
 ## Not ready to launch
 
 ```text
-Overall ████████░░░░░░░░░░░░ 2/5 · not ready
+Overall       ████████░░░░░░░░░░░░  2/5 · not ready
 
-CRM                  ████████████████████ ✓ ready
-OutboundSync         ████████████████████ ✓ ready
-Instantly            ░░░░░░░░░░░░░░░░░░░░ ✗ 0/3
+CRM           ████████████████████  ✓ ready
+OutboundSync  ████████████████████  ✓ ready
+Instantly     ░░░░░░░░░░░░░░░░░░░░  ✗ 0/3
 ```
 
 ### CRM — HubSpot
@@ -49,12 +49,12 @@ Instantly            ░░░░░░░░░░░░░░░░░░░�
 ## Not ready to launch
 
 ```text
-Overall ████████████░░░░░░░░ 3/5 · not ready · 1 manual
+Overall       ████████████░░░░░░░░  3/5 · not ready · 1 manual
 
-CRM                  ████████████████████ ✓ ready
-OutboundSync         ████████████████████ ✓ ready
-Instantly            ███████░░░░░░░░░░░░░ ✗ 1/3
-Smartlead            ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ · manual — verify in UI
+CRM           ████████████████████  ✓ ready
+OutboundSync  ████████████████████  ✓ ready
+Instantly     ███████░░░░░░░░░░░░░  ✗ 1/3
+Smartlead     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  · manual — verify in UI
 ```
 
 ### CRM — HubSpot
@@ -96,11 +96,11 @@ Smartlead            ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒�
 ## Ready to launch
 
 ```text
-Overall ████████████████████ 5/5 · ready
+Overall       ████████████████████  5/5 · ready
 
-CRM                  ████████████████████ ✓ ready
-OutboundSync         ████████████████████ ✓ ready
-Instantly            ████████████████████ ✓ 3/3
+CRM           ████████████████████  ✓ ready
+OutboundSync  ████████████████████  ✓ ready
+Instantly     ████████████████████  ✓ 3/3
 ```
 
 ### CRM — HubSpot
@@ -120,5 +120,45 @@ Instantly            ███████████████████�
 ### Instantly
 `Connection 177 · …/webhooks/ac2346f2`
 
-- ✓ 3 active mailboxes · webhook wired · campaign sendable
+- ✓ 3 active mailboxes
+- ✓ Exact-match campaign webhook wired and enabled
+- ✓ Campaign sendable
+````
+
+## Instantly check failed (UNVERIFIED)
+
+The Instantly API returned `503` for accounts and campaigns, so those gates are unknown — not failed and not passed.
+
+````markdown
+## Not ready to launch
+
+```text
+Overall       ████████████████████  2/2 · not ready · 1 unverified
+
+CRM           ████████████████████  ✓ ready
+OutboundSync  ████████████████████  ✓ ready
+Instantly     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  · UNVERIFIED — Instantly API 503
+```
+
+### CRM — HubSpot
+`Connection 177 · outboundsync.com · org 123`
+
+- ✓ Connected — HubSpot OAuth ready
+- · Capabilities: sync on · destinations on · blocklists on
+- · Integration config: instantly → company ✓ · task ✓ · owner ✓
+- · Destinations (forwarding, not CRM writes): none — events still sync to CRM natively; 2 unbound in catalog — forward nothing
+- · Blocklists: ready (1 enabled)
+
+### OutboundSync
+`HubSpot · outboundsync.com`
+
+- ✓ Sources + sync enabled
+
+### Instantly
+`Connection 177 · …/webhooks/ac2346f2`
+
+- · UNVERIFIED — list_accounts returned 503; mailboxes, webhook, and campaign not checked
+
+### Next
+1. Rerun preflight in a few minutes; if Instantly keeps failing, verify the mailbox, webhook, and campaign in the Instantly UI
 ````

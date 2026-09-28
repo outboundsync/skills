@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # Connection requests (social outreach)
@@ -19,7 +19,7 @@ Default to the **quick** shape when the user asks for a note or "just the
 copy." Use the full contract only for audits or volume/health checks. Render
 only the selected shape.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## Core rules (encode verbatim)
 
@@ -81,7 +81,10 @@ Quick shape:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · ·
+GitHub-flavored markdown only. Render only the selected shape; no prose outside it. Blank line between blocks. Marks: `✓` pass · `✗` blocker · `·` advisory; the mark leads every bullet.
+
+- **Score** leads with the pack's 20-cell `/100` [score meter](https://github.com/outboundsync/skills/blob/main/CONVENTIONS.md#score-meter--required-for-any-skill-that-scores-or-rates): `█` × round(n / 100 × 20), then `░`. Scores are judgment against this skill's rubric, not industry benchmarks.
+- **Volume / health** uses the [status layout](https://github.com/outboundsync/skills/blob/main/CONVENTIONS.md#status-layout--required-for-readiness-health-and-audit-skills) gauge: one gate per row — Invites (within the safe band), Acceptance (vs the seniority benchmark), Pending (under ~500), Restrictions (none). A gate passes on `✓` or `·` caution and fails on `✗` red flag; a metric the user didn't give is `▒` `· UNVERIFIED — not provided`. Omit the section outside Audit and Volume check.
 
 ### Shape
 
@@ -96,9 +99,13 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 - Reason: <one line>
 
 ### Score
-- Total: </100>
-- Band: <fail | weak | solid | strong>
-- Category lines: <bullets with scores>
+
+```text
+Score  <bar>  <n>/100 · <fail | weak | solid | strong>
+```
+
+- <✓ | · | ✗> <category> <n>/<max> — <one-line reason>
+- …
 
 ### Findings
 - <✓/✗/· line>
@@ -114,9 +121,17 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 - Wait ~24h → one easy question → no immediate pitch
 
 ### Volume / health
-- Invites: <n/day · n/week> vs safe band
-- Acceptance: <n%> · benchmark <IC|manager|C-level>
-- Pending: <n> · <ok | withdraw stale>
+
+```text
+Overall       <bar>  <p>/<t> · <healthy | at risk>[ · <n> unverified]
+
+Invites       <bar>  <mark> <n>/day · <n>/week vs <band>
+Acceptance    <bar>  <mark> <n>% vs <IC | manager | C-level> benchmark
+Pending       <bar>  <mark> <n> pending
+Restrictions  <bar>  <mark> <none | recent warning | active limit>
+```
+
+- <✓ | · | ✗> <shortest fix or confirmation per failing row>
 ````
 
 ## Safety

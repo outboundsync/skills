@@ -4,14 +4,14 @@ description: >-
   Audit SPF, DKIM, DMARC (and MX, PTR, BIMI, MTA-STS, TLS-RPT) for one or more
   sending domains. Use when the user asks to check SPF/DKIM/DMARC, email
   authentication, whether a domain is authenticated, why SPF is failing, or to
-  audit DNS for a sending domain.
+  audit DNS for a sending domain. No OutboundSync API key.
 license: MIT
 compatibility: >-
   Uses read-only public DNS lookups via the agent's shell/HTTP (no key).
   Optional MXTOOLBOX_API_KEY or a DNS MCP for richer checks.
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # Email authentication audit
@@ -20,7 +20,7 @@ Run **read-only**. Public DNS lookups only (shell/HTTP). Never mutate DNS, regis
 
 Render **only** the fixed output shape in this skill — no prose outside it.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md).
 
 ## Scope and safety
 
@@ -119,14 +119,21 @@ BIMI still requires a qualifying DMARC policy and valid SVG/logo evidence when c
 
 ## Output contract
 
-GitHub-flavored markdown only. Layout is the spec:
+GitHub-flavored markdown only. Render only this shape; no prose outside it. This is the pack's [status layout](https://github.com/outboundsync/skills/blob/main/CONVENTIONS.md#status-layout--required-for-readiness-health-and-audit-skills):
 
-1. `##` verdict: `Authentication healthy` | `Authentication needs work` | `Authentication unverified`.
-2. Optional glance ```text``` block when auditing multiple domains (one row per domain).
-3. One `###` card per domain.
-4. Blank line between blocks. Every status line is a `-` bullet. Never two checks on one line.
-5. Marks: ✓ · ✗ · UNVERIFIED. No colored emoji, no ASCII boxes.
-6. `### Next` only when any ✗ or UNVERIFIED (or actionable ·); each item maps to a finding above.
+1. `##` is the verdict: `Authentication healthy` | `Authentication needs work` | `Authentication unverified`.
+2. A fenced `text` gauge follows immediately — always, even for one domain: an `Overall` row, then one row per domain. Pad labels so bars align.
+3. One `###` card per domain, in gauge order, opening with a backtick context line.
+4. Every bullet starts with its mark: `✓` pass · `·` warn · `✗` fail · `· UNVERIFIED — <reason>` when a lookup failed or alignment has no sample headers. One check per bullet; blank line between blocks. No colored emoji, no ASCII boxes.
+5. `### Next` only when any ✗, UNVERIFIED, or actionable · exists; each item maps to a line above.
+
+**Gates per domain** (the gauge's `<t>`): SPF · DKIM · DMARC · MX (only when the domain must receive replies) · alignment. PTR, BIMI, MTA-STS, and TLS-RPT are advisory card lines, not gates.
+
+- A gate **passes** on `✓` or `·` warn — the record publishes and works.
+- `UNVERIFIED` (lookup failed, no sample headers) and DKIM "not found at probed selectors" fill `▒`, not `█`.
+- `✗` fills `░`.
+- Bar: `█` = round(passed / t × 20), `▒` = round(unverified / t × 20), `░` = the rest. Overall sums the gates of every domain with at least one verified gate; a wholly UNVERIFIED domain is left out of `<t>` and counted in the suffix, which counts domains.
+- Row text: `<✓ | ✗ | ·> <passed>/<t>[ · <n> unverified]` — the mark is the domain's verdict (`·` = unverified). Overall: `<passed>/<t> · <healthy | needs work | unverified>[ · <n> unverified]`, omitting the suffix when the verdict is already unverified.
 
 ### Shape
 
@@ -134,23 +141,28 @@ GitHub-flavored markdown only. Layout is the spec:
 ## <Authentication healthy | Authentication needs work | Authentication unverified>
 
 ```text
-<domain>  <bar-or-summary>  <✓|·|✗|UNVERIFIED> alignment <pass|fail|UNVERIFIED>
+Overall     <bar>  <p>/<t> · <verdict>[ · <n> unverified]
+
+<domain>    <bar>  <✓ | ✗ | ·> <p>/<t>[ · <n> unverified]
 ```
 
 ### <domain>
-`SPF · DKIM · DMARC · MX · PTR · BIMI/MTA-STS/TLS-RPT`
+`<reply-receiving | send-only> · <brand | cold outbound> · <mail provider if known>`
 
-- <✓/·/✗/UNVERIFIED SPF line — include lookup count and all mechanism>
-- <✓/·/✗/UNVERIFIED DKIM line — selectors probed or matched>
-- <✓/·/✗/UNVERIFIED DMARC line — p= and rua summary>
-- <✓/·/✗/UNVERIFIED MX line — or role-skipped note>
-- <✓/·/✗/UNVERIFIED PTR line — or N/A hosted mailbox>
-- <✓/· BIMI / MTA-STS / TLS-RPT lines as applicable>
-- Alignment: <✓ pass | ✗ fail | UNVERIFIED — no sample headers | UNVERIFIED — lookup failed>
+- <✓ | · | ✗> SPF — <n> record(s) · <n> lookups · <all mechanism>
+- <✓ | · | ✗> DKIM — <selector(s) found, key size | not found at probed selectors (<list>); selector may be custom>
+- <✓ | · | ✗> DMARC — p=<policy> · rua <present | missing>
+- <✓ | · | ✗> MX — <hosts | not required for send-only>
+- <✓ | ✗> Alignment — <SPF or DKIM aligned with From> | · UNVERIFIED — no sample headers
+- · PTR — <N/A hosted mailbox | FCrDNS result>
+- · <BIMI | MTA-STS | TLS-RPT> — <state; brand domains only>
 
 ### Next
 1. <shortest fix tied to a ✗ or UNVERIFIED above>
+   `<exact DNS record when the fix is a record>`
 ````
+
+Replace any line whose lookup failed with `· UNVERIFIED — <record> lookup failed (<resolver error>)`. Worked examples: [references/examples.md](references/examples.md).
 
 ### Verdict logic (compute, never print as its own section)
 

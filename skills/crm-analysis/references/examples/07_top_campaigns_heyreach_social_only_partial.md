@@ -14,20 +14,35 @@
 - `os_last_reply_social_time`
 - Missing: `os_last_email_campaign_name`, `os_last_reply_time`
 
-## Compact preflight output
-- `Intent:` top_campaigns_by_replies_30d
-- `Mode:` strict
-- `Verdict:` PARTIAL
-- `Confidence:` low
-- `Missing fields:` `os_last_reply_time`
-- `Fallback plan:` rank campaigns by contact volume only; state missing reply-time limitation
+## Rendered output
 
-## Example analysis output
-- Partial strict result (email reply data unavailable for HeyReach):
-  - Campaign ranking by contact volume only.
-  - `Social Outreach Q1` -> 87 contacts
-  - `VP Eng Social Touch` -> 54 contacts
-- Limitation:
-  - HeyReach does not sync email reply timestamps for this strict email-focused intent.
-- Suggested handoff:
-  - Re-run in exploratory mode with social summary intent (`heyreach_social_summary`) if social-only signals are the goal.
+````markdown
+## Partial — top campaigns by replies (social-only data)
+
+```text
+Overall                ██████████░░░░░░░░░░  1/2 · partial
+
+os_last_campaign_name  ████████████████████  ✓ present
+os_last_reply_time     ░░░░░░░░░░░░░░░░░░░░  ✗ missing
+```
+
+### Field check
+`top_campaigns_by_replies_30d · strict · HubSpot · HeyReach · last 30 days`
+
+- · Verdict: PARTIAL · confidence low
+- ✗ Missing: `os_last_reply_time`
+- · Fallback plan: rank campaigns by contact volume only; state the missing reply-time limitation
+
+### Results
+`contacts (reply data unavailable) · last 30 days · HubSpot contacts`
+
+| Rank | Campaign | Contacts |
+| --- | --- | --- |
+| 1 | `Social Outreach Q1` | ████████████████████ 87 |
+| 2 | `VP Eng Social Touch` | ████████████░░░░░░░░ 54 |
+
+- · HeyReach does not sync email reply timestamps, so this strict email-reply intent can only rank by volume
+
+### Next
+1. Re-run with `Mode: exploratory` for the social summary (`heyreach_social_summary`) if social replies are the goal
+````

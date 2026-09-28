@@ -14,17 +14,33 @@
 - `os_last_sent_time`
 - Missing: `os_last_sent_address`
 
-## Compact preflight output
-- `Intent:` deliverability_unsubscribes_bounces
-- `Mode:` strict
-- `Verdict:` PARTIAL
-- `Confidence:` medium
-- `Missing fields:` `os_last_sent_address`
-- `Fallback plan:` campaign/global deliverability analysis only
+## Rendered output
 
-## Example analysis output
-- Partial deliverability view:
-  - Bounce and unsubscribe trends by campaign/time window
-  - No sender-address breakdown available
-- Limitation:
-  - `os_last_sent_address` missing, so sender-level diagnosis is unavailable.
+````markdown
+## Partial — deliverability (unsubscribes and bounces)
+
+```text
+Overall                   ███████████████░░░░░  3/4 · partial
+
+os_last_bounce_time       ████████████████████  ✓ present
+os_last_unsubscribe_time  ████████████████████  ✓ present
+os_last_sent_time         ████████████████████  ✓ present
+os_last_sent_address      ░░░░░░░░░░░░░░░░░░░░  ✗ missing
+```
+
+### Field check
+`deliverability_unsubscribes_bounces · strict · HubSpot · Smartlead · last 30 days`
+
+- · Verdict: PARTIAL · confidence medium
+- ✗ Missing: `os_last_sent_address`
+- · Fallback plan: campaign-level and aggregate deliverability only
+
+### Results
+`bounces and unsubscribes · last 30 days · HubSpot contacts`
+
+- · Bounce and unsubscribe trends by campaign and week
+- · No sender-address breakdown — `os_last_sent_address` is missing
+
+### Next
+1. Check why `os_last_sent_address` is empty in this portal to diagnose deliverability per mailbox
+````

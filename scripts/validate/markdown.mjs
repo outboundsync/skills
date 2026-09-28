@@ -67,7 +67,7 @@ export function scanMarkdown(text) {
   };
 }
 
-function stripInlineCode(line) {
+export function stripInlineCode(line) {
   return line.replace(/(`+)(?:(?!\1).)+?\1/g, (match) => ' '.repeat(match.length));
 }
 

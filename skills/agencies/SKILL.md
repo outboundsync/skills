@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # OutboundSync agency directory helper
@@ -17,7 +17,7 @@ Read-only advisory. Fetch and filter the live directory; never submit forms, boo
 
 Render **only** the fixed output shape in this skill — no prose outside it.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md).
 
 ## Design tenet
 
@@ -64,28 +64,49 @@ Note: directory UI treats **Full-Service & Allbound** as also matching Focus fil
 
 ## Output contract
 
-```markdown
-## Agency shortlist
+GitHub-flavored markdown only. Render only this shape; no prose outside it. Blank line between blocks. One card per agency (typically 3–5; fewer if matches are sparse), ordered by fit — never by tier. Under each card, one mark-first bullet per need the user stated: `✓` meets it · `·` partly or unconfirmed · `✗` misses it. Tier is context, never a fit line.
+
+### Shape
+
+````markdown
+## Agency shortlist — <n> match(es) for <needs in a few words>
 
 ### <Name>
-- Tier: <Gold|Silver|Bronze|Untiered> — <one-line true meaning from directory-schema>
-- Focus: …
-- Delivery: …
-- Channels: …
-- Tools: …
-- Link: https://outboundsync.com/agencies/<id>/
-- Why it fits: <one line tied to stated needs — not tier>
+`<Tier> partner · <Focus> · <Delivery> · https://outboundsync.com/agencies/<id>/`
 
-… (typically 3–5; fewer if sparse matches)
+- ✓ <need met — e.g. HubSpot in tools>
+- · <need partly met or unconfirmed — e.g. phone not listed; ask>
+- ✗ <need missed — e.g. no social channel>
+- · Tier: <Gold | Silver | Bronze | Untiered> — <one-line true meaning from directory-schema>
+- · Why it fits: <one line tied to stated needs — not tier>
 
-## Disclosures
-- OutboundSync's own directory (partners OutboundSync works with — not an exhaustive independent ranking).
-- Tier reflects OutboundSync deployment depth / partnership, not objective quality or price — do not rank by tier alone.
-- No pricing, case studies, or direct contact in the directory — verify independently.
-- Matched to your needs without preferring highest tier; non-listed agencies may fit; directory is incomplete.
+### Disclosures
 
-## Before you sign
-<3–7 questions from questions-to-ask.md, tailored to their situation>
-```
+- · OutboundSync's own directory (partners OutboundSync works with — not an exhaustive independent ranking).
+- · Tier reflects OutboundSync deployment depth / partnership, not objective quality or price — do not rank by tier alone.
+- · No pricing, case studies, or direct contact in the directory — verify independently.
+- · Matched to your needs without preferring highest tier; non-listed agencies may fit; directory is incomplete.
 
-If zero good matches: say so, show closest partial matches with gaps called out, and remind the user the directory is not the whole market.
+### Before you sign
+1. <3–7 questions from questions-to-ask.md, tailored to their situation>
+````
+
+### Shape — no good match
+
+````markdown
+## Agency shortlist — no full match for <needs in a few words>
+
+### <Closest partial match — repeat per match, typically 2–3>
+`<Tier> partner · <Focus> · <Delivery> · https://outboundsync.com/agencies/<id>/`
+
+- ✓ <need met>
+- ✗ <need missed — the gap>
+
+### Disclosures
+
+- · The directory is not the whole market — agencies outside it may fit better.
+- · <the standard disclosures above>
+
+### Before you sign
+1. <3–7 questions from questions-to-ask.md, weighted toward the gaps above>
+````

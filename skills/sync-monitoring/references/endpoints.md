@@ -1,42 +1,47 @@
-# Sync Monitoring API map
+# Sync Monitoring API + MCP map
 
-Base: `https://app.outboundsync.com/api/v1`
+Trimmed copy of the pack's full map (the `api` skill's `references/endpoints.md`); `npm run validate` keeps the rows below matching it.
 
-```http
-Authorization: Bearer $OUTBOUNDSYNC_API_KEY
-```
+- REST base: `https://app.outboundsync.com/api/v1` · `Authorization: Bearer $OUTBOUNDSYNC_API_KEY`
+- MCP: `https://mcp.outboundsync.com/mcp` (same Bearer key)
 
-Account-scoped key required for every `/webhooks*` route. `write` scope required for mutations.
+`R` = read. `W` = needs the `write` scope. `A` = needs an **account-scoped** key **and** platform webhooks enabled (`canUseWebhooks`). `H` = needs `canUseWebhooks`, any key scope — a connection-scoped key reads its connection's events plus account-level events.
 
-## Webhooks
+## REST ↔ MCP tools
 
-| Method + path | Scope | Purpose |
-| --- | --- | --- |
-| `GET /webhooks` | read | List (`{ "webhooks": [...] }`, no secrets) |
-| `GET /webhooks/:id` | read | Get one |
-| `POST /webhooks` | write | Create; returns `secret` once |
-| `PATCH /webhooks/:id` | write | Update url / description / enabledEvents / isActive |
-| `DELETE /webhooks/:id` | write | Soft-delete `204` |
-| `POST /webhooks/:id/rotate-secret` | write | New `secret` once |
-| `POST /webhooks/:id/test` | write | `test.ping` → `202` `{ eventId }` |
-| `GET /webhooks/:id/deliveries` | read | Delivery log |
-| `POST /webhooks/:id/deliveries/:deliveryId/replay` | write | Replay |
+| REST | MCP tool | Access | Owner / notes |
+| --- | --- | --- | --- |
+| `GET /me` | `get_me` | R | Identity, `apiKey{name, scopes[], connectionScope: account\|connection, connectionId}`, `connections[]`, `links`. Call first. No capability flags. |
+| `GET /syncs/metrics` | `get_syncs_metrics` | R | `{ success, warning, error }`; `sourceId?`, `connectionId?`. An inaccessible `connectionId` returns zeros, not 404. |
+| `GET /webhooks` | `list_webhooks` | R · A | Sync Monitoring endpoints → `sync-monitoring`. |
+| `GET /webhooks/:id` | `get_webhook` | R · A | → `sync-monitoring`. |
+| `POST /webhooks` | `create_webhook` | W · A | → `sync-monitoring`. Returns `secret` once. |
+| `PATCH /webhooks/:id` | `update_webhook` | W · A | → `sync-monitoring`. |
+| `DELETE /webhooks/:id` | `delete_webhook` | W · A | → `sync-monitoring`. Soft-delete; `204`. |
+| `POST /webhooks/:id/rotate-secret` | `rotate_webhook_secret` | W · A | → `sync-monitoring`. New `secret` once; old one stops working. |
+| `POST /webhooks/:id/test` | `test_webhook` | W · A | → `sync-monitoring`. `202 { eventId }`; `502` if it could not be queued. |
+| `GET /webhooks/:id/deliveries` | `list_webhook_deliveries` | R · A | → `sync-monitoring`. `status?` (`PENDING`\|`SUCCEEDED`\|`FAILED`\|`DEAD`). |
+| `POST /webhooks/:id/deliveries/:deliveryId/replay` | `replay_webhook_delivery` | W · A | → `sync-monitoring`. |
+| `GET /events` | `list_events` | R · H | → `sync-monitoring`. `type?`, `delivered?`. Any key scope; a connection-scoped key sees its connection's events plus account-level events. |
+| `GET /events/:id` | `get_event` | R · H | → `sync-monitoring`. Event plus `deliveries[]`. |
 
-## Events
+## Resources
 
-| Method + path | Purpose |
+| Resource | Fields |
 | --- | --- |
-| `GET /events` | Log; filters `type`, `delivered`, `cursor`, `limit` |
-| `GET /events/:id` | Detail + delivery attempts |
+| Webhook endpoint | `id` (`oswhk_…`), `url` (https only), `description`, `enabledEvents[]` (empty = all subscribable), `isActive`, `autoDisabledAt`, `createdAt`, `updatedAt` — never a secret |
+| Delivery attempt | `id` (`oswhd_…`), `endpointId`, `status` (`PENDING`\|`SUCCEEDED`\|`FAILED`\|`DEAD`), `attemptCount`, `lastAttemptAt`, `lastHttpStatus`, `lastError`, `replayOfDeliveryId`, `createdAt` |
+| Event | `id` (`osevt_…`), `type`, `summary`, `data`, `connectionId`, `sourceId`, `delivered` (≥1 delivery `SUCCEEDED`), `createdAt`; `get_event` adds `deliveries[]` |
+| Signing secret | `oswhsec_…` — only in the create/rotate response |
 
-## Ids
+There is no events or webhook-delivery metrics endpoint: count undelivered events by paging `list_events` with `delivered=false`.
 
-| Prefix | Meaning |
-| --- | --- |
-| `oswhk_` | Webhook endpoint |
-| `osevt_` | Platform event |
-| `oswhd_` | Delivery attempt |
-| `oswhsec_` | Signing secret (shown once) |
+## Paging and errors
+
+- `/events` and `/webhooks/:id/deliveries`: cursor pages `{ data, hasMore, nextCursor }`, default 25, max 100. Loop on `hasMore` / `nextCursor`, never on page length. `/webhooks` returns the whole list.
+- `get_syncs_metrics` needs full ISO-8601 `from`/`to`, at most 31 days apart.
+- `403` messages: "Webhook endpoint management requires an account-scoped API key" · "Platform webhooks are not enabled for this account" · missing `write`. Relay them verbatim.
+- Any `401`/`403`/`5xx`, timeout, non-JSON body, or MCP `isError` → that row is **UNVERIFIED**, never "no endpoints" or "no events".
 
 ## Docs
 

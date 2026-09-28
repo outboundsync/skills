@@ -10,7 +10,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Cold email body
@@ -29,7 +29,7 @@ when available, but assemble **one user-facing answer** from their results
 rather than emitting three separate audit reports. Never block if they are not
 installed.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## Core rules (encode verbatim)
 
@@ -132,7 +132,7 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 ### Score
 
 ```text
-Score  ███████████████░░░░░  78/100 · solid
+Score  ████████████████░░░░  78/100 · solid
 ```
 
 - Total: </100>

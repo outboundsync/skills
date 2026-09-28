@@ -10,33 +10,23 @@ Authorization: Bearer $OUTBOUNDSYNC_API_KEY
 
 Never print, log, or commit the key. Prefer connection-scoped keys when least privilege matters.
 
-## MCP when connected
+## REST ↔ MCP tools (in call order)
 
-Hosted OutboundSync MCP: `https://mcp.outboundsync.com/mcp` (streamable HTTP, same Bearer key). Setup: https://outboundsync.com/docs/mcp/setup/
+Trimmed copy of the pack's full map (the `api` skill's `references/endpoints.md`); `npm run validate` keeps these rows matching it. Hosted MCP: `https://mcp.outboundsync.com/mcp` (streamable HTTP, same Bearer key). Setup: https://outboundsync.com/docs/mcp/setup/ — prefer MCP when connected; the output contract is unchanged either way.
 
-| Order | REST | MCP tool |
-| --- | --- | --- |
-| 1 | `GET /me` | `get_me` |
-| 2 | `GET /connections` | `list_connections` |
-| 3 | `GET /account/status` | `get_account_status` |
-| 4 | `GET /sources` | `list_sources` |
-| 5 | `GET /destinations/reply-relays` | `list_reply_relays` |
+| REST | MCP tool | Access | Owner / notes |
+| --- | --- | --- | --- |
+| `GET /me` | `get_me` | R | Validate the key; accessible connections; `apiKey.connectionScope` / `connectionId`. |
+| `GET /connections` | `list_connections` | R | Per-connection OAuth `status`, `organizationId`, plan `capabilities{sync, destinations, blocklists}`. |
+| `GET /account/status` | `get_account_status` | R | `ready`, `blockers[]`, `warnings[]`, per-connection components (enums below). |
+| `GET /sources` | `list_sources` | R | Paste URLs, platform, config flags, forwarding bindings, bound reply relay. One call — not paginated. |
+| `GET /destinations` | `list_destinations` | R | Forwarding catalog; `sourceIds: []` entries are unbound (CRM-card advisory only; not a gate). |
 
-Prefer MCP tools when the client has OutboundSync MCP connected; otherwise use REST. Output contract is unchanged.
+Docs: https://outboundsync.com/docs/api/v1/ · Creating API keys: https://outboundsync.com/docs/api/authentication/creating-api-keys/
 
-## Endpoints used by this skill
+## Failures are UNVERIFIED
 
-| Order | Method + path | Why preflight calls it |
-| --- | --- | --- |
-| 1 | `GET /me` | Validate key; list accessible connections (`id`, `crm`, `organizationDomain`); note `apiKey.connectionScope` / `connectionId`. |
-| 2 | `GET /connections` | Per-connection OAuth `status`, `organizationId`, and plan `capabilities{sync, destinations, blocklists}`. |
-| 3 | `GET /account/status` | Top-level `ready`, `blockers[]`, `warnings[]`; per-connection `crmConnection`, `sources`, `destinations`, `blocklists` component statuses. |
-| 4 | `GET /sources` | Inbound Sources paste URLs, platform, config flags, forwarding destinations, bound reply relay. Paginate until exhausted. |
-| 5 | `GET /destinations/reply-relays` | Reply-relay catalog (CRM-card advisory only; not a gate). |
-
-Docs: https://outboundsync.com/docs/api/v1/
-
-Creating API keys: https://outboundsync.com/docs/api/authentication/creating-api-keys/
+Any `401`/`403`/`5xx`, timeout, non-JSON body (unknown `/api/v1/*` paths return HTML with `200`), or MCP `isError` (`{ error: { code, message, status? } }`) → render that card as `· UNVERIFIED — <status or message>` and its gauge row as 20 `▒`. Never read a failed call as "no sources" or "no blockers".
 
 ## Related skills (not called here)
 
@@ -54,14 +44,18 @@ Creating API keys: https://outboundsync.com/docs/api/authentication/creating-api
 | `destinations[].url` | Only as a full paste under a `Next` step that needs it |
 | Capabilities, config booleans, CRM names, blocker codes | Safe |
 
-## ComponentStatus mapping (destinations / blocklists)
+## `/account/status` enums
 
-| Status | How to render on the CRM card |
+| Field | Values → CRM / pipeline card |
 | --- | --- |
-| `ready` | Ready — include count when available (`<n> enabled` / `<n> endpoint(s)`) |
-| `not_configured` | Advisory — feature on plan, nothing set up |
-| `disabled` | `disabled on plan` — no warning |
-| `error` | `error: <lastError>` |
+| `blockers[].code` | `crm_disconnected` (CRM ✗) · `sync_not_enabled` / `no_sources` (pipeline ✗) — gate `ready` |
+| `warnings[].code` | `destinations_not_configured` · `blocklists_not_configured` · `blocklists_error` — advisory `·` only |
+| `crmConnection.status` | `ready` · `disconnected` |
+| `sources.status` | `ready` · `not_configured` · `disabled` |
+| `destinations.status` | `ready` (`<forwardingCount> endpoint(s)`) · `not_configured` (advisory) · `disabled` (`disabled on plan`, no warning) — **no `error` value** |
+| `blocklists.status` | `ready` (`<enabledCount> enabled`) · `not_configured` (advisory) · `disabled` (`disabled on plan`) · `error` (`error: <lastError>`) |
+
+Every blocker and warning carries `message`, `remediation`, and `docUrl` — turn remediation into the shortest Next step.
 
 ## Optional Instantly surface
 

@@ -2,6 +2,7 @@ import barGeometry from './bar-geometry.mjs';
 import crmAnalysis from './crm-analysis.mjs';
 import descriptionStyle from './description-style.mjs';
 import disclaimer from './disclaimer.mjs';
+import endpointMapConsistent from './endpoint-map-consistent.mjs';
 import frontmatter from './frontmatter.mjs';
 import links from './links.mjs';
 import linksEscapeSkill from './links-escape-skill.mjs';
@@ -24,6 +25,7 @@ export const rules = [
   scoreMeter,
   barGeometry,
   writeToolsNamed,
+  endpointMapConsistent,
   links,
   linksEscapeSkill,
   stalePaths,

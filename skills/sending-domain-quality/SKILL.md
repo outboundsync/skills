@@ -4,14 +4,14 @@ description: >-
   Score a sending domain on TLD, name quality, age, and reputation for cold
   outbound. Use when the user asks if a domain is good for sending, about TLD
   quality, domain reputation/blacklist, which domain to buy for outbound, or to
-  audit cold domains.
+  audit cold domains. No OutboundSync API key.
 license: MIT
 compatibility: >-
   Read-only RDAP + public DNSBL lookups (no key). Optional GOOGLE_WEB_RISK_KEY /
   VIRUSTOTAL_API_KEY / WHOISXML_API_KEY for reputation scoring.
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # Sending domain quality
@@ -20,7 +20,7 @@ Run **read-only**. RDAP + public DNS/DNSBL (and optional reputation APIs). Never
 
 Render **only** the fixed output shape in this skill — no prose outside it.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md).
 
 ## Scope and safety
 
@@ -104,15 +104,22 @@ No first-party domain-reputation MCP is assumed — use DNS/HTTP/optional keys.
 
 ## Output contract
 
-GitHub-flavored markdown only. Layout is the spec:
+GitHub-flavored markdown only. Render only this shape; no prose outside it. This is the pack's [status layout](https://github.com/outboundsync/skills/blob/main/CONVENTIONS.md#status-layout--required-for-readiness-health-and-audit-skills):
 
-1. `##` verdict: `Domain fit for cold send` | `Domain risky for cold send` | `Domain quality unverified`.
-2. Optional ```text``` glance when scoring multiple domains.
-3. One `###` card per domain with **4-factor scores + overall**.
-4. Blank line between blocks. Every status line is a `-` bullet. Never two checks on one line.
-5. Marks: ✓ · ✗ · UNVERIFIED. No colored emoji, no ASCII boxes.
-6. Always include the dominance caveat as a final `·` bullet on each card (or once under Next when multi-domain).
-7. `### Next` when any ✗, UNVERIFIED, or actionable ·.
+1. `##` is the verdict: `Domain fit for cold send` | `Domain risky for cold send` | `Domain quality unverified`.
+2. A fenced `text` gauge follows immediately — always, even for one domain: an `Overall` row, then one row per domain. Pad labels so bars align.
+3. One `###` card per domain, in gauge order, opening with a backtick context line.
+4. Every bullet starts with its mark: `✓` pass · `·` warn · `✗` fail · `· UNVERIFIED — <reason>` when a lookup failed. One check per bullet; blank line between blocks. No colored emoji, no ASCII boxes.
+5. End each card with the dominance caveat as a `·` bullet (once under Next instead when there are several domains).
+6. `### Next` when any ✗, UNVERIFIED, or actionable · exists.
+
+**Gates per domain** (4): TLD · name · age · reputation, following the verdict logic below.
+
+- TLD and non-deceptive name `·` warnings **pass** (advisory). A deceptive-lookalike name fails.
+- Age and reputation pass only on `✓`; their `·` fills `░` (warn ≠ fit for cold outbound).
+- `UNVERIFIED` fills `▒`.
+- Bar: `█` = round(passed / 4 × 20), `▒` = round(unverified / 4 × 20), `░` = the rest. Overall sums the gates of every domain with at least one verified gate; a wholly UNVERIFIED domain is left out of `<t>` and counted in the suffix, which counts domains.
+- Row text: `<✓ | · | ✗> <passed>/4[ · <n> unverified]` — the mark is the domain's operational overall. Overall: `<passed>/<t> · <fit | risky | unverified>[ · <n> unverified]`, omitting the suffix when the verdict is already unverified.
 
 ### Shape
 
@@ -120,22 +127,25 @@ GitHub-flavored markdown only. Layout is the spec:
 ## <Domain fit for cold send | Domain risky for cold send | Domain quality unverified>
 
 ```text
-<domain>  TLD=<mark> Name=<mark> Age=<mark> Rep=<mark>  overall <✓|·|✗|UNVERIFIED>
+Overall     <bar>  <p>/<t> · <verdict>[ · <n> unverified]
+
+<domain>    <bar>  <✓ | · | ✗> <p>/4[ · <n> unverified]
 ```
 
 ### <domain>
-`TLD · name · age · reputation`
+`created <date | unknown> · <n> days old · <brand site | redirect target | parked>`
 
-- TLD: <✓/·/✗> <tld> — <gold|acceptable|warn|fail>[; portfolio risky-fraction <n>%]
-- Name: <✓/·/✗> <short rationale>
-- Age: <✓/·/✗/UNVERIFIED> <created date or failure> — <gate note>
-- Reputation: <✓/·/✗/UNVERIFIED> <blocklist/redirect summary>
-- Overall: <✓|·|✗|UNVERIFIED>
-- · Caveat: name/TLD secondary — auth, engagement, and complaint rate dominate placement
+- <✓ | · | ✗> TLD — .<tld> <gold | acceptable | warn | elevated-risk>[ · portfolio risky-fraction <n>%]
+- <✓ | · | ✗> Name — <short rationale>
+- <✓ | · | ✗> Age — <n> days before first send — <gate note>
+- <✓ | · | ✗> Reputation — <blocklist and redirect summary>
+- · Caveat: name and TLD are secondary — authentication, engagement, and complaint rate dominate placement
 
 ### Next
 1. <shortest action tied to a ✗ or UNVERIFIED above>
 ````
+
+Replace any line whose lookup failed with `· UNVERIFIED — <factor> lookup failed (<error>)`. Worked examples: [references/examples.md](references/examples.md).
 
 ### Verdict logic (compute, never print as its own section)
 

@@ -10,7 +10,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # List building (source + enrich)
@@ -19,7 +19,7 @@ Plan how to build a prospect list when the user has none — or score a list-bui
 
 Render **only** the selected output shape. No invented coverage %, match rates, contact counts, or vendor capability claims the user did not provide.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## When to use adjacent skills
 
@@ -64,9 +64,9 @@ Collect or mark missing:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗ gap · · advisory. In `### Scorecard`, the Score cell leads with a bar: `<bar> <n>/5`; bar = `█`×n then `░` to width 5 (monospace glance; no colored emoji).
+GitHub-flavored markdown only. Blank line between blocks. Render only the selected shape; no prose outside it. Marks: ✓ pass · ✗ gap · · advisory. In `### Scorecard`, the Score cell leads with a bar: `<bar> <n>/5`; bar = `█`×n then `░` to width 5 (monospace glance; no colored emoji).
 
-### Quick (default for “help me build a list”)
+### Shape — Quick (default for “help me build a list”)
 
 ```markdown
 ## List-building plan
@@ -79,7 +79,7 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗
 - Watchouts: <coverage / cost / compliance / overlap — one line each>
 ```
 
-### Scorecard (Audit)
+### Shape — Audit
 
 ```markdown
 ## List-building audit
@@ -93,8 +93,9 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗
 | Dedupe / suppression | <bar> n/5 | |
 | Compliance / consent | <bar> n/5 | |
 
-**Weakest lever:** <name>
-**Fix focus:** <one paragraph>
+- ✗ Weakest lever: <name> — <why, one line>
+- · Fix focus: <first change>
+- · <second change, if any>
 ```
 
 Scores are judgment against the rubric — not industry benchmarks.
