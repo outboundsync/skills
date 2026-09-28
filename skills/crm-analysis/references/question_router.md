@@ -7,7 +7,7 @@ This router maps user questions to analysis intents. It defines six strict inten
 - Verdicts: `SUPPORTED`, `PARTIAL`, `UNSUPPORTED`, `EXPERIMENTAL_LIMITED`
 
 ## Preflight behavior
-- Default output is compact: `Intent`, `Mode`, `Verdict`, `Confidence`, `Missing fields`, `Fallback plan`.
+- Default output is the compact field check — `Intent`, `Mode`, `Verdict`, `Confidence`, `Missing fields`, `Fallback plan` — rendered as the `### Field check` card in SKILL.md's Output contract.
 - Full decision trace is emitted only if the user asks for `verbose preflight`.
 
 ## Strict verdict rules

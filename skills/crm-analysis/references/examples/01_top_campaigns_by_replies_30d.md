@@ -14,19 +14,33 @@
 - `os_last_reply_time`
 - `os_last_sent_time`
 
-## Compact preflight output
-- `Intent:` top_campaigns_by_replies_30d
-- `Mode:` strict
-- `Verdict:` SUPPORTED
-- `Confidence:` high
-- `Missing fields:` none
-- `Fallback plan:` none
+## Rendered output
 
-## Example analysis output
-- Top campaigns by reply count (30d):
-  1. `Q1 Outbound - VP Sales` -> 42 replies
-  2. `Demand Gen Directors` -> 31 replies
-  3. `Ecom Founders` -> 19 replies
-- Notes:
-  - Analysis uses observed reply timestamps only.
-  - No inferred replies were added.
+````markdown
+## Supported — top campaigns by replies
+
+```text
+Overall                      ████████████████████  2/2 · supported
+
+os_last_email_campaign_name  ████████████████████  ✓ present
+os_last_reply_time           ████████████████████  ✓ present
+```
+
+### Field check
+`top_campaigns_by_replies_30d · strict · HubSpot · Instantly, Smartlead · last 30 days`
+
+- · Verdict: SUPPORTED · confidence high
+- ✓ No missing fields
+- · Fallback plan: none
+
+### Results
+`replies · last 30 days · HubSpot contacts`
+
+| Rank | Campaign | Replies |
+| --- | --- | --- |
+| 1 | `Q1 Outbound - VP Sales` | ████████████████████ 42 |
+| 2 | `Demand Gen Directors` | ███████████████░░░░░ 31 |
+| 3 | `Ecom Founders` | █████████░░░░░░░░░░░ 19 |
+
+- · Counts observed reply timestamps only; no inferred replies
+````

@@ -12,10 +12,12 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key. Optional Instantly MCP/API for automated Instantly gates.
 metadata:
   author: outboundsync
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # OutboundSync launch preflight
+
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md).
 
 Run **read-only**. Never write, activate, pause, or re-point anything. Never print, log, or commit the API key. Never print `sources[].url` or `destinations[].url` except as a full paste URL under a `Next` step that needs it. Capabilities and config flags are safe to print.
 
@@ -31,9 +33,7 @@ Render **only** the fixed output shape in this skill — no prose outside it.
 - MCP setup: https://outboundsync.com/docs/mcp/setup/
 - Docs: https://outboundsync.com/docs/api/v1/
 
-See [references/endpoints.md](references/endpoints.md) for the REST ↔ MCP map. Output contract is identical either way.
-
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md).
+See [references/endpoints.md](references/endpoints.md) for the REST ↔ MCP map, response enums, and error handling. Output contract is identical either way.
 
 ## Phase 1 — OutboundSync pipeline (always, in order)
 
@@ -42,8 +42,8 @@ Use MCP tools when OutboundSync MCP is connected; otherwise call the REST paths 
 1. `get_me` / `GET /me` → `account.email`, `apiKey.connectionScope` / `connectionId`, `connections[]` (`id`, `crm`, `organizationDomain`).
 2. `list_connections` / `GET /connections` → per connection: `id`, `crm`, `status`, `organizationDomain`, `organizationId`, `capabilities{sync, destinations, blocklists}`, `createdAt`.
 3. `get_account_status` / `GET /account/status` → top-level `ready`, `blockers[]`, `warnings[]`, per-connection component statuses (`crmConnection`, `sources`, `destinations`, `blocklists`).
-4. `list_sources` / `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, createOrUpdateTask, assignContactOwner, salesforceObjectType}`, `destinations[]{url, description, eventTypes, isDelayed}`, bound `replyRelay` when present. Paginate to exhaustion.
-5. `list_reply_relays` / `GET /destinations/reply-relays` → reply-relay catalog for accessible connections (advisory on the CRM card; does **not** change gate math). Sources may already embed a bound `replyRelay`.
+4. `list_sources` / `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, createOrUpdateTask, assignContactOwner, salesforceObjectType}`, `destinations[]{url, description, eventTypes, isDelayed}`, bound `replyRelay` when present. One call returns every source — it is not paginated.
+5. `list_destinations` / `GET /destinations` → forwarding catalog; count entries with `sourceIds: []` as **unbound** (advisory on the CRM card; does **not** change gate math). Reply-relay counts come from `/account/status`; sources may also embed a bound `replyRelay`.
 
 Join by `connectionId`. Render one CRM card + one OutboundSync (pipeline) card per connection. When >1 connection, disambiguate gauge labels by domain (e.g. `CRM (acme.com)`, `OutboundSync (acme.com)`).
 
@@ -66,9 +66,9 @@ Run Phase 3 per detected platform only. If `no_sources` blocks the pipeline, inv
 
 If an MCP/API exists for the platform, run its checks. If not: confirm the source(s) exist, mark the SEP **MANUAL** (unverified — never a ✓ pass), and put verification in Next.
 
-API/MCP/auth failures are **UNVERIFIED**, not empty results. Never invent empty mailboxes/campaigns/webhooks from a failed call.
+API/MCP/auth failures are **UNVERIFIED**, not empty results: a `401`/`403`/`5xx`, a timeout, a non-JSON body, or an MCP `isError` renders as `· UNVERIFIED — <status or message>` and the row as 20 `▒`. Never invent empty mailboxes/campaigns/webhooks from a failed call. If a Phase 1 call fails, its card is UNVERIFIED and the verdict stays Not ready.
 
-Paginate accounts, campaigns, webhooks, and sources to exhaustion.
+Paginate SEP accounts, campaigns, and webhooks to exhaustion.
 
 Never duplicate destination-forwarding recap in a SEP card — destinations live only on the CRM card.
 
@@ -96,7 +96,7 @@ Confirm source(s) exist, mark MANUAL, list short identifiers, instruct UI verifi
 - **CRM (1):** CRM connected (`crmConnection.status === "ready"`).
 - **OutboundSync / pipeline (1):** sources+sync enabled (`sources.status === "ready"`).
 - **Each SEP (3):** ≥1 active mailbox · exact-match webhook wired+enabled · sendable campaign.
-- A gate counts as passed only when verified true. Manual/unverified SEPs have zero passed gates and render as an unverified row.
+- A gate counts as passed only when verified true. Manual (no API) and UNVERIFIED (call failed) SEPs have zero passed gates and render as a 20-cell `▒` row.
 - Gauge total is dynamic: sum of CRM + pipeline + 3 per automated SEP. SEP rows exist only for platforms detected in `/sources`. When `no_sources`, total = 2 (CRM + OutboundSync).
 
 ## CRM card (one per connection)
@@ -108,8 +108,8 @@ Header: `### CRM — <CRM>` with context `` `Connection <id> · <domain> · org 
 - Gate: `✓ Connected — <CRM> OAuth ready` OR `✗ Disconnected — crm_disconnected` (→ Next: reconnect).
 - `· Capabilities: sync <on/off> · destinations <on/off> · blocklists <on/off>` (from `GET /connections`; plan context, not a gate).
 - `· Integration config` — per source under this connection: `<platform> → company <✓/✗> · task <✓/✗> · owner <✓/✗>` (+ `SF object: <type>` only when Salesforce; omit when null).
-- `· Destinations (forwarding, not CRM writes): <n> endpoint(s)` listing `description → eventTypes` from `sources[].destinations[]`, OR `none — events still sync to CRM natively`. Use connection-level `destinations{status,count}` for the count/advisory. Honor ComponentStatus: ready / not_configured (advisory) / disabled on plan (no warning) / error.
-- `· Reply relays: <n> in catalog` (from `/destinations/reply-relays`) and/or bound relays on sources — advisory only; never a launch gate.
+- `· Destinations (forwarding, not CRM writes): <forwardingCount> endpoint(s)` listing `description → eventTypes` from `sources[].destinations[]`, OR `none — events still sync to CRM natively`. Counts come from `/account/status` `destinations{status, forwardingCount, replyRelayCount}`. Destinations status is `ready` / `not_configured` (advisory) / `disabled` (say "disabled on plan", no warning) — it has no `error` value. Catalog entries with `sourceIds: []` are unbound: say `<n> unbound — forwards nothing` rather than counting them.
+- `· Reply relays: <replyRelayCount> configured` (plus bound relays on sources) — advisory only; never a launch gate.
 - `· Blocklists: <status>` — map ComponentStatus: ready (`<n> enabled`) / not_configured / disabled on plan / error: `<lastError>`.
 
 Distinguish disabled (feature off on plan → no warning, show "disabled on plan") from not_configured (feature on, nothing set up → advisory) for both destinations and blocklists.
@@ -135,12 +135,14 @@ GitHub-flavored markdown only. Layout is the spec:
 
 ### Status gauge (inside the ```text block)
 
+This is the reference implementation of the pack's [status layout](https://github.com/outboundsync/skills/blob/main/CONVENTIONS.md#status-layout--required-for-readiness-health-and-audit-skills).
+
 - Bars are 20 wide: █ passed gate · ░ failed/missing gate · ▒ unverified/manual.
-- One `Overall` row, then one row per system in order: CRM, OutboundSync, then each SEP. Left-pad every label to the width of the longest label so all bars start in the same column.
+- One `Overall` row, then one row per system in order: CRM, OutboundSync, then each SEP. Pad every label, `Overall` included, to the width of the longest label so all bars start in the same column.
 - Row fill: filled = `round(passed / total * 20)` █ cells, remainder ░. A fully manual/unverified row is 20 ▒ cells (partial-verified manual rows fill █ for confirmed gates).
 - After the bar + two spaces:
-  - Overall → `<passed>/<total> · <ready|not ready>[ · <n> manual]`. Total = sum of automated gates across all systems; exclude manual systems from the fraction and append `· <n> manual` when any exist.
-  - System → `<✓|✗|·> <ready | <passed>/<total> | manual — <hint>>`.
+  - Overall → `<passed>/<total> · <ready|not ready>[ · <n> manual][ · <n> unverified]`. Total = sum of automated gates across all systems; exclude manual and unverified systems from the fraction and append their counts.
+  - System → `<✓|✗|·> <ready | <passed>/<total> | manual — <hint> | UNVERIFIED — <reason>>`.
 - The gauge is the glance layer; the `###` sections carry the specifics.
 
 ### Shape
@@ -149,11 +151,11 @@ GitHub-flavored markdown only. Layout is the spec:
 ## <Ready to launch | Not ready to launch>
 
 ```text
-Overall <bar> <p>/<t> · <verdict>[ · <n> manual]
+Overall       <bar>  <p>/<t> · <verdict>[ · <n> manual][ · <n> unverified]
 
-CRM <bar> <mark> <ready | p/t>
-OutboundSync <bar> <mark> <ready | p/t>
-<SEP> <bar> <mark> <ready | p/t | manual — hint>
+CRM           <bar>  <mark> <ready | p/t>
+OutboundSync  <bar>  <mark> <ready | p/t>
+<SEP>         <bar>  <mark> <ready | p/t | manual — hint | UNVERIFIED — reason>
 ```
 
 ### CRM — <CRM>
@@ -170,7 +172,7 @@ OutboundSync <bar> <mark> <ready | p/t>
 ### <SEP>
 `Connection <id> · …/webhooks/<code>`
 
-- <✓ pass line | ✗ blocker line | · advisory/manual line>
+- <✓ pass line | ✗ blocker line | · advisory, manual, or UNVERIFIED line>
 
 ### Next
 1. <shortest action tied to a ✗ or unverified · above>

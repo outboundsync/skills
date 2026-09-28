@@ -10,6 +10,35 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+### Added
+
+- **Status layout** in `CONVENTIONS.md`, generalized from `preflight`. The `##` heading is the verdict, followed by a 20-cell `█░▒` gauge, then `###` cards with a context line and mark-first bullets, then `Next`. There is one UNVERIFIED vocabulary: a failed call is never an empty result.
+- **sync-monitoring** is now a health dashboard. Its gauge covers Access, Endpoints, Deliveries, Events, and CRM syncs (7-day `get_syncs_metrics`). A `## Mutations` table names every webhook write tool, and `### Proposed change` / `### Applied` cards cover the write flow.
+- **api**: new Access, Plan, Prior outreach, Blocklists, and Metrics cards. `references/endpoints.md` is now the pack's single REST ↔ MCP map (all 35 MCP v0.4.0 tools), with access rules, enums, pagination, rate-limit headers, and the MCP error envelope.
+- **crm-analysis**: a formal output contract with a verdict heading, a field-coverage gauge, a Field check card (the router's compact fields), and ranked results with bars relative to the top row. All nine examples are re-rendered.
+- Rendered `references/examples.md` for `api`, `sync-monitoring`, `email-authentication`, and `sending-domain-quality`, plus a new UNVERIFIED example for `preflight`.
+- Validator rule `endpoint-map-consistent`. The PR 1 content rules are now errors.
+
+### Fixed
+
+- **API/MCP drift** against the live API and MCP v0.4.0:
+  - `/sources` is not paginated.
+  - `/events` also needs `canUseWebhooks`, for reads too.
+  - `/account/status` `destinations.status` has no `error` value.
+  - Unbound destinations (`sourceIds: []`) forward nothing.
+  - The "OpenAPI lags" caveat is gone; OpenAPI now matches MCP one to one.
+  - Loop on `hasMore` / `nextCursor`, never on page length.
+  - A non-JSON `200` means the route is not shipped.
+  - `/contacts/outreach` and `/account/metrics` timeouts are UNVERIFIED.
+- **Output bugs:**
+  - `cold-email-body`'s reference meter showed 15 of 20 cells for 78/100 (should be 16).
+  - `connection-requests` scored /100 with no meter.
+  - `preflight`'s Ready example had three checks on one line.
+  - `sending-domain-quality` had five marks on one glance line.
+  - Five skills had no `### Shape`.
+- `crm-analysis` dropped a stale caveat claiming reply subject maps to `os_last_reply_message`. It is `os_last_reply_subject`, as fixed in `2026.09.02.1`.
+- Every `../../` link in a skill (the disclaimer, SECURITY, LICENSE) is now an absolute URL. The old links broke once `npx skills add` installed a single skill folder.
+
 ### Changed
 
 - **Tooling:** replace `scripts/validate_skill_integrity.sh` (bash + Ruby/Python) with a Node validator (`npm run validate`). It reports every problem in one run, emits GitHub annotations, and is covered by fixture tests (`npm test`). The existing checks are ported unchanged. New checks: output contract, score meter, bar geometry, description style, frontmatter spec limits, exact disclaimer text and position, fence-aware links and anchors across all Markdown, links that escape a skill folder, vague tool wildcards, committed secrets, non-doc files under `skills/`, the README skill index, and version bumps against a PR base (`--base`). Content rules start as warnings (`scripts/validate/config.json`).

@@ -10,7 +10,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.1.0"
 ---
 
 # Outbound offer (audit + draft)
@@ -26,7 +26,7 @@ For a full-email request, establish the offer and CTA first, then apply the
 body and subject-line skills when available. Never block if an adjacent skill
 is unavailable; return this skill's part and state the remaining inputs needed.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## Modes
 
@@ -116,7 +116,7 @@ Quick shape:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between every block. Every line under a section is a `-` bullet unless noted. Marks: ✓ pass · ✗ fail · · advisory. Lead `### Score / levers` with a fenced `text` meter — one row per lever, bar = `█`×n then `░` to width 5; mark the weakest `✗ weakest`. Bars are a monospace glance only (`█` filled · `░` empty; no colored emoji).
+GitHub-flavored markdown only. Blank line between every block. Every line under a section is a `-` bullet unless noted. Marks: ✓ pass · ✗ fail · · advisory. Lead `### Score / levers` with a fenced `text` meter — one row per lever, bar = `█`×n then `░` to width 5; mark the weakest `✗ weakest`. The `Overall` row sums the four levers as a 10-cell `/20` bar (`█`×round(sum/20×10)) plus the band. The band comes from the rubric's lever rule (any lever ≤ 2 → weak), not from the sum. Bars are a monospace glance only (`█` filled · `░` empty; no colored emoji).
 
 ### Shape
 
@@ -133,7 +133,8 @@ Dream outcome   █████  5/5
 Likelihood      ██░░░  2/5  ✗ weakest
 Speed to value  ███░░  3/5
 Ease            ████░  4/5
-Overall  fair
+
+Overall         ███████░░░  14/20 · weak
 ```
 
 - Dream Outcome: <one-line note>

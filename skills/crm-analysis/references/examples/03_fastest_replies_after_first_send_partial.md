@@ -13,17 +13,33 @@
 - `os_last_reply_time`
 - Missing: `os_last_sent_time`
 
-## Compact preflight output
-- `Intent:` fastest_replies_after_first_send
-- `Mode:` strict
-- `Verdict:` PARTIAL
-- `Confidence:` medium
-- `Missing fields:` `os_last_sent_time`
-- `Fallback plan:` replace latency analysis with reply volume and reply recency
+## Rendered output
 
-## Example analysis output
-- Partial result (latency unavailable):
-  - `Security Buyers Q1` -> highest reply volume in window
-  - `Operations Leaders` -> most recent reply activity trend
-- Limitation:
-  - Cannot compute send-to-reply latency without `os_last_sent_time`.
+````markdown
+## Partial — fastest replies after first send
+
+```text
+Overall                █████████████░░░░░░░  2/3 · partial
+
+os_last_campaign_name  ████████████████████  ✓ present
+os_last_sent_time      ░░░░░░░░░░░░░░░░░░░░  ✗ missing
+os_last_reply_time     ████████████████████  ✓ present
+```
+
+### Field check
+`fastest_replies_after_first_send · strict · HubSpot · Smartlead · last 30 days`
+
+- · Verdict: PARTIAL · confidence medium
+- ✗ Missing: `os_last_sent_time`
+- · Fallback plan: replace latency with reply volume and reply recency
+
+### Results
+`reply volume and recency (latency unavailable) · last 30 days · HubSpot contacts`
+
+- · `Security Buyers Q1` — highest reply volume in the window
+- · `Operations Leaders` — most recent reply activity
+- · Send-to-reply latency needs `os_last_sent_time`
+
+### Next
+1. Check why `os_last_sent_time` is empty in this portal (it is written on send events), then re-run for true latency
+````

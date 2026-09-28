@@ -10,7 +10,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Cold email subject lines
@@ -25,7 +25,7 @@ For a full-email request, establish the offer and body before finalizing the
 subject. Use adjacent offer/body skills when available, but never block if they
 are not installed.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## Core rules (encode verbatim)
 
@@ -94,7 +94,7 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 ### Scorecard
 | Subject | Chars | Words | Lowercase | Spam hits | Rubric | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
-| `<subject>` | <n> | <n> | ✓/✗ | <n or list> | <bar> <n>/20 | keep / rewrite / kill |
+| `<subject>` | <n> | <n> | ✓/✗ | <n or list> | <bar> <n>/20 | ✓ keep \| · rewrite \| ✗ kill |
 
 ### Findings
 - <✓/✗/· line>
@@ -108,8 +108,7 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ · ✗ · �
 ### Measurement note
 - Primary metric: reply rate (not opens)
 - MPP caveat: opens inflated; ~49% of tracked opens may be MPP
-- A/B: one variable · rough exposure floor ≥250 delivered/variant for opens or
-  ≥500 delivered/variant for replies · use a power calculation for decisions
+- A/B: one variable · rough exposure floor ≥250 delivered/variant for opens or ≥500 delivered/variant for replies · use a power calculation for decisions
 ````
 
 ## Safety

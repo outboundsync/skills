@@ -1,11 +1,4 @@
 {
-  "$comment": "Per-rule severity: error | warn | off. Unlisted rules are errors. Run `npm run validate -- --list` to see every rule. Rules at warn are new; skills are being brought into line and the rule will become an error.",
-  "rules": {
-    "output-contract": "warn",
-    "score-meter": "warn",
-    "bar-geometry": "warn",
-    "description-style": "warn",
-    "links-escape-skill": "warn",
-    "write-tools-named": "warn"
-  }
+  "$comment": "Per-rule severity: error | warn | off. Unlisted rules are errors. Run `npm run validate -- --list` to see every rule. Introduce a new rule at warn while skills are brought into line, then remove it from this list.",
+  "rules": {}
 }

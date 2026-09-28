@@ -10,7 +10,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Omnichannel campaigns (email + social)
@@ -19,7 +19,7 @@ Plan email + B2B social networking (professional social platforms) outbound as o
 
 Render **only** the selected output shape. No invented metrics, scarcity, or case-study numbers the user did not provide.
 
-**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](../../DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
+**Note:** These instructions reflect OutboundSync best practices shared freely and without warranty of outcomes — see [DISCLAIMER.md](https://github.com/outboundsync/skills/blob/main/DISCLAIMER.md). Treat techniques as widely-taught industry patterns; do **not** paste copyrighted course modules or private playbooks.
 
 ## When to use adjacent skills
 
@@ -68,9 +68,9 @@ Collect or mark missing:
 
 ## Output contract
 
-GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗ fail · · advisory. In `### Scorecard`, the Score cell leads with a bar: `<bar> <n>/5`; bar = `█`×n then `░` to width 5 (monospace glance; no colored emoji).
+GitHub-flavored markdown only. Blank line between blocks. Render only the selected shape; no prose outside it. Marks: ✓ pass · ✗ fail · · advisory. In `### Scorecard`, the Score cell leads with a bar: `<bar> <n>/5`; bar = `█`×n then `░` to width 5 (monospace glance; no colored emoji).
 
-### Quick (default for “build me a sequence”)
+### Shape — Quick (default for “build me a sequence”)
 
 ```markdown
 ## Omnichannel plan
@@ -82,7 +82,7 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗
 - Watchouts: <volume / compliance / missing inputs — one line each>
 ```
 
-### Scorecard (Audit)
+### Shape — Audit
 
 ```markdown
 ## Omnichannel audit
@@ -97,8 +97,9 @@ GitHub-flavored markdown only. Blank line between blocks. Marks: ✓ pass · ✗
 | Offer coherence | <bar> n/5 | |
 | Exit / breakup | <bar> n/5 | |
 
-**Weakest lever:** <name>
-**Rewrite focus:** <one paragraph>
+- ✗ Weakest lever: <name> — <why, one line>
+- · Rewrite focus: <first change>
+- · <second change, if any>
 ```
 
 Scores are judgment against the rubric — not industry benchmarks.

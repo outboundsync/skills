@@ -66,6 +66,17 @@ Thanks for connecting! Got 15 minutes this week for a quick call?
 
 ## Volume vignette
 
-- 45 invites/day, acceptance 16%, pending 900, mostly C-level  
-→ ✗ over safe volume · ✗ red-flag acceptance (even for C-level, volume too high) · ✗ pending  
-→ Pause, withdraw stale, cut to 10–15/day, require signals, prefer blank over generic notes
+45 invites/day, acceptance 16%, pending 900, mostly C-level, no restrictions:
+
+```text
+Overall       █████░░░░░░░░░░░░░░░  1/4 · at risk
+
+Invites       ░░░░░░░░░░░░░░░░░░░░  ✗ 45/day · ~225/week vs ~20/day
+Acceptance    ░░░░░░░░░░░░░░░░░░░░  ✗ 16% vs C-level benchmark (18–25%)
+Pending       ░░░░░░░░░░░░░░░░░░░░  ✗ 900 pending
+Restrictions  ████████████████████  ✓ none
+```
+
+- ✗ Pause new invites and withdraw stale pendings until you are under ~500
+- ✗ Resume at 10–15/day, only with a real signal per invite
+- · Prefer a blank invite over a generic note

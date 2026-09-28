@@ -7,17 +7,18 @@
 ## User question
 "What are my A/B test results by sequence step?"
 
-## Compact preflight output
-- `Intent:` none
-- `Mode:` strict
-- `Verdict:` UNSUPPORTED
-- `Confidence:` high
-- `Missing fields:` n/a
-- `Fallback plan:` none
-- `Reason:` no_matching_intent
-- `Supported intents:` top campaigns by replies, high opens low replies, fastest replies after first send, follow-up prioritization, platform engagement attribution, deliverability unsubscribes/bounces
+## Rendered output
 
-## Suggested handoff output
-- Strict no-match detected.
-- If the user wants best-effort analysis, offer:
-  - "Switch to `Mode: exploratory` and I will analyze available signals with explicit caveats and confidence labels."
+````markdown
+## Unsupported — no strict intent matches this question
+
+### Field check
+`none · strict · HubSpot · Instantly · last 30 days`
+
+- · Verdict: UNSUPPORTED · confidence high · reason no_matching_intent
+- ✗ No strict intent covers "A/B results by sequence step"
+- · Supported intents: top campaigns by replies · high opens, low replies · fastest replies after first send · follow-up prioritization · platform engagement attribution · deliverability (unsubscribes and bounces)
+
+### Next
+1. Re-run with `Mode: exploratory` for a best-effort answer with explicit caveats and confidence labels
+````

@@ -14,17 +14,30 @@
 - `OSLastReplyTime__c`
 - `OSLastLinkClickTime__c`
 
-## Compact preflight output
-- `Intent:` high_opens_low_replies
-- `Mode:` strict
-- `Verdict:` SUPPORTED
-- `Confidence:` medium
-- `Missing fields:` `open counts` (not available in Salesforce field set)
-- `Fallback plan:` none
+## Rendered output
 
-## Example analysis output
-- Campaigns with high engagement but weak reply conversion:
-  1. `RevOps NA MidMarket` -> strong open activity, low reply activity
-  2. `PLG Security Persona` -> strong open activity, low reply activity
-- Limitation:
-  - Salesforce schema does not expose open counts; open-time presence is used as the engagement signal.
+````markdown
+## Supported — high opens, low replies
+
+```text
+Overall                ████████████████████  3/3 · supported
+
+OSLastCampaignName__c  ████████████████████  ✓ present
+OSLastOpenTime__c      ████████████████████  ✓ present
+OSLastReplyTime__c     ████████████████████  ✓ present
+```
+
+### Field check
+`high_opens_low_replies · strict · Salesforce · EmailBison · last 30 days`
+
+- · Verdict: SUPPORTED · confidence medium
+- ✓ No missing fields
+- · Fallback plan: none
+
+### Results
+`open activity vs reply activity · last 30 days · Salesforce contacts`
+
+- · `RevOps NA MidMarket` — strong open activity, low reply activity
+- · `PLG Security Persona` — strong open activity, low reply activity
+- · Salesforce has no open counts; open-time presence stands in for engagement
+````

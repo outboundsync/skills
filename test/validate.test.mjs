@@ -37,6 +37,7 @@ const cases = [
   ['output-contract: Shape variants count', { 'skills/demo/SKILL.md': skillMd({ body: defaultBody().replace('### Shape', '### Shape — Quick') }) }, []],
   ['score-meter: /100 with no bar', { 'skills/demo/SKILL.md': skillMd({ body: '## Output contract\n\n### Shape\n\n- Total: <n>/100\n' }) }, ['score-meter']],
   ['bar-geometry: wrong fill', { 'skills/demo/SKILL.md': skillMd({ body: defaultBody().replace('████████████████░░░░', '███████████████░░░░░') }) }, ['bar-geometry']],
+  ['bar-geometry: glyphs in inline code are a legend, not a bar', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nGlyphs: `█░▒` and `███░`.\n' }, []],
   ['links: broken relative link', { 'skills/demo/references/rubric.md': null }, ['links']],
   ['links: missing anchor', { 'skills/demo/SKILL.md': skillMd({ body: defaultBody().replace('references/rubric.md', 'references/rubric.md#nope') }) }, ['links']],
   ['links: valid anchor', { 'skills/demo/SKILL.md': skillMd({ body: defaultBody().replace('references/rubric.md', 'references/rubric.md#levels') }) }, []],
@@ -45,6 +46,24 @@ const cases = [
   ['write-tools-named: vague wildcard', { 'skills/demo/SKILL.md': skillMd({ body: `${defaultBody()}\nUse the matching write tools.\n` }) }, ['write-tools-named']],
   ['write-tools-named: Mutations must name MCP tools and the protocol', { 'skills/demo/SKILL.md': skillMd({ body: `${defaultBody()}\n## Mutations\n\n| POST /webhooks | creates |\n` }) }, ['write-tools-named']],
   ['write-tools-named: well-formed Mutations', { 'skills/demo/SKILL.md': skillMd({ body: `${defaultBody()}\n## Mutations\n\nFollow the write-on-confirm protocol.\n\n| POST /webhooks | create_webhook |\n` }) }, []],
+  ['endpoint-map-consistent: trimmed copy disagrees', {
+    'skills/api/SKILL.md': skillMd({ name: 'api' }).replace('references/rubric.md', 'references/endpoints.md'),
+    'skills/api/references/endpoints.md': '| REST | MCP tool | Access | Notes |\n| --- | --- | --- | --- |\n| `GET /me` | `get_me` | R | x |\n',
+    'skills/demo/references/endpoints.md': '| `GET /me` | `whoami` | R | y |\n| `GET /nope` | `nope` | R | z |\n',
+    'README.md': readmeFor(['api', 'demo']),
+  }, ['endpoint-map-consistent']],
+  ['endpoint-map-consistent: SKILL.md tables are checked for tool name only', {
+    'skills/api/SKILL.md': skillMd({ name: 'api' }).replace('references/rubric.md', 'references/endpoints.md'),
+    'skills/api/references/endpoints.md': '| `POST /webhooks` | `create_webhook` | W · A | x |\n',
+    'skills/demo/SKILL.md': skillMd({ body: defaultBody() + '\n| `POST /webhooks` | `create_webhook` | Register |\n' }),
+    'README.md': readmeFor(['api', 'demo']),
+  }, []],
+  ['endpoint-map-consistent: malformed and duplicate rows are reported', {
+    'skills/api/SKILL.md': skillMd({ name: 'api' }).replace('references/rubric.md', 'references/endpoints.md'),
+    'skills/api/references/endpoints.md': '| `GET /me` | `get_me` | R | x |\n',
+    'skills/demo/references/endpoints.md': '| `GET /me` | get_me | R | y |\n| `GET /me` | `get_me` | R | y |\n| `GET /me` | `get_me` | R | z |\n',
+    'README.md': readmeFor(['api', 'demo']),
+  }, ['endpoint-map-consistent']],
   ['stale-paths', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nSee openclaw-skills/foo.\n' }, ['stale-paths']],
   ['secrets: committed key', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nexport KEY=osapi_abcdefghijklmnop\n' }, ['secrets']],
   ['secrets: placeholder allowed', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nexport KEY=osapi_...\n' }, []],
@@ -94,6 +113,8 @@ test('bar geometry: widths, fills, and unverified cells', () => {
   assert.deepEqual(checkBarLine('Rubric  ███████░░░  14/20'), []);
   assert.deepEqual(checkBarLine('Overall ████████████░░░░░░░░ 3/5 · not ready'), []);
   assert.deepEqual(checkBarLine('Smartlead ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ · manual'), []);
+  assert.deepEqual(checkBarLine('CRM syncs ███████████████████░  ✗ 1,216/1,277 ok'), []);
+  assert.match(checkBarLine('CRM syncs ████████████████████  ✗ 1,216/1,277 ok')[0], /expected 19/);
   assert.match(checkBarLine('Rubric  ██████░░░░  14/20')[0], /expected 7/);
   assert.match(checkBarLine('Levers  ██░░  2/4')[0], /4 cells wide/);
   assert.match(checkBarLine('Lever  ███░░  3/20')[0], /5-cell bar/);

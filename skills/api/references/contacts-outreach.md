@@ -24,7 +24,21 @@ Rate limit: **600 requests / 60s** per account (separate from the general 120/60
 3. Keep contacts where `found` is false, **or** `summary.daysSinceLastTouch` is null, **or** it is ≥ the **user's** cadence
 4. If the user did not give a cadence, report `found` / DNC / `daysSinceLastTouch` and **omit keep/skip** — do not default to 90 days
 
-Prefer `query.email` for field mapping. Top-level `email` is a deprecated alias of `query.email`.
+Prefer `query.email` for field mapping. Top-level `email` is a deprecated alias of `query.email`. The response echoes social identities as the plural `query.profileUrls[]`.
+
+## Response fields used by the Prior outreach card
+
+| Field | Use |
+| --- | --- |
+| `found` | Any matching event on record |
+| `summary{totalEvents, daysSinceLastTouch, lastEventType, lastPlatform, everContacted, everEmailed, everOpened, everCalled, everSocialTouched, firstTouchAt, lastTouchAt}` | Found / Last touch lines |
+| `platforms[]`, `eventTypes[]` | Per-platform and per-type counts |
+| `outcomes{replied, lastReplyAt, bounced, unsubscribed, lastCategoryName, lastCategoryAt}` | Outcomes line |
+| `doNotContact{value, reasons[]}` | Leads the card when true |
+
+## Failures
+
+This call can take up to 30s and time out (`503`, sometimes as an HTML page, or MCP `upstream_error` "…aborted due to timeout"). A timeout, `5xx`, `401`/`403`, or non-JSON body is **UNVERIFIED** — never `found: false`. Keep the contact out of the send until a retry succeeds.
 
 ## Do not
 

@@ -10,11 +10,16 @@ label the claim as unverified.
 
 > We help teams accelerate pipeline with our AI-powered platform. Are you free Thursday for a 30-minute demo?
 
-- Dream Outcome: 2 (vague)
-- Likelihood: 1 (no proof)
-- Speed to Value: 1
-- Ease: 1
-- Fails: Likelihood + Ease; stacked product pitch + hard CTA
+```text
+Dream outcome   ██░░░  2/5  vague
+Likelihood      █░░░░  1/5  ✗ weakest — no proof
+Speed to value  █░░░░  1/5
+Ease            █░░░░  1/5
+
+Overall         ███░░░░░░░  5/20 · weak
+```
+
+- ✗ Fails on Likelihood and Ease: stacked product pitch plus a hard CTA
 
 **After (stronger)**
 
