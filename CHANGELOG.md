@@ -12,6 +12,7 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ### Added
 
+- **integrations** (1.2.0) reads the directory feed's new `pairings` and `combos` fields to confirm tool + CRM pairings, block-list support, and pairing status, and links the tool + CRM guide page (`/integrations/<tool>-<crm>/`). Falls back to the detail page when the fields are absent. Pipedrive and HighLevel are named as CRM targets.
 - **Status layout** in `CONVENTIONS.md`, generalized from `preflight`. The `##` heading is the verdict, followed by a 20-cell `█░▒` gauge, then `###` cards with a context line and mark-first bullets, then `Next`. There is one UNVERIFIED vocabulary: a failed call is never an empty result.
 - **sync-monitoring** is now a health dashboard. Its gauge covers Access, Endpoints, Deliveries, Events, and CRM syncs (7-day `get_syncs_metrics`). A `## Mutations` table names every webhook write tool, and `### Proposed change` / `### Applied` cards cover the write flow.
 - **api**: new Access, Plan, Prior outreach, Blocklists, and Metrics cards. `references/endpoints.md` is now the pack's single REST ↔ MCP map (all 35 MCP v0.4.0 tools), with access rules, enums, pagination, rate-limit headers, and the MCP error envelope.

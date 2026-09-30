@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # OutboundSync integrations directory helper
@@ -47,14 +47,15 @@ Surface this block (or equivalent plain language) in every recommendation output
 1. Clarify needs: target CRM, tool or category, required channels, sync expectations (one-way vs two-way), must-be-Live vs open to Beta.
 2. Fetch live data — see [references/directory-schema.md](references/directory-schema.md).
 3. Filter and rank by [references/selection-rubric.md](references/selection-rubric.md). **Availability first.**
-4. For shortlisted items, open detail pages when CRM compatibility or FAQ specifics matter (`/integrations/<slug>/`).
+4. When the user names a CRM, use the item's `pairings` (or the top-level `combos` array) to confirm the tool + CRM pairing, then open its guide page (`/integrations/<tool>-<crm>/`) for which events sync, where each lands in the CRM, block lists, and plan requirements. Otherwise open the detail page (`/integrations/<slug>/`) for FAQ specifics. If the feed has no `pairings` field, fall back to the detail page's “Works with these CRMs” list.
 5. Render the output contract. If nothing is Live for the ask: say so, list Beta (with caution) and Planned/Requested, plus request path.
 
 ### Needs → filter mapping
 
 | User need | Directory filter / field |
 | --- | --- |
-| Target CRM (HubSpot / Salesforce / Close / Attio) | Category **CRM/ATS/ERP Software** for the CRM itself; for SEPs/tools, confirm “Works with these CRMs” on the **detail page** (index JSON does not list CRM targets) |
+| Target CRM (HubSpot / Salesforce / Close / Attio / Pipedrive / HighLevel) | Category **CRM/ATS/ERP Software** for the CRM itself; for SEPs/tools, `pairings[].crm` on the item, or `combos` filtered by `crm` (includes `status`, `channels`, `blockLists`, and the guide `url`) |
+| CRM block lists (suppression from HubSpot lists / Salesforce reports) | `combos[].blockLists` for that tool + CRM — never infer it from `depth` |
 | Tool / category (SEP, AI/Agents, Data & Enrichment, Automation & Low-code, Inbox Mgmt, CRM, …) | **Type** (`type`) |
 | Must work today | **Availability** = Live (Beta only if user accepts beta risk) |
 | Who builds the connector | **Connection** = Direct vs Via Partner |
@@ -71,7 +72,7 @@ GitHub-flavored markdown only. Render only this shape; no prose outside it. Blan
 ## Matched integrations — <n> for <job in a few words>
 
 ### <Name>
-`<Category> · <Direct | Via Partner> · <One-way | Two-way> sync · https://outboundsync.com/integrations/<slug>/`
+`<Category> · <Direct | Via Partner> · <One-way | Two-way> sync · <guide URL: https://outboundsync.com/integrations/<tool>-<crm>/ when the user named a paired CRM, else https://outboundsync.com/integrations/<slug>/>`
 
 - <✓ Live | · Beta | ✗ Planned | ✗ Requested>
 - <✓ | · | ✗> <CRM or need from the user — e.g. syncs to HubSpot>
@@ -103,4 +104,4 @@ GitHub-flavored markdown only. Render only this shape; no prose outside it. Blan
 - · <the four standard disclosures above>
 ````
 
-When the user asks “does OutboundSync connect X to my CRM?”: answer from live Availability + detail-page CRM list. If X is absent: say it is not listed (or only Requested/Planned), and do not invent a connector.
+When the user asks “does OutboundSync connect X to my CRM?”: answer from live Availability plus the `pairings` / `combos` entry for that CRM, and link the tool + CRM guide page. A pairing's `status` is Beta whenever either side is Beta. If X is absent, or has no pairing for that CRM: say so (or that it is only Requested/Planned), and do not invent a connector.
