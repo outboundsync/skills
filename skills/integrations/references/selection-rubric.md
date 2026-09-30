@@ -6,7 +6,7 @@ Score fit from live directory fields. **Availability first.** Tier is context on
 
 1. **Availability** — Live preferred; Beta only if the user accepts beta risk; Planned/Requested are never “ready” recommendations.
 2. **Must-haves the user stated** — category/`type`, connection (Direct vs Via Partner), sync/`depth` (one-way vs two-way), required channels (`hasEmail` / `hasSocial` / `hasPhone`).
-3. **CRM compatibility** — confirm on the detail page when the user named HubSpot / Salesforce / Close / Attio (index JSON does not list CRM targets for SEPs/tools).
+3. **CRM compatibility** — when the user named a CRM, require a `pairings` / `combos` entry for that tool + CRM. Use the pairing's `status` (Beta if either side is Beta) and, for suppression needs, `combos[].blockLists`. The guide page `/integrations/<tool>-<crm>/` has the event-by-event detail.
 4. **Stack / category fit** — SEP vs enrichment vs automation vs inbox vs AI/Agents vs CRM product itself.
 5. **Tier** — partnership/deployment depth with OutboundSync. Tie-breaker among otherwise equal Live fits — **never** quality or price rank.
 

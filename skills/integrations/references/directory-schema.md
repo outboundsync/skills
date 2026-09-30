@@ -32,7 +32,26 @@ The directory page sets `data-data-endpoint="/data/integrations-index.json"`. Co
       "headquartersFlag": "…",
       "hasEmail": true,
       "hasSocial": false,
-      "hasPhone": false
+      "hasPhone": false,
+      "url": "https://outboundsync.com/integrations/{slug}/",
+      "markdownUrl": "https://outboundsync.com/content/integrations/{slug}.md/",
+      "pairings": [
+        { "crm": "hubspot", "crmName": "HubSpot", "status": "Live | Beta", "url": "https://outboundsync.com/integrations/{slug}-hubspot/" }
+      ]
+    }
+  ],
+  "combos": [
+    {
+      "slug": "{tool}-{crm}",
+      "platform": "{tool}",
+      "platformName": "Tool name",
+      "crm": "hubspot | salesforce | close | attio | pipedrive | highlevel",
+      "crmName": "CRM name",
+      "status": "Live | Beta",
+      "channels": ["email", "social"],
+      "blockLists": true,
+      "url": "https://outboundsync.com/integrations/{tool}-{crm}/",
+      "markdownUrl": "https://outboundsync.com/content/integrations/{tool}-{crm}.md/"
     }
   ]
 }
@@ -43,7 +62,10 @@ The directory page sets `data-data-endpoint="/data/integrations-index.json"`. Co
 - **Sync direction** field name in JSON is `depth` (UI label: Sync).
 - **Category** field name in JSON is `type` (UI label: Type).
 - Channels are booleans: Email ← `hasEmail`, Social ← `hasSocial`, Phone ← `hasPhone`.
-- Target CRM compatibility (HubSpot / Salesforce / Close / Attio) is **not** on the index card — confirm on the **detail page** (“Works with these CRMs” or equivalent). For CRM products themselves, `type` is `CRM/ATS/ERP Software`.
+- **CRM compatibility** is in `pairings`: on a tool, the CRMs it has a tool + CRM guide page for; on a CRM, the tools. `pairings` is empty for items without guide pages. For CRM products themselves, `type` is `CRM/ATS/ERP Software`.
+- **`combos`** lists every tool + CRM guide page with its `status` (Beta when either side is Beta), synced `channels`, and `blockLists` (whether CRM lists/reports can be pushed to the tool as block lists).
+- **Guide pages** (`/integrations/{tool}-{crm}/`) state which events sync, where each lands in the CRM, setup steps, and plan requirements. Prefer them over the tool's detail page when the user names both products. `markdownUrl` returns the same page as Markdown.
+- Older snapshots of the feed may lack `url`, `markdownUrl`, `pairings`, and `combos`. When they are missing, confirm CRM targets on the detail page (“Works with these CRMs”).
 
 ## Filter / shareable query params
 
@@ -67,7 +89,7 @@ Examples:
 
 ## Per-listing fields (detail pages)
 
-Detail pages typically add narrative copy, FAQ, CRM compatibility, website / get-demo / express-interest CTAs, and tier explanation. Use detail pages to confirm CRM targets and usability notes — not to invent pricing or case studies (those remain omitted).
+Detail pages typically add narrative copy, the events the tool sends, FAQ, CRM links, website / get-demo / express-interest CTAs, and tier explanation. Planned and Requested pages add a “What works today” section with interim options. Use these pages for usability notes — not to invent pricing or case studies (those remain omitted).
 
 ## Tier semantics (partnership depth — not quality/price)
 
@@ -99,4 +121,4 @@ Always restate the true meaning when showing a tier:
 
 ## What the directory does not include
 
-Pricing, SLAs, case studies, vendor sales contact, independent reviews, exhaustive market coverage, or (on the index) per-CRM compatibility matrices — those live on detail pages when present.
+Pricing, SLAs, case studies, vendor sales contact, independent reviews, or exhaustive market coverage. Per-event CRM mapping lives on the tool + CRM guide pages linked from `combos`.
