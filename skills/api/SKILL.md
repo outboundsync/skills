@@ -14,7 +14,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key.
 metadata:
   author: outboundsync
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # OutboundSync API v1
@@ -46,7 +46,7 @@ Every REST path, its MCP tool, access rules, response fields, and error handling
 | Connection-scoped key | Sees exactly one connection everywhere — expected, not an error; `403` on `/webhooks*`; may read `/events` for its connection |
 | No API-enabled connection | Every authenticated route returns `403` — enable API access for a connection in the dashboard |
 | `canUseWebhooks` | Account flag for Sync Monitoring. Off → `403` "Platform webhooks are not enabled for this account" on `/webhooks*` **and** `/events` reads. `/me` does not expose it; only the `403` reveals it. |
-| Rate limits | 120 / 60s per account; `/contacts/outreach` 600 / 60s. Read `X-RateLimit-Remaining`; on `429` wait `Retry-After`. |
+| Rate limits | 120 / 60s per account; `/contacts/outreach` 600 / 60s. Read `X-RateLimit-Remaining` when present (not on `/contacts/outreach` or the per-IP `429`); on `429` wait `Retry-After`. |
 
 On `401` / `403` / `429`, relay the response message and the shortest fix. Never invent admin flags or capabilities absent from the response.
 
