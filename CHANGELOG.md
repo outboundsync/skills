@@ -22,6 +22,7 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ### Fixed
 
+- **api** (1.4.1): the `X-RateLimit-*` headers come from the per-account sliding-window limit only. They are absent on `/contacts/outreach`, which is a fixed-window bucket, and on the per-IP `429`, so treat them as optional and fall back to `Retry-After`. `Reset` is the number of seconds until the next request slot frees up.
 - **API/MCP drift** against the live API and MCP v0.4.0:
   - `/sources` is not paginated.
   - `/events` also needs `canUseWebhooks`, for reads too.

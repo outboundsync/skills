@@ -15,7 +15,7 @@ Neither identity, an invalid `email`/`profileUrl`, or more than 5 `profileUrl` v
 
 All supplied identities are **OR-unioned into one aggregate**. Pass identities for a **single** contact only — mixing people merges their engagement.
 
-Rate limit: **600 requests / 60s** per account (separate from the general 120/60s bucket). Honor `Retry-After` on `429`.
+Rate limit: **600 requests / 60s** per account (separate from the general 120/60s bucket). Honor `Retry-After` on `429`; this bucket sends no `X-RateLimit-*` headers.
 
 ## Recipe
 
