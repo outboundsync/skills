@@ -12,7 +12,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key. Optional Instantly MCP/API for automated Instantly gates.
 metadata:
   author: outboundsync
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # OutboundSync launch preflight

@@ -90,7 +90,7 @@ CRM syncs   ███████████████████░  ✗ 1,
 ### CRM syncs
 `2026-09-21 → 2026-09-28`
 
-- ✗ 61 errors — sync.failed fires after 3 in a row per source × connection · 12 benign skips
+- ✗ 61 errors — sync.failed fires on the first auth/billing error, else after 3 in a row per source × connection · 12 benign skips
 
 ### Next
 1. Fix the receiver at hooks.example.com (it returned 5xx before auto-disabling), then re-enable it

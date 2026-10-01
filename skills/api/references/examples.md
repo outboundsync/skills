@@ -76,10 +76,10 @@ A timeout is not "never contacted". Nothing is decided.
 ### Prior outreach
 `email sam@prospect.example.com · profileUrl none`
 
-- · UNVERIFIED — lookup timed out after 30s (503); keep this contact out of the send until it resolves
+- · UNVERIFIED — lookup hit the 20s query limit (504); keep this contact out of the send until it resolves
 
 ### Next
-1. Retry the lookup in a minute; if it keeps timing out, check https://outboundsync.com/docs/api/v1/ status notes
+1. Retry the lookup shortly; if it keeps returning `504`, check https://outboundsync.com/docs/api/errors-and-rate-limits/ and contact support
 ````
 
 ## Metrics and blocklists — "how is sync doing this week?"
