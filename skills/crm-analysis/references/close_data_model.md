@@ -8,8 +8,8 @@ Source: OutboundSync Help Center — "Close CRM beta" (one-way activity sync). L
 
 | Object | Close endpoint | What OutboundSync sets |
 | --- | --- | --- |
-| Lead | `/lead/` | Matched/created (by email domain, then company name). The analysis anchor — engagement hangs off the Lead. |
-| Contact | `/contact/` | Embedded on the Lead: name + email (+ title / phone / url when present). Custom fields (`custom.cf_*`) hold only record-matching keys, **never engagement**. |
+| Lead | `/lead/` | Matched by the configured lookup field (a Contact field, or a Lead custom field stored as `lead:cf_*`), then Contact email, then Lead domain / company name (that heuristic is skipped when a Lead field is configured); created on miss. Lead custom fields (`custom.cf_*`) can hold identity keys (email, social profile URL) — typical when selling to individuals or principal-led businesses where the person *is* the account and Contacts are secondary: written on create, backfilled on match only when empty. The analysis anchor — engagement hangs off the Lead. |
+| Contact | `/contact/` | Embedded on the Lead: name + email (+ title / phone / url when present). Reused by email under the matched Lead; a new email adds a Contact to that Lead. With Lead-field lookup, email-less social events create **no** Contact. Custom fields (`custom.cf_*`) hold only record-matching keys, **never engagement**. |
 | Email Activity | `/activity/email/` | For `EMAIL_SENT` and `EMAIL_REPLY`. |
 | Note Activity | `/activity/note/` | For every other synced event. |
 
@@ -43,5 +43,6 @@ Per the beta docs, phone/call activity is not supported for Close. Actual covera
 - **Social / other signals:** read Note Activities whose first line is `OutboundSync <EVENT_TYPE>`; read `Campaign:` / `Platform:` for attribution.
 - **Owner attribution:** available via activity `user_id`.
 - **Not available:** numeric counters, "last-value" fields, and field-level filtering. Engagement is Lead-anchored, so per-contact analysis means walking the Lead's contacts + activities.
+- **Lead-only activities:** with Lead-field lookup, email-less social activities can attach to the Lead with no `contact_id`. Count them at the Lead level instead of dropping them from per-contact rollups.
 
 The six strict HubSpot/Salesforce field intents (`references/router_contract.yaml`) do **not** apply to Close — run these in `exploratory` mode with explicit limitations.
