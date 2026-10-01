@@ -23,14 +23,16 @@ The served OpenAPI is authoritative and matches the MCP tools one to one. Never 
 
 | Surface | Shape |
 | --- | --- |
-| REST | `{ statusCode, message, error }`. `message` is usually a string but can be an **array** of validation messages on `400` — join them. |
-| MCP | `isError: true` with text `{ "error": { code, message, status?, retryAfterSeconds?, remediation? } }` and no `structuredContent`. Branch on `status` (the upstream HTTP status) when present; codes: `auth_required`, `unauthorized`, `forbidden`, `rate_limited`, `upstream_error`, `internal_error`, and on newer servers `bad_request` (400/422), `not_found` (404), `timeout`. Treat an unknown code by its `status`; `remediation`, when present, is the fix to relay. |
+| REST | Every error is JSON: `{ statusCode, message, error }`. `message` is usually a string but can be an **array** of validation messages on `400` — join them. An unknown or unshipped path returns `404` `"Cannot GET /api/v1/…"`. A heavy read past the 20s query limit returns `504` (`error: "Gateway Timeout"`); the query is cancelled and nothing is written. |
+| MCP | `isError: true` with text `{ "error": { code, message, status?, retryAfterSeconds?, remediation? } }` and no `structuredContent`. Branch on `status` (the upstream HTTP status) when present; codes: `auth_required`, `unauthorized`, `forbidden`, `rate_limited`, `upstream_error`, `internal_error`, and on newer servers `bad_request` (400/422), `not_found` (404), `timeout`. `timeout` means the MCP's own 30s client limit fired; an API `504` arrives as `upstream_error` with `status: 504` (the MCP retries a failed read once first). Treat an unknown code by its `status`; `remediation`, when present, is the fix to relay. |
 
 Render these as **`· UNVERIFIED — <reason>`** (include the status code), never as an empty result, `found: false`, or `0`:
 
 - any `401` / `403` / `5xx`, a timeout, or MCP `isError`
-- a `200` whose body is not JSON — unknown `/api/v1/*` paths currently return the dashboard's HTML with `200`, which means **the route is not shipped**; do not retry or invent it
-- `/contacts/outreach` in particular can take up to 30s and time out — a timeout is UNVERIFIED, not "not contacted"
+- a response whose body is not JSON — the hosting layer can answer before the API during a deploy or incident; retry with backoff, and report UNVERIFIED until it succeeds
+- a `504` from the 20s query limit on `/contacts/outreach`, `/account/metrics`, `/syncs`, `/syncs/metrics`, `/sources/:sourceId/syncs`, `/requests/metrics`, or `/destinations/:id/deliveries/metrics` — narrow `from`/`to` or pass `connectionId`, or retry shortly. A `504` on `/contacts/outreach` is UNVERIFIED, not "not contacted"
+
+A `404` `"Cannot GET …"` on a path you expected means **the route is not shipped** — do not retry or invent it.
 
 `403` messages to relay verbatim: missing `write` scope · "Webhook endpoint management requires an account-scoped API key" · "Platform webhooks are not enabled for this account" (`canUseWebhooks` off — also blocks **reads** of `/webhooks*` and `/events`) · "Block lists are not enabled for this connection".
 
@@ -42,22 +44,22 @@ Render these as **`· UNVERIFIED — <reason>`** (include the status code), neve
 | --- | --- | --- | --- |
 | `GET /me` | `get_me` | R | Identity, `apiKey{name, scopes[], connectionScope: account\|connection, connectionId}`, `connections[]`, `links`. Call first. No capability flags. |
 | `GET /account/status` | `get_account_status` | R | Readiness; see enums below. |
-| `GET /account/metrics` | `get_account_metrics` | R | `{ from, to, requests{count}, syncs{success, warning, error}, destinationDeliveries{success, error, http2xx} }`; optional `connectionId`, `sourceId` (filters requests + syncs only). Can take ~10s. |
+| `GET /account/metrics` | `get_account_metrics` | R | `{ from, to, requests{count}, syncs{success, warning, error}, destinationDeliveries{success, error, http2xx} }`; optional `connectionId`, `sourceId` (filters requests + syncs only). Heaviest read; can return `504` (20s query limit). |
 | `GET /connections` | `list_connections` | R | OAuth `status`, `organizationDomain`, `organizationId`, `capabilities{sync, destinations, blocklists}`. |
 | `GET /sources` | `list_sources` | R | `{ sources: [{ id, url, platform, connectionId, crm, config, destinations[], replyRelay, createdAt }] }`. Not paginated. |
 | `GET /contacts/outreach` | `get_contact_outreach` | R | See [contacts-outreach.md](contacts-outreach.md). |
 | `GET /requests` | `list_requests` | R | Inbound receipts; `sourceId?`. |
-| `GET /requests/metrics` | `get_requests_metrics` | R | `{ count }`; `sourceId?`. |
+| `GET /requests/metrics` | `get_requests_metrics` | R | `{ count }`; `sourceId?`. Can return `504` (20s query limit). |
 | `GET /sources/:sourceId/requests` | `list_source_requests` | R | `/requests` for one source. |
 | `GET /syncs` | `list_syncs` | R | CRM sync attempts; `status?` (`success`\|`warning`\|`error`), `sourceId?`, `connectionId?`. |
-| `GET /syncs/metrics` | `get_syncs_metrics` | R | `{ success, warning, error }`; `sourceId?`, `connectionId?`. An inaccessible `connectionId` returns zeros, not 404. |
+| `GET /syncs/metrics` | `get_syncs_metrics` | R | `{ success, warning, error }`; `sourceId?`, `connectionId?`. Exact counts classified like `list_syncs` `status`, so the three sum to the syncs listed for the same filters; a sync with no recorded result is `error`. An inaccessible `connectionId` returns zeros, not 404. |
 | `GET /syncs/:id` | `get_sync` | R | One sync (no date range). |
 | `GET /sources/:sourceId/syncs` | `list_source_syncs` | R | `/syncs` for one source. |
 | `POST /syncs/:id/retry` | `retry_sync` | W | Not this skill. Error-status HubSpot/Salesforce syncs only; connection-scoped keys allowed. Returns `{ queued, syncId }`. |
 | `GET /destinations` | `list_destinations` | R | Forwarding catalog. Entries with `sourceIds: []` are **unbound** — they forward nothing. |
 | `GET /destinations/:id` | `get_destination` | R | One forwarding destination. |
 | `GET /destinations/:id/deliveries` | `list_destination_deliveries` | R | Forwarding attempts; `status?` (`success`\|`error`). |
-| `GET /destinations/:id/deliveries/metrics` | `get_destination_delivery_metrics` | R | `{ success, error, http2xx }`. |
+| `GET /destinations/:id/deliveries/metrics` | `get_destination_delivery_metrics` | R | `{ success, error, http2xx }`. Can return `504` (20s query limit). |
 | `POST /destinations/:id/deliveries/:deliveryId/replay` | `replay_destination_delivery` | W | Not this skill. Connection-scoped keys allowed. Returns `{ queued, destinationId, payloadId }`. |
 | `GET /deliveries` | `list_deliveries` | R | Account-wide forwarding deliveries; `destinationId?`. |
 | `GET /destinations/reply-relays` | `list_reply_relays` | R | `{ replyRelays: [{ id, connectionId, description, ccEmail, delayMinutes, sourceIds[], … }] }`. |

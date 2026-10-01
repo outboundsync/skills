@@ -14,7 +14,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key.
 metadata:
   author: outboundsync
-  version: "1.4.1"
+  version: "1.5.0"
 ---
 
 # OutboundSync API v1
@@ -69,7 +69,7 @@ Inbound `POST /webhooks/:code` is the Sources paste target — not Sync Monitori
 2. Auth-free `GET /openapi.json` / `GET /openapi.yaml` — authoritative, one operation per MCP tool.
 3. `/api/v1/*` responses carry `Link: rel="service-desc"` / `service-doc`.
 
-A `200` with an HTML body means the route is **not shipped** — do not retry it or invent a replacement. The not-shipped list is in [references/endpoints.md](references/endpoints.md).
+A JSON `404` with `message: "Cannot GET /api/v1/…"` means the route is **not shipped** — do not retry it or invent a replacement. The not-shipped list is in [references/endpoints.md](references/endpoints.md).
 
 ## What this skill may call (read-only)
 
@@ -84,7 +84,7 @@ Bootstrap when the user asks what the key can see or how to start:
 
 When the user asks about volume, sync health, or forwarding (not on every bootstrap), with full ISO-8601 `from`/`to` at most 31 days apart:
 
-- `get_account_metrics` / `GET /account/metrics` — one call for the whole Metrics card. It can take ~10s and time out; on a timeout, fall back to `get_syncs_metrics` + `get_requests_metrics` (fast) and mark Deliveries `· UNVERIFIED — timed out`
+- `get_account_metrics` / `GET /account/metrics` — one call for the whole Metrics card. It is the heaviest read: past the 20s query limit it returns a JSON `504`. On a `504` or timeout, retry once with a narrower `from`/`to` (or one `connectionId`), else fall back to `get_syncs_metrics` + `get_requests_metrics` and mark Deliveries `· UNVERIFIED — timed out`
 - `get_syncs_metrics`, `get_requests_metrics`, `get_destination_delivery_metrics` — narrower counts
 - `list_syncs`, `list_source_syncs`, `get_sync`, `list_requests`, `list_source_requests`, `list_deliveries`, `list_destination_deliveries`, `get_destination` — records; loop on `hasMore` / `nextCursor`
 
@@ -133,7 +133,7 @@ GitHub-flavored markdown only. Render only this shape; no prose outside it. It u
 
 - Blocklists: `✓` `SYNCED` and enabled · `·` `CREATED` / `FETCHING` / `SYNCING` / `SYNCING_NEW_CONTACTS` (in progress) · `·` paused (`isEnabled: false`) · `✗` `lastError` present.
 - Prior outreach, first line: `✗ Do not contact` when `doNotContact.value` is true; else `✓ Keep` or `✗ Skip` against the **user's** cadence; else `· No cadence given — not deciding`.
-- Metrics meter: the bar is the **OK share**, not a score — syncs count `success` + `warning` (warnings are benign skips, as in `sync-monitoring`), deliveries count `success`; 20 cells. A family with zero attempts shows no bar.
+- Metrics meter: the bar is the **OK share**, not a score — syncs count `success` + `warning` (warnings are benign skips, as in `sync-monitoring`; a sync that never recorded a result counts as `error`), deliveries count `success`; 20 cells. A family with zero attempts shows no bar.
 
 ### Shape
 

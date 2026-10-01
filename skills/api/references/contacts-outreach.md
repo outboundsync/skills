@@ -38,7 +38,7 @@ Prefer `query.email` for field mapping. Top-level `email` is a deprecated alias 
 
 ## Failures
 
-This call can take up to 30s and time out (`503`, sometimes as an HTML page, or MCP `upstream_error` "…aborted due to timeout"). A timeout, `5xx`, `401`/`403`, or non-JSON body is **UNVERIFIED** — never `found: false`. Keep the contact out of the send until a retry succeeds.
+A slow lookup stops at the 20s query limit and returns a JSON `504` (`error: "Gateway Timeout"`; MCP `upstream_error` with `status: 504`, or `timeout` if the MCP's own 30s limit fires first). A `504`, other `5xx`, timeout, `401`/`403`, or non-JSON body is **UNVERIFIED** — never `found: false`. Keep the contact out of the send until a retry succeeds.
 
 ## Do not
 

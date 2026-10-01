@@ -13,7 +13,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY (account-scoped for /webhooks*; write scope for mutations) and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key. The account needs platform webhooks enabled.
 metadata:
   author: outboundsync
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Sync Monitoring (OutboundSync Webhooks + events)
@@ -53,7 +53,7 @@ Run in order; one failed call makes only its own row UNVERIFIED.
    - **covers alerts** — `enabledEvents` empty (all subscribable) or includes `sync.failed`
 3. **Deliveries** — for each healthy endpoint, `list_webhook_deliveries` (`limit` 25, newest first) → sample of recent attempts. OK = `SUCCEEDED` or `PENDING`; failed = `FAILED` or `DEAD`.
 4. **Events** — `list_events` (`limit` 25) → sample of recent events. An event **counts** only if some non-paused endpoint subscribes to its type and it is older than 15 minutes (newer ones may still be `PENDING`). `delivered` = at least one delivery `SUCCEEDED`. For an undelivered backlog, page `list_events` with `delivered=false` on `hasMore` / `nextCursor`. Optional `get_event` for one event's delivery attempts.
-5. **CRM syncs** — `get_syncs_metrics` over the last 7 days (full ISO-8601 `from`/`to`). This is what `sync.failed` alerts on: it fires after **3 consecutive** failed syncs for a source × connection. Works with any key.
+5. **CRM syncs** — `get_syncs_metrics` over the last 7 days (full ISO-8601 `from`/`to`). This is what `sync.failed` alerts on: it fires on the **first** connection-breaking error (CRM auth, billing, app not installed), which also pauses that source × connection until the CRM is reconnected, and after **3 consecutive** failures for anything else. Transient errors (429, 5xx, timeouts) never count. `error` includes syncs that never recorded a result and syncs skipped while paused (`sync_circuit_open`). On a `504` (20s query limit), narrow `from`/`to` or pass `connectionId`. Works with any key.
 
 Caps: max **20** webhooks per account. An endpoint auto-disables after **20** consecutive terminal delivery failures (`autoDisabledAt` set); re-enable with `update_webhook` `isActive: true` after fixing the receiver.
 
@@ -147,7 +147,7 @@ CRM syncs   <bar>  <mark> <ok>/<total> ok · 7 days
 ### CRM syncs
 `<from> → <to>`
 
-- <✓ No sync errors | ✗ <n> errors — sync.failed fires after 3 in a row per source × connection> · <warning> benign skips
+- <✓ No sync errors | ✗ <n> errors — sync.failed fires on the first auth/billing error, else after 3 in a row per source × connection> · <warning> benign skips
 
 ### Proposed change
 `write-on-confirm — reply "yes" to run exactly this`

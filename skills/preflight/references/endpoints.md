@@ -26,7 +26,7 @@ Docs: https://outboundsync.com/docs/api/v1/ · Creating API keys: https://outbou
 
 ## Failures are UNVERIFIED
 
-Any `401`/`403`/`5xx`, timeout, non-JSON body (unknown `/api/v1/*` paths return HTML with `200`), or MCP `isError` (`{ error: { code, message, status? } }`) → render that card as `· UNVERIFIED — <status or message>` and its gauge row as 20 `▒`. Never read a failed call as "no sources" or "no blockers".
+Any `401`/`403`/`404`/`5xx` (every API error is a JSON `{ statusCode, message, error }` body), timeout, non-JSON body (the hosting layer answering during a deploy or incident), or MCP `isError` (`{ error: { code, message, status? } }`) → render that card as `· UNVERIFIED — <status or message>` and its gauge row as 20 `▒`. Never read a failed call as "no sources" or "no blockers".
 
 ## Related skills (not called here)
 

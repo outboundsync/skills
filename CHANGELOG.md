@@ -12,6 +12,7 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ### Added
 
+- **sync-monitoring** (1.3.0): documents the `sync.failed` payload (`reason`, `remediation`, `consecutiveFailures`), the seven remediation categories with the action for each, and paused syncs. A CRM auth, billing, or app-not-installed error fires `sync.failed` on the first failure and pauses that source × connection until reconnect. Other failures still need 3 in a row, and transient errors never count. Events skipped while paused show as `sync_circuit_open` errors and are not replayed automatically.
 - **integrations** (1.2.0) reads the directory feed's new `pairings` and `combos` fields to confirm tool + CRM pairings, block-list support, and pairing status, and links the tool + CRM guide page (`/integrations/<tool>-<crm>/`). Falls back to the detail page when the fields are absent. Pipedrive and HighLevel are named as CRM targets.
 - **Status layout** in `CONVENTIONS.md`, generalized from `preflight`. The `##` heading is the verdict, followed by a 20-cell `█░▒` gauge, then `###` cards with a context line and mark-first bullets, then `Next`. There is one UNVERIFIED vocabulary: a failed call is never an empty result.
 - **sync-monitoring** is now a health dashboard. Its gauge covers Access, Endpoints, Deliveries, Events, and CRM syncs (7-day `get_syncs_metrics`). A `## Mutations` table names every webhook write tool, and `### Proposed change` / `### Applied` cards cover the write flow.
@@ -22,6 +23,8 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ### Fixed
 
+- **api** (1.5.0): every API error is JSON. An unknown or unshipped path returns `404` `"Cannot GET …"` instead of the dashboard's HTML with `200`. Heavy reads (`/contacts/outreach`, `/account/metrics`, `/syncs`, `/syncs/metrics`, `/sources/:sourceId/syncs`, `/requests/metrics`, `/destinations/:id/deliveries/metrics`) stop at a 20s query limit and return `504`, not a `503` HTML page. Narrow `from`/`to` or pass `connectionId`. Sync metrics classify like `list_syncs`, so `success + warning + error` equals the listed syncs, and a sync with no recorded result counts as `error`. The MCP `timeout` code is distinct from an API `504` (`upstream_error`).
+- **preflight** (1.3.1): unknown paths no longer return HTML with `200`. They are JSON `404`s, and a non-JSON body now means the hosting layer answered during a deploy or incident.
 - **api** (1.4.1): the `X-RateLimit-*` headers come from the per-account sliding-window limit only. They are absent on `/contacts/outreach`, which is a fixed-window bucket, and on the per-IP `429`, so treat them as optional and fall back to `Retry-After`. `Reset` is the number of seconds until the next request slot frees up.
 - **API/MCP drift** against the live API and MCP v0.4.0:
   - `/sources` is not paginated.

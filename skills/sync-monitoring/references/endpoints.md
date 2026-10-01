@@ -12,7 +12,7 @@ Trimmed copy of the pack's full map (the `api` skill's `references/endpoints.md`
 | REST | MCP tool | Access | Owner / notes |
 | --- | --- | --- | --- |
 | `GET /me` | `get_me` | R | Identity, `apiKey{name, scopes[], connectionScope: account\|connection, connectionId}`, `connections[]`, `links`. Call first. No capability flags. |
-| `GET /syncs/metrics` | `get_syncs_metrics` | R | `{ success, warning, error }`; `sourceId?`, `connectionId?`. An inaccessible `connectionId` returns zeros, not 404. |
+| `GET /syncs/metrics` | `get_syncs_metrics` | R | `{ success, warning, error }`; `sourceId?`, `connectionId?`. Exact counts classified like `list_syncs` `status`, so the three sum to the syncs listed for the same filters; a sync with no recorded result is `error`. An inaccessible `connectionId` returns zeros, not 404. |
 | `GET /webhooks` | `list_webhooks` | R · A | Sync Monitoring endpoints → `sync-monitoring`. |
 | `GET /webhooks/:id` | `get_webhook` | R · A | → `sync-monitoring`. |
 | `POST /webhooks` | `create_webhook` | W · A | → `sync-monitoring`. Returns `secret` once. |
@@ -39,9 +39,9 @@ There is no events or webhook-delivery metrics endpoint: count undelivered event
 ## Paging and errors
 
 - `/events` and `/webhooks/:id/deliveries`: cursor pages `{ data, hasMore, nextCursor }`, default 25, max 100. Loop on `hasMore` / `nextCursor`, never on page length. `/webhooks` returns the whole list.
-- `get_syncs_metrics` needs full ISO-8601 `from`/`to`, at most 31 days apart.
+- `get_syncs_metrics` needs full ISO-8601 `from`/`to`, at most 31 days apart. Past the 20s query limit it returns a JSON `504` — narrow the window or pass `connectionId`, or retry shortly.
 - `403` messages: "Webhook endpoint management requires an account-scoped API key" · "Platform webhooks are not enabled for this account" · missing `write`. Relay them verbatim.
-- Any `401`/`403`/`5xx`, timeout, non-JSON body, or MCP `isError` → that row is **UNVERIFIED**, never "no endpoints" or "no events".
+- Any `401`/`403`/`5xx` (including `504`), timeout, non-JSON body, or MCP `isError` → that row is **UNVERIFIED**, never "no endpoints" or "no events".
 
 ## Docs
 
