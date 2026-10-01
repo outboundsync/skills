@@ -65,6 +65,8 @@ const cases = [
     'README.md': readmeFor(['api', 'demo']),
   }, ['endpoint-map-consistent']],
   ['stale-paths', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nSee openclaw-skills/foo.\n' }, ['stale-paths']],
+  ['stale-paths: retired admin click path', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nCreate one under Connected Accounts → API keys.\n' }, ['stale-paths']],
+  ['stale-paths: current admin click path allowed', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nCreate one under Platform access → API keys.\n' }, []],
   ['secrets: committed key', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nexport KEY=osapi_abcdefghijklmnop\n' }, ['secrets']],
   ['secrets: placeholder allowed', { 'skills/demo/references/rubric.md': '# Rubric\n\n## Levels\n\nexport KEY=osapi_...\n' }, []],
   ['skills-only-docs: script under skills/', { 'skills/demo/run.sh': 'echo hi\n' }, ['skills-only-docs']],
