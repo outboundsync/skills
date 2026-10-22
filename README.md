@@ -4,6 +4,8 @@ Public [Agent Skills](https://agentskills.io) for OutboundSync — installable w
 
 The pack ships **15** skills.
 
+**Sister pack:** [KingMinos Agent Skills for enrichment](https://kingminos.com) (kingminos.com).
+
 **Output style.** Every skill renders a fixed, terminal-friendly Markdown shape. Readiness and health checks (`preflight`, `sync-monitoring`, `email-authentication`, `sending-domain-quality`) lead with a verdict and a `█░▒` status gauge, then one card per system and a `Next` list. Scoring skills lead with a score meter. A failed lookup always shows as `UNVERIFIED`, never as a pass or an empty result. See [CONVENTIONS.md](CONVENTIONS.md) and each skill's `references/examples.md`.
 
 ### API & launch
