@@ -12,7 +12,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key. Optional Instantly MCP/API for automated Instantly gates.
 metadata:
   author: outboundsync
-  version: "1.3.1"
+  version: "1.4.0"
 ---
 
 # OutboundSync launch preflight
@@ -42,7 +42,7 @@ Use MCP tools when OutboundSync MCP is connected; otherwise call the REST paths 
 1. `get_me` / `GET /me` → `account.email`, `apiKey.connectionScope` / `connectionId`, `connections[]` (`id`, `crm`, `organizationDomain`).
 2. `list_connections` / `GET /connections` → per connection: `id`, `crm`, `status`, `organizationDomain`, `organizationId`, `capabilities{sync, destinations, blocklists}`, `createdAt`.
 3. `get_account_status` / `GET /account/status` → top-level `ready`, `blockers[]`, `warnings[]`, per-connection component statuses (`crmConnection`, `sources`, `destinations`, `blocklists`).
-4. `list_sources` / `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, createOrUpdateTask, assignContactOwner, salesforceObjectType}`, `destinations[]{url, description, eventTypes, isDelayed}`, bound `replyRelay` when present. One call returns every source — it is not paginated.
+4. `list_sources` / `GET /sources` → per source: `platform`, `connectionId`, `url`, `config{createOrUpdateCompany, excludeFreeEmailDomains, createOrUpdateTask, assignContactOwner, salesforceObjectType, salesforceNoCompanyAccount}`, `destinations[]{url, description, eventTypes, isDelayed}`, bound `replyRelay` when present. One call returns every source — it is not paginated.
 5. `list_destinations` / `GET /destinations` → forwarding catalog; count entries with `sourceIds: []` as **unbound** (advisory on the CRM card; does **not** change gate math). Reply-relay counts come from `/account/status`; sources may also embed a bound `replyRelay`.
 
 Join by `connectionId`. Render one CRM card + one OutboundSync (pipeline) card per connection. When >1 connection, disambiguate gauge labels by domain (e.g. `CRM (acme.com)`, `OutboundSync (acme.com)`).
@@ -107,7 +107,7 @@ Header: `### CRM — <CRM>` with context `` `Connection <id> · <domain> · org 
 
 - Gate: `✓ Connected — <CRM> OAuth ready` OR `✗ Disconnected — crm_disconnected` (→ Next: reconnect).
 - `· Capabilities: sync <on/off> · destinations <on/off> · blocklists <on/off>` (from `GET /connections`; plan context, not a gate).
-- `· Integration config` — per source under this connection: `<platform> → company <✓/✗> · task <✓/✗> · owner <✓/✗>` (+ `SF object: <type>` only when Salesforce; omit when null).
+- `· Integration config` — per source under this connection: `<platform> → company <✓/✗> · task <✓/✗> · owner <✓/✗>` (+ `SF object: <type>` only when Salesforce; omit when null). Append `· free email domains not skipped` only when `excludeFreeEmailDomains` is `false` (advisory: personal-address contacts such as gmail.com can be matched or named by that domain); omit when `true` or absent. On Salesforce Contact sources, append `· no-company Account: <none/shared>` only when `salesforceNoCompanyAccount` is `NONE` or `SHARED`; omit for `DEDICATED` (the default) or absent. Never a launch gate.
 - `· Destinations (forwarding, not CRM writes): <forwardingCount> endpoint(s)` listing `description → eventTypes` from `sources[].destinations[]`, OR `none — events still sync to CRM natively`. Counts come from `/account/status` `destinations{status, forwardingCount, replyRelayCount}`. Destinations status is `ready` / `not_configured` (advisory) / `disabled` (say "disabled on plan", no warning) — it has no `error` value. Catalog entries with `sourceIds: []` are unbound: say `<n> unbound — forwards nothing` rather than counting them.
 - `· Reply relays: <replyRelayCount> configured` (plus bound relays on sources) — advisory only; never a launch gate.
 - `· Blocklists: <status>` — map ComponentStatus: ready (`<n> enabled`) / not_configured / disabled on plan / error: `<lastError>`.

@@ -14,7 +14,7 @@ Source: OutboundSync Help Center — “Which HubSpot properties are updated” 
 
 ## Default company properties
 
-Only used if “Create or update company” is enabled.
+Only used if “Create or update company” is enabled. With “Skip free email domains” on (the default for new sources), free email domains such as gmail.com are never used: the company comes from the SEP company website, then company name, or the contact has no company association. A personal-address contact with no company is “no company identified,” not missing data.
 
 | OutboundSync webhook field | Notes | HubSpot property label | HubSpot internal label | Type |
 |---|---|---|---|---|
