@@ -7,8 +7,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# contents: tag + release + changelog branch; pull-requests: open/merge the
+# changelog PR.
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: calver-release
@@ -21,7 +24,7 @@ jobs:
       || (github.event.workflow_run.conclusion == 'success'
           && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
     env:
       RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
@@ -37,17 +40,24 @@ jobs:
         with:
           node-version: 22
 
-      - name: Generate release metadata
+      # --apply also moves curated `## Unreleased` notes under the new tag in the
+      # working tree (no-op when Unreleased is empty). The tag below still points
+      # at RELEASE_SHA; the CHANGELOG change lands on main afterwards via a PR.
+      - name: Generate release metadata and promote CHANGELOG
         id: calver
-        run: node scripts/release-calver.mjs --dry-run --notes-file release-notes.md
+        run: node scripts/release-calver.mjs --apply --notes-file release-notes.md
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Create and push tag
         id: tag
         if: steps.calver.outputs.has_changes == 'true'
+        env:
+          TAG: ${{ steps.calver.outputs.next_tag }}
         run: |
-          TAG="${{ steps.calver.outputs.next_tag }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
             echo "created=false" >> "$GITHUB_OUTPUT"
             echo "Tag $TAG already exists, skipping."
@@ -64,3 +74,20 @@ jobs:
           tag_name: ${{ steps.calver.outputs.next_tag }}
           name: ${{ steps.calver.outputs.next_tag }}
           body_path: release-notes.md
+
+      # Land the CHANGELOG promotion through a short-lived PR, never a direct
+      # push. Only after a new tag, and only when Unreleased had entries. main
+      # has no required checks, so the PR merges itself with GITHUB_TOKEN
+      # (which starts no workflow, so no release loop). If main ever requires
+      # checks, set RELEASE_PR_TOKEN so the PR can run CI; see the script.
+      - name: Land CHANGELOG promotion on main
+        if: >-
+          steps.calver.outputs.has_changes == 'true'
+          && steps.tag.outputs.created == 'true'
+          && steps.calver.outputs.changelog_updated == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_PR_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ steps.calver.outputs.next_tag }}
+        run: bash scripts/release-changelog-pr.sh

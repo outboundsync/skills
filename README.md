@@ -105,6 +105,17 @@ npx skills use outboundsync/skills --skill agencies
 npx skills use outboundsync/skills --skill integrations
 ```
 
+### Stay up to date
+
+`npx skills add` and `npx skills use` always read the latest `main` of this repo, so new installs get every merged change. Skills you already installed are a snapshot. Refresh them with:
+
+```bash
+npx skills update -g   # skills installed with -g
+npx skills update -p   # skills installed in this project
+```
+
+This GitHub repo is the only distribution channel. The pack is not published to npm.
+
 ## OpenClaw marketplace (optional)
 
 ClawHub is discovery/update for OpenClaw users. **Not required** — `npx skills … -a openclaw -g` already installs into OpenClaw.
@@ -167,7 +178,7 @@ Releases are created automatically after Validate skill integrity passes on `mai
 
 - Versioning format: `YYYY.MM.DD.N` (CalVer). Each skill also has its own `metadata.version`.
 - Release notes: [GitHub Releases](https://github.com/outboundsync/skills/releases), generated from commit subjects.
-- Curated changelog: [CHANGELOG.md](CHANGELOG.md).
+- Curated changelog: [CHANGELOG.md](CHANGELOG.md). Each release moves the `## Unreleased` lines under the new tag automatically, through a bot PR that merges itself (see CONTRIBUTING).
 
 To preview the next release locally:
 

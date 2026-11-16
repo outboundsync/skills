@@ -4,7 +4,7 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 - Add entries under `## Unreleased` in the PR that makes the change.
 - [GitHub Releases](https://github.com/outboundsync/skills/releases) are published automatically from commit subjects on every merge to `main`.
-- To fold `## Unreleased` into a dated release section, run `npm run release:apply` and commit the result.
+- Each release moves the `## Unreleased` lines under the new tag automatically, through a bot PR that merges itself. Don't hand-edit release sections.
 
 <!-- release entries -->
 
@@ -50,6 +50,7 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ### Changed
 
+- **Releases** now promote the CHANGELOG automatically, matching the KingMinos pack. Each CalVer release moves `## Unreleased` under the new tag through a bot PR that merges itself (`scripts/release-changelog-pr.sh`), so `npm run release:apply` is no longer a manual step. Commits from that bot PR never trigger another release. README documents `npx skills update` for refreshing installed skills.
 - **Tooling:** replace `scripts/validate_skill_integrity.sh` (bash + Ruby/Python) with a Node validator (`npm run validate`). It reports every problem in one run, emits GitHub annotations, and is covered by fixture tests (`npm test`). The existing checks are ported unchanged. New checks: output contract, score meter, bar geometry, description style, frontmatter spec limits, exact disclaimer text and position, fence-aware links and anchors across all Markdown, links that escape a skill folder, vague tool wildcards, committed secrets, non-doc files under `skills/`, the README skill index, and version bumps against a PR base (`--base`). Content rules start as warnings (`scripts/validate/config.json`).
 - **Release tooling:** `release-calver.mjs` is importable and tested. `--dry-run` and `--apply` are mutually exclusive, and the preview prints the full notes. `--apply` promotes `## Unreleased` into the new release section instead of inserting above it. `GITHUB_OUTPUT` uses a random delimiter.
 - **CI:** least-privilege `permissions`, SHA-pinned actions with Dependabot, concurrency and timeouts, actionlint, PR version-bump enforcement, a separate weekly external-link check (lychee), annotated release tags, and manual `workflow_dispatch` runs.
