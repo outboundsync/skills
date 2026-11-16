@@ -6,6 +6,11 @@
 //   node scripts/release-calver.mjs --dry-run --notes-file notes.md --tag-file tag.txt
 //                                      # CI: also write notes/tag files; CHANGELOG untouched
 //   npm run release:apply             # promote CHANGELOG `## Unreleased` into the new release
+//                                      # (no-op when Unreleased has no entries)
+//
+// CI (.github/workflows/release-calver.yml) runs --apply, tags the release
+// commit, then lands the CHANGELOG change on main via
+// scripts/release-changelog-pr.sh.
 //
 // GITHUB_OUTPUT (when set) receives has_changes, next_tag, previous_tag,
 // release_date, and changelog_updated.
@@ -17,7 +22,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const CALVER_TAG_PATTERN = /^\d{4}\.\d{2}\.\d{2}\.\d+$/;
-const RELEASE_COMMIT_PATTERN = /^chore\(release\):\s+\d{4}\.\d{2}\.\d{2}\.\d+$/i;
+// Release bookkeeping commits never count toward a new release, including the
+// squash-merged CHANGELOG promotion PR (`chore(release): CHANGELOG for <tag> (#N)`).
+export const RELEASE_COMMIT_PATTERN = /^chore\(release\):\s+(?:CHANGELOG for\s+)?\d{4}\.\d{2}\.\d{2}\.\d+(?:\s+\(#\d+\))?$/i;
 export const CHANGELOG_MARKER = '<!-- release entries -->';
 const UNRELEASED_HEADING = '## Unreleased';
 
@@ -123,6 +130,16 @@ export function renderReleaseSection(tag, date, body) {
   return `## [${tag}] - ${date}\n\n${body}`;
 }
 
+/** Curated text under `## Unreleased` (trimmed), or '' when absent or empty. */
+export function unreleasedEntries(changelog) {
+  if (!changelog.includes(CHANGELOG_MARKER)) return '';
+  const rest = changelog.split(CHANGELOG_MARKER)[1].replace(/^\n+/, '');
+  if (!rest.startsWith(UNRELEASED_HEADING)) return '';
+  const afterHeading = rest.slice(UNRELEASED_HEADING.length);
+  const nextRelease = afterHeading.search(/\n## /);
+  return (nextRelease === -1 ? afterHeading : afterHeading.slice(0, nextRelease)).trim();
+}
+
 /**
  * Turns the curated `## Unreleased` section into the new release section
  * (falling back to generated commit notes when it is empty) and leaves an
@@ -193,8 +210,12 @@ function main() {
   if (args.apply) {
     const changelogPath = 'CHANGELOG.md';
     const current = existsSync(changelogPath) ? readFileSync(changelogPath, 'utf8') : `# Changelog\n\n${CHANGELOG_MARKER}\n`;
-    writeFileSync(changelogPath, promoteUnreleased(current, plan.nextTag, plan.date, plan.notes), 'utf8');
-    changelogUpdated = true;
+    if (unreleasedEntries(current)) {
+      writeFileSync(changelogPath, promoteUnreleased(current, plan.nextTag, plan.date, plan.notes), 'utf8');
+      changelogUpdated = true;
+    } else {
+      console.log('CHANGELOG.md `## Unreleased` has no entries; leaving CHANGELOG.md unchanged.');
+    }
   }
   if (args.notesFile) writeFileSync(args.notesFile, `${plan.releaseNotes}\n`, 'utf8');
   if (args.tagFile) writeFileSync(args.tagFile, `${plan.nextTag}\n`, 'utf8');

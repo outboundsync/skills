@@ -31,6 +31,11 @@ Run `npm run validate -- --list` to see every rule with its severity. Rules and 
 
 - **Skills:** bump `metadata.version` in a skill's frontmatter whenever any file in its folder changes. Minor for new behavior or output changes, patch for fixes and wording. CI enforces a bump on PRs.
 - **Pack:** releases are CalVer tags `YYYY.MM.DD.N`, created automatically after Validate passes on `main`. Preview the next release with `npm run release:preview`.
+- **Distribution:** `npx skills add outboundsync/skills` installs from `main`, so a merge is live for new installs immediately. There is no npm package; don't add one.
+
+## Changelog promotion
+
+Automatic. On each release, `release-calver.yml` runs `release-calver.mjs --apply`, which moves the curated `## Unreleased` lines under `## [YYYY.MM.DD.N] - YYYY-MM-DD`, then publishes the tag and GitHub release. The CHANGELOG change lands on `main` through a short-lived PR (`chore(release): CHANGELOG for <tag>`, `scripts/release-changelog-pr.sh`). `main` has no required checks, so the workflow squash-merges that PR with `GITHUB_TOKEN` as soon as GitHub reports it mergeable. That merge starts no workflow, and its subject never counts toward a release, so it can't loop. If `main` ever requires checks, add the repository secret `RELEASE_PR_TOKEN` (a fine-grained token limited to this repo with Contents and Pull requests read/write) so the PR can run CI before it merges. Without it, the PR stays open for a maintainer. An empty `## Unreleased` changes nothing. Contributors only add lines under `## Unreleased`; do not hand-edit release sections. If the bot PR fails (for example, it conflicts with a newer commit on `main`), move that tag's lines by hand in a normal PR.
 
 ## After merging
 
