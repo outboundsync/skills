@@ -9,7 +9,7 @@ Source: OutboundSync Attio integration (beta, one-way sync). Lighter-touch than 
 | Object | Attio record | What OutboundSync sets |
 | --- | --- | --- |
 | Person | `people` record | Matched/created on email address (social-only outreach falls back to LinkedIn / X). Identity only: name, email, linked company. |
-| Company | `companies` record | Matched/created on domain (free/public email domains skipped). Name + domain only — **no engagement attaches to the company**. |
+| Company | `companies` record | Matched/created on domain; with **Skip free email domains** on (the default), free/public email domains are skipped and the company is matched/created by SEP company website, then company name, else none. Name + domain only — **no engagement attaches to the company**. |
 | Note | `notes` on the Person | One note per engagement event. This is the analysis surface. |
 
 Owner is **not** written to Attio — its People object has no owner attribute, and note authorship (`created_by_actor`) always resolves to the OAuth installer. Do not read rep/owner attribution from Attio notes.

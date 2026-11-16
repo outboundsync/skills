@@ -51,7 +51,7 @@ A `404` `"Cannot GET …"` on a path you expected means **the route is not shipp
 | `GET /requests` | `list_requests` | R | Inbound receipts; `sourceId?`. |
 | `GET /requests/metrics` | `get_requests_metrics` | R | `{ count }`; `sourceId?`. Can return `504` (20s query limit). |
 | `GET /sources/:sourceId/requests` | `list_source_requests` | R | `/requests` for one source. |
-| `GET /syncs` | `list_syncs` | R | CRM sync attempts; `status?` (`success`\|`warning`\|`error`), `sourceId?`, `connectionId?`. |
+| `GET /syncs` | `list_syncs` | R | CRM sync attempts; `status?` (`success`\|`warning`\|`error`), `sourceId?`, `connectionId?`. Each row has `notes[]` (`{ code, message }`, `[]` when none; informational, never changes `status`), e.g. `FREE_EMAIL_DOMAIN_COMPANY_SKIPPED`, `FREE_EMAIL_DOMAIN_MATCHED_BY_NAME`, `FREE_EMAIL_DOMAIN_MATCHED_BY_WEBSITE`. |
 | `GET /syncs/metrics` | `get_syncs_metrics` | R | `{ success, warning, error }`; `sourceId?`, `connectionId?`. Exact counts classified like `list_syncs` `status`, so the three sum to the syncs listed for the same filters; a sync with no recorded result is `error`. An inaccessible `connectionId` returns zeros, not 404. |
 | `GET /syncs/:id` | `get_sync` | R | One sync (no date range). |
 | `GET /sources/:sourceId/syncs` | `list_source_syncs` | R | `/syncs` for one source. |

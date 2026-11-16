@@ -14,7 +14,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key.
 metadata:
   author: outboundsync
-  version: "1.5.2"
+  version: "1.5.3"
 ---
 
 # OutboundSync API v1

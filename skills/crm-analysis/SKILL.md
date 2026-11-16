@@ -13,7 +13,7 @@ description: >-
 license: MIT
 metadata:
   author: outboundsync
-  version: "1.2.1"
+  version: "1.2.2"
 ---
 
 # CRM analysis (HubSpot + Salesforce, plus Attio & Close beta)
