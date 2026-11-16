@@ -10,6 +10,8 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+## [2026.11.16.2] - 2026-11-16
+
 ### Added
 
 - **Skip free email domains** (OS-1753): **preflight** (1.4.0) reads the new `/sources` `config.excludeFreeEmailDomains` and `config.salesforceNoCompanyAccount` fields and adds advisory suffixes to the Integration config line when free email domains aren't skipped or a Salesforce Contact source doesn't create a dedicated Account. **api** (1.5.3) documents `notes[]` on `/syncs` rows. **crm-analysis** (1.2.2) explains how HubSpot and Attio companies are matched when a contact uses a free email domain.
