@@ -10,6 +10,8 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+## [2026.11.17.4] - 2026-11-17
+
 ### Fixed
 
 - **sync-monitoring** (1.4.1): support batch-requeue covers HubSpot and Salesforce only. Close was listed, but the only batch requeue path in the API (`admin/services/webhooks.service.ts`) is HubSpot/Salesforce.
