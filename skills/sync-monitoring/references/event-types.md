@@ -40,11 +40,11 @@ OutboundSync re-queues a failed CRM sync on its own only in these cases. Everyth
 | Salesforce | Record lock (`UNABLE_TO_LOCK_ROW`) | up to 5 retries, 5–15 s apart |
 | Attio, Close, HighLevel, Pipedrive | 429 only | up to 7 retries, seconds apart (CRM `Retry-After`, max 60 s) |
 
-A sync whose retries run out stays `error`. When a retry succeeds, HubSpot, Salesforce, and Close update the original sync to `success`. Attio, HighLevel, and Pipedrive write a new `success` sync, and the original stays `error`, so don't count those leftover `error` rows as unresolved without checking for a later success. Manual `retry_sync` covers HubSpot and Salesforce only. Support can batch-requeue HubSpot, Salesforce, and Close.
+A sync whose retries run out stays `error`. When a retry succeeds, HubSpot, Salesforce, and Close update the original sync to `success`. Attio, HighLevel, and Pipedrive write a new `success` sync, and the original stays `error`, so don't count those leftover `error` rows as unresolved without checking for a later success. Manual `retry_sync` covers HubSpot and Salesforce only, one sync at a time, with no daily limit. `retry_source_syncs` (`POST /sources/:sourceId/syncs/retry`, `write`, via the `api` skill's caution list) enqueues that source's recorded errors from the last 30 days (warnings skipped) and allows one bulk retry per source per 24 hours. Support can batch-requeue HubSpot, Salesforce, and Close.
 
 ## Paused syncs
 
-A `reconnect` or `billing` failure pauses CRM sync for that source × connection. Events that arrive while paused are not sent to the CRM: they appear as `error` syncs with message `sync_circuit_open`. Reconnecting the CRM (also after fixing a billing limit) resumes syncing for every source on that connection. Paused events are **not** replayed automatically — after the reconnect, propose `retry_sync` per sync (HubSpot/Salesforce, `write` scope; via the `api` skill's caution list) or point the user to OutboundSync support for a batch requeue.
+A `reconnect` or `billing` failure pauses CRM sync for that source × connection. Events that arrive while paused are not sent to the CRM: they appear as `error` syncs with message `sync_circuit_open`. Reconnecting the CRM (also after fixing a billing limit) resumes syncing for every source on that connection. Paused events are **not** replayed automatically — after the reconnect, propose `retry_sync` per sync or one `retry_source_syncs` for the source (HubSpot/Salesforce, `write` scope; via the `api` skill's caution list) or point the user to OutboundSync support for a batch requeue.
 
 ## Test-only (not subscribable)
 

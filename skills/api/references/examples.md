@@ -14,7 +14,7 @@ Calls: `get_me` → `list_connections` → `get_account_status` → `list_source
 
 - ✓ Key valid
 - · Connection-scoped — connection 177 only
-- · read only — retry, replay, pause, and resync need write (not this skill)
+- · read only — retry, bulk source retry, replay, pause, and resync need write (not this skill)
 - · Sync Monitoring needs platform webhooks on (and an account-scoped key for `/webhooks`) — checked by sync-monitoring
 
 ### Plan
@@ -37,7 +37,7 @@ Calls: `get_contact_outreach` with `email` and `profileUrl`.
 
 - ✓ Key valid
 - ✓ Account-scoped — sees every connection
-- · read only — retry, replay, pause, and resync need write (not this skill)
+- · read only — retry, bulk source retry, replay, pause, and resync need write (not this skill)
 
 ### Plan
 `Prior-outreach filter, 60-day cadence`

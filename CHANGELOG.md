@@ -10,6 +10,9 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+- **api** (1.6.0): documents `GET /setup` (`get_setup_status`) and `POST /sources/:sourceId/syncs/retry` (`retry_source_syncs`). `/setup` reports wizard progress and plan entitlement (`syncEntitled`), not whether a connection can live-sync now (`/account/status`). The bulk source retry is a write this skill does not call.
+- **sync-monitoring** (1.4.0): names `retry_source_syncs` as the HubSpot/Salesforce batch requeue (still not called here), alongside per-sync `retry_sync` and support.
+
 ## [2026.11.17.1] - 2026-11-17
 
 ### Added
