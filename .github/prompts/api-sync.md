@@ -34,9 +34,10 @@ Anything outside `skills/` and `CHANGELOG.md`: not `api-sync/` (the workflow wri
 
 ## Rules
 
+- **The spec can be wrong.** Never delete a specific fact from the docs (a number, limit, threshold, status code, version or retry schedule) just because the spec does not mention it. When the docs and the spec disagree on a fact that the spec diff did not change (in bootstrap mode, every fact), keep the docs as they are and list the conflict in your summary under `Spec conflicts to check:` (what the docs say, what the spec says, and where). Change such a fact only when the snapshot diff itself changed it.
 - Read `CONTRIBUTING.md`, `CONVENTIONS.md` and `SECURITY.md` first and follow them. Every write-capable skill keeps its `## Mutations` section and the write-on-confirm protocol.
 - Describe only what the spec says. Never invent endpoints, fields, enums, MCP tools, limits or behavior. If the spec is ambiguous, leave the text as it is and say so in your summary.
 - If the change only touches wording that doesn't change what a skill does or tells the user, change nothing.
 - Don't commit, push, create branches or open pull requests.
 - When you're done, run `npm run validate -- --base origin/main` and `npm test`, and fix anything they report in the files you're allowed to edit. `API_SYNC_SPEC` is set, so the `endpoint-map-openapi` rule checks the map against the live spec.
-- End your last message with a line that starts `Summary:`, followed by a short plain-text summary: which files and sections you changed and why, the version bumps, and anything a human should check. The workflow puts it in the pull request.
+- End your last message with a line that starts `Summary:`, followed by a short plain-text summary: which files and sections you changed and why, the version bumps, any `Spec conflicts to check:`, and anything a human should check. The workflow puts it in the pull request.
