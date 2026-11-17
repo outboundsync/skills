@@ -32,12 +32,17 @@ export const TOOL_ALIASES = {
   listDestinationReplyRelays: 'list_reply_relays',
 };
 
-/** camelCase → snake_case (`getSetupStatus` → `get_setup_status`, `getURLInfo` → `get_url_info`). */
+/**
+ * camelCase → snake_case (`getSetupStatus` → `get_setup_status`, `getURLInfo` →
+ * `get_url_info`). Same function as the OutboundSync MCP server and website:
+ * keep the three identical.
+ */
 export function toSnake(operationId) {
   return String(operationId)
     .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-    .replace(/[-.\s]+/g, '_')
+    .replace(/[^A-Za-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
     .toLowerCase();
 }
 

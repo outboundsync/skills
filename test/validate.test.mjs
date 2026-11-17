@@ -254,6 +254,9 @@ test('endpoint-map-openapi: naming rule and route spelling', () => {
   assert.equal(toSnake('getSetupStatus'), 'get_setup_status');
   assert.equal(toSnake('getDestinationDeliveryMetrics'), 'get_destination_delivery_metrics');
   assert.equal(toSnake('getURLInfo'), 'get_url_info');
+  assert.equal(toSnake('list.webhook-deliveries'), 'list_webhook_deliveries');
+  assert.equal(toSnake('_getMe__'), 'get_me');
+  assert.equal(toSnake('get  Me!!Now'), 'get_me_now');
   assert.equal(toolName('getSyncMetrics'), 'get_syncs_metrics');
   assert.equal(toolName('listDestinationReplyRelays'), 'list_reply_relays');
   assert.equal(mapRoute('post', '/api/v1/destinations/{id}/deliveries/{deliveryId}/replay'), 'POST /destinations/:id/deliveries/:deliveryId/replay');
