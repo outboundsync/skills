@@ -9,12 +9,13 @@ description: >-
   read vs write scopes, sync or delivery counts, how API work relates to the
   preflight and sync-monitoring skills, or about prior outreach, already
   contacted, skip contacts I already reached, GET /contacts/outreach,
-  blocklist syncs, or GET /blocklists.
+  blocklist syncs, GET /blocklists, setup wizard progress, GET /setup,
+  or a bulk retry of failed syncs for one source.
 license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key.
 metadata:
   author: outboundsync
-  version: "1.5.3"
+  version: "1.6.0"
 ---
 
 # OutboundSync API v1
@@ -41,7 +42,7 @@ Every REST path, its MCP tool, access rules, response fields, and error handling
 | --- | --- |
 | Header | `Authorization: Bearer osapi_…` (REST and MCP) |
 | `read` scope | Every GET |
-| `write` scope | `retry_sync`, `replay_destination_delivery`, `pause_blocklist`, `resync_blocklist`, and the webhook mutations — **never from this skill** |
+| `write` scope | `retry_sync`, `retry_source_syncs`, `replay_destination_delivery`, `pause_blocklist`, `resync_blocklist`, and the webhook mutations — **never from this skill** |
 | Account-scoped key | Sees all connections; **required** for `/webhooks*` |
 | Connection-scoped key | Sees exactly one connection everywhere — expected, not an error; `403` on `/webhooks*`; may read `/events` for its connection |
 | No API-enabled connection | Every authenticated route returns `403`. Customers can't turn API access on themselves: ask OutboundSync support to enable it for a connection |
@@ -65,7 +66,7 @@ Inbound `POST /webhooks/:code` is the Sources paste target — not Sync Monitori
 
 ## Discovery
 
-1. `get_me` / `GET /me` — its `links` name the main related paths (not blocklists, webhooks, events, or health).
+1. `get_me` / `GET /me` — its `links` name the main related paths (not blocklists, webhooks, events, setup, or health).
 2. Auth-free `GET /openapi.json` / `GET /openapi.yaml` — authoritative, one operation per MCP tool.
 3. `/api/v1/*` responses carry `Link: rel="service-desc"` / `service-doc`.
 
@@ -92,6 +93,10 @@ When the user asks about a contact, prior outreach, already contacted, or skip/d
 
 - `get_contact_outreach` / `GET /contacts/outreach` — `email` and/or `profileUrl` (max 5, OR-unioned). Contract: [references/contacts-outreach.md](references/contacts-outreach.md)
 
+When the user asks about the setup wizard, whether an OutboundSync test succeeded, or whether live SEP traffic has arrived — not launch readiness (`preflight`) and not live-sync entitlement (`get_account_status`):
+
+- `get_setup_status` / `GET /setup`
+
 When the user asks about blocklist syncs, suppression lists, pause, or resync:
 
 - `list_blocklists` / `GET /blocklists` (optional `connectionId`). Map each list to one mark (see Output contract). Pause/resync are `write` — describe the recipe under `### Plan` Caution; never call them.
@@ -108,6 +113,7 @@ Do **not** render the preflight launch gauge here — "am I ready to launch?" be
 | Sync, request, or forwarding counts and records (GET) | this skill |
 | Already outreached? Skip / delay enrollment? | this skill |
 | CRM→SEP blocklist syncs (GET) | this skill |
+| Setup wizard, test succeeded, or live SEP traffic arrived? | this skill (`get_setup_status` — not `preflight`) |
 | Campaign replies / attribution from CRM fields | `crm-analysis` (no API key) |
 
 If the ask spans launch readiness and Sync Monitoring, say which skill runs first and why under `### Plan`.
@@ -117,6 +123,7 @@ If the ask spans launch readiness and Sync Monitoring, say which skill runs firs
 List these under `### Plan` Caution only when relevant; never perform them:
 
 - `retry_sync` (`POST /syncs/:id/retry`) and `replay_destination_delivery` (`POST /destinations/:id/deliveries/:deliveryId/replay`).
+- `retry_source_syncs` (`POST /sources/:sourceId/syncs/retry`). HubSpot/Salesforce only. Enqueues recorded errors from the last 30 days (warnings skipped; a sync with no result stays on `retry_sync`). One bulk retry per source per 24 hours. A `409` inside that window returns `retryAvailableAt` and `retryAfterSeconds`. A paused sync is a separate `409` and does not start the window. `queued: true` means the batch was accepted, including when nothing was eligible. Retry one recorded error with `retry_sync` and read it back to success before the bulk call: the bulk call spends the 24-hour window even when the underlying issue is still broken. `POST /syncs/:id/retry` has no daily limit and stays available during that window.
 - `pause_blocklist` / `resync_blocklist` (`POST /blocklists/:id/pause|resync`). SEP push is additive — neither clears the sequencer. Scheduled-reload recipe: (1) `list_blocklists` → pick `id`; (2) optionally clear the list **in the sequencer**; (3) `resync_blocklist` (needs `write`); (4) on `409`, back off; (5) poll `list_blocklists` until `status` leaves `FETCHING`/`SYNCING`, or read `lastError`.
 - Webhook mutations → `sync-monitoring`.
 
@@ -145,7 +152,7 @@ GitHub-flavored markdown only. Render only this shape; no prose outside it. It u
 
 - ✓ Key valid
 - <✓ Account-scoped — sees every connection | · Connection-scoped — connection <id> only>
-- <✓ write scope | · read only — retry, replay, pause, and resync need write (not this skill)>
+- <✓ write scope | · read only — retry, bulk source retry, replay, pause, and resync need write (not this skill)>
 - · Sync Monitoring needs platform webhooks on (and an account-scoped key for `/webhooks`) — checked by sync-monitoring
 
 ### Plan
