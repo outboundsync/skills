@@ -13,7 +13,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY (account-scoped for /webhooks*; write scope for mutations) and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key. The account needs platform webhooks enabled.
 metadata:
   author: outboundsync
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # Sync Monitoring (OutboundSync Webhooks + events)
