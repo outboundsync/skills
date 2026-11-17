@@ -10,6 +10,8 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+## [2026.11.17.0] - 2026-11-17
+
 ### Changed
 
 - **Docs:** CONTRIBUTING's "After merging" now describes the automatic website sync. outboundsync.com copies the pack and updates its skills docs through a sync PR, so there's no manual mirror step.
