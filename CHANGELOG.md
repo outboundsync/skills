@@ -10,6 +10,10 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+### Added
+
+- **API sync:** a scheduled `API sync` workflow keeps the skills in step with the OutboundSync API's public OpenAPI spec. When the spec changes, a Cursor CLI agent updates the skills and a PR opens for review. New validator rule `endpoint-map-openapi` checks the api skill's REST ↔ MCP map against the committed snapshot (`api-sync/openapi.snapshot.json`), and `write-tools-named` reads write tools from it. Until the first sync PR adds the snapshot, `endpoint-map-openapi` only warns and `write-tools-named` keeps its built-in list.
+
 ## [2026.11.17.0] - 2026-11-17
 
 ### Changed

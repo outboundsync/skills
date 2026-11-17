@@ -3,6 +3,7 @@ import crmAnalysis from './crm-analysis.mjs';
 import descriptionStyle from './description-style.mjs';
 import disclaimer from './disclaimer.mjs';
 import endpointMapConsistent from './endpoint-map-consistent.mjs';
+import endpointMapOpenapi from './endpoint-map-openapi.mjs';
 import frontmatter from './frontmatter.mjs';
 import links from './links.mjs';
 import linksEscapeSkill from './links-escape-skill.mjs';
@@ -26,6 +27,7 @@ export const rules = [
   barGeometry,
   writeToolsNamed,
   endpointMapConsistent,
+  endpointMapOpenapi,
   links,
   linksEscapeSkill,
   stalePaths,
