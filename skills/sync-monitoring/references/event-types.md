@@ -44,7 +44,7 @@ A sync whose retries run out stays `error`. When a retry succeeds, HubSpot, Sale
 
 ## Paused syncs
 
-A `reconnect` or `billing` failure pauses CRM sync for that source × connection. Events that arrive while paused are not sent to the CRM: they appear as `error` syncs with message `sync_circuit_open`. Reconnecting the CRM (also after fixing a billing limit) resumes syncing for every source on that connection. Paused events are **not** replayed automatically — after the reconnect, propose `retry_sync` per sync or one `retry_source_syncs` for the source (HubSpot/Salesforce, `write` scope; via the `api` skill's caution list) or point the user to OutboundSync support for a batch requeue (including Close).
+A `reconnect` or `billing` failure pauses CRM sync for that source × connection. Events that arrive while paused are not sent to the CRM: they appear as `error` syncs with message `sync_circuit_open`. Reconnecting the CRM (also after fixing a billing limit) resumes syncing for every source on that connection. Paused events are **not** replayed automatically — after the reconnect, propose `retry_sync` per sync or one `retry_source_syncs` for the source (HubSpot/Salesforce, `write` scope; via the `api` skill's caution list) or point the user to OutboundSync support for a batch requeue.
 
 ## Test-only (not subscribable)
 

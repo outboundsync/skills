@@ -44,7 +44,7 @@ A `404` `"Cannot GET …"` on a path you expected means **the route is not shipp
 | --- | --- | --- | --- |
 | `GET /me` | `get_me` | R | Identity, `apiKey{name, scopes[], connectionScope: account\|connection, connectionId}`, `connections[]`, `links`. Call first. No capability flags. |
 | `GET /account/status` | `get_account_status` | R | Readiness; see enums below. |
-| `GET /setup` | `get_setup_status` | R | Wizard snapshot: sources created, OutboundSync test succeeded, live SEP traffic received. Not live-sync entitlement — that is `/account/status`. |
+| `GET /setup` | `get_setup_status` | R | Wizard snapshot per connection and source: `test.status`, `sepInbound.lastReceivedAt` (first live SEP event; refreshed at most hourly, not a heartbeat), `steps[]`. `syncEntitled` is plan entitlement (`canSync`) only, not pause state — whether a connection can live-sync now is `/account/status`. |
 | `GET /account/metrics` | `get_account_metrics` | R | `{ from, to, requests{count}, syncs{success, warning, error}, destinationDeliveries{success, error, http2xx} }`; optional `connectionId`, `sourceId` (filters requests + syncs only). Heaviest read; can return `504` (20s query limit). |
 | `GET /connections` | `list_connections` | R | OAuth `status`, `organizationDomain`, `organizationId`, `capabilities{sync, destinations, blocklists}`. |
 | `GET /sources` | `list_sources` | R | `{ sources: [{ id, url, platform, connectionId, crm, config, destinations[], replyRelay, createdAt }] }`. Not paginated. |
@@ -57,7 +57,7 @@ A `404` `"Cannot GET …"` on a path you expected means **the route is not shipp
 | `GET /syncs/:id` | `get_sync` | R | One sync (no date range). |
 | `GET /sources/:sourceId/syncs` | `list_source_syncs` | R | `/syncs` for one source. |
 | `POST /syncs/:id/retry` | `retry_sync` | W | Not this skill. Error-status HubSpot/Salesforce syncs only; connection-scoped keys allowed. Returns `{ queued, syncId }`. |
-| `POST /sources/:sourceId/syncs/retry` | `retry_source_syncs` | W | Not this skill. Enqueues recorded HubSpot/Salesforce errors from the last 30 days (warnings and in-flight rows skipped). One per source per 24h. `201 { queued, sourceId, retryAvailableAt, retryAfterSeconds }`; `queued: true` includes an empty batch. A `409` inside that window returns `retryAvailableAt` and `retryAfterSeconds`. A paused sync is a separate `409` and does not start the window. |
+| `POST /sources/:sourceId/syncs/retry` | `retry_source_syncs` | W | Not this skill. Enqueues recorded HubSpot/Salesforce errors from the last 30 days (warnings and syncs with no result row skipped — use `retry_sync` for those). One per source per 24h. `201 { queued, sourceId, retryAvailableAt, retryAfterSeconds }`; `queued: true` includes an empty batch. A `409` inside that window returns `retryAvailableAt` and `retryAfterSeconds`. A non-HubSpot/Salesforce source or a paused or unentitled connection/source is a plain `409` and does not start the window. Shares the window with the dashboard's **Retry failed**. |
 | `GET /destinations` | `list_destinations` | R | Forwarding catalog. Entries with `sourceIds: []` are **unbound** — they forward nothing. |
 | `GET /destinations/:id` | `get_destination` | R | One forwarding destination. |
 | `GET /destinations/:id/deliveries` | `list_destination_deliveries` | R | Forwarding attempts; `status?` (`success`\|`error`). |

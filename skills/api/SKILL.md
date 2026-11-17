@@ -93,7 +93,7 @@ When the user asks about a contact, prior outreach, already contacted, or skip/d
 
 - `get_contact_outreach` / `GET /contacts/outreach` — `email` and/or `profileUrl` (max 5, OR-unioned). Contract: [references/contacts-outreach.md](references/contacts-outreach.md)
 
-When the user asks about the setup wizard, whether an OutboundSync test succeeded, or whether live SEP traffic has arrived — not launch readiness (`preflight`) and not live-sync entitlement (`get_account_status`):
+When the user asks about the setup wizard, whether an OutboundSync test succeeded, or whether live SEP traffic has arrived — not launch readiness (`preflight`) and not whether a connection can live-sync now (`get_account_status`):
 
 - `get_setup_status` / `GET /setup`
 
@@ -123,7 +123,7 @@ If the ask spans launch readiness and Sync Monitoring, say which skill runs firs
 List these under `### Plan` Caution only when relevant; never perform them:
 
 - `retry_sync` (`POST /syncs/:id/retry`) and `replay_destination_delivery` (`POST /destinations/:id/deliveries/:deliveryId/replay`).
-- `retry_source_syncs` (`POST /sources/:sourceId/syncs/retry`). HubSpot/Salesforce only. Enqueues recorded errors from the last 30 days (warnings skipped; a sync with no result stays on `retry_sync`). One bulk retry per source per 24 hours. A `409` inside that window returns `retryAvailableAt` and `retryAfterSeconds`. A paused sync is a separate `409` and does not start the window. `queued: true` means the batch was accepted, including when nothing was eligible. Retry one recorded error with `retry_sync` and read it back to success before the bulk call: the bulk call spends the 24-hour window even when the underlying issue is still broken. `POST /syncs/:id/retry` has no daily limit and stays available during that window.
+- `retry_source_syncs` (`POST /sources/:sourceId/syncs/retry`). HubSpot/Salesforce only. Enqueues recorded errors from the last 30 days (warnings skipped; a sync with no result stays on `retry_sync`). One bulk retry per source per 24 hours. A `409` inside that window returns `retryAvailableAt` and `retryAfterSeconds`. A non-HubSpot/Salesforce source, or a connection or source that is paused or not entitled to sync, is a plain `409` (`message` only) and does not start the window. The dashboard's **Retry failed** button on a source shares the same 24-hour window. `queued: true` means the batch was accepted, including when nothing was eligible. Retry one recorded error with `retry_sync` and read it back to success before the bulk call: the bulk call spends the 24-hour window even when the underlying issue is still broken. `POST /syncs/:id/retry` has no daily limit and stays available during that window.
 - `pause_blocklist` / `resync_blocklist` (`POST /blocklists/:id/pause|resync`). SEP push is additive — neither clears the sequencer. Scheduled-reload recipe: (1) `list_blocklists` → pick `id`; (2) optionally clear the list **in the sequencer**; (3) `resync_blocklist` (needs `write`); (4) on `409`, back off; (5) poll `list_blocklists` until `status` leaves `FETCHING`/`SYNCING`, or read `lastError`.
 - Webhook mutations → `sync-monitoring`.
 
