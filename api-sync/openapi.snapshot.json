@@ -1597,7 +1597,7 @@
         "additionalProperties": true,
         "properties": {
           "schema_version": {
-            "description": "Version of this response contract. Currently 2.",
+            "description": "Version of this response contract. Currently 3.",
             "type": "integer"
           },
           "status": {
@@ -1626,7 +1626,7 @@
             "type": "object"
           },
           "schema_version": {
-            "description": "Version of this response contract. Currently 2.",
+            "description": "Version of this response contract. Currently 3.",
             "type": "integer"
           },
           "status": {
@@ -4129,7 +4129,7 @@
     },
     "/api/v1/setup": {
       "get": {
-        "description": "Point-in-time setup / wizard status for connections the key can access.\nAnswers whether sources are created, OutboundSync tests succeeded, and\nlive SEP traffic has been received — not whether live sync is entitled.\n\nDo not confuse with `GET /api/v1/account/status`, which answers whether\na connection may live-sync (CRM OAuth + entitlement + ≥1 source).\nAccount-status `ready` does **not** mean the SEP webhook is wired.\n",
+        "description": "Point-in-time setup / wizard status for connections the key can access.\nAnswers whether sources are created, OutboundSync tests succeeded, and\nlive SEP traffic has been received. Each connection also reports\n`syncEntitled`; whether it can live-sync right now (entitled and sync\nenabled) is `GET /api/v1/account/status`.\n\nDo not confuse with `GET /api/v1/account/status`, which answers whether\na connection may live-sync (CRM OAuth + entitlement + ≥1 source).\nAccount-status `ready` does **not** mean the SEP webhook is wired.\n",
         "operationId": "getSetupStatus",
         "responses": {
           "200": {
