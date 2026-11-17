@@ -5,16 +5,26 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { parseArgs, validate } from '../scripts/validate/cli.mjs';
 import { checkBarLine } from '../scripts/validate/rules/bar-geometry.mjs';
+import { mapRoute, toolName, toSnake } from '../scripts/validate/rules/endpoint-map-openapi.mjs';
 import { githubSlug, scanMarkdown } from '../scripts/validate/markdown.mjs';
 import { defaultBody, makeRepo, readmeFor, skillMd } from './helpers/fixture.mjs';
 
-function ruleIds(overrides, opts = {}) {
+// The API sync workflow sets API_SYNC_SPEC for its agent; tests use only the
+// fixture's own snapshot.
+delete process.env.API_SYNC_SPEC;
+
+function diagnosticsFor(overrides, opts = {}) {
   const repo = makeRepo(overrides);
   try {
-    return [...new Set(validate({ root: repo.root, ...opts }).diagnostics.map((d) => d.rule))].sort();
+    return validate({ root: repo.root, ...opts }).diagnostics;
   } finally {
     repo.cleanup();
   }
+}
+
+/** Ids of the rules that report errors (warnings are asserted separately). */
+function ruleIds(overrides, opts = {}) {
+  return [...new Set(diagnosticsFor(overrides, opts).filter((d) => d.severity === 'error').map((d) => d.rule))].sort();
 }
 
 test('a minimal valid repo produces no diagnostics', () => {
@@ -155,4 +165,99 @@ test('templates/SKILL.template.md is a valid skill under every rule', () => {
     }),
     [],
   );
+});
+
+// --- endpoint-map-openapi: the canonical map against api-sync/openapi.snapshot.json
+
+function openapi(ops) {
+  const paths = {
+    '/health/live': { get: { operationId: 'getHealthLive' } },
+    '/api/v1/openapi.json': { get: { operationId: 'getOpenApiJson' } },
+  };
+  for (const [method, specPath, operationId] of ops) {
+    paths[specPath] = { ...paths[specPath], parameters: [], [method]: { operationId } };
+  }
+  return JSON.stringify({ openapi: '3.1.0', paths }, null, 2);
+}
+
+const SPEC_OPS = [
+  ['get', '/api/v1/me', 'getMe'],
+  ['get', '/api/v1/requests/metrics', 'getRequestMetrics'],
+  ['post', '/api/v1/syncs/{id}/retry', 'retrySync'],
+];
+const MAP_ROWS = [
+  '| `GET /me` | `get_me` | R | x |',
+  '| `GET /requests/metrics` | `get_requests_metrics` | R | x |',
+  '| `POST /syncs/:id/retry` | `retry_sync` | W | x |',
+];
+
+function apiRepo({ rows = MAP_ROWS, spec = openapi(SPEC_OPS), extra = {} } = {}) {
+  return {
+    'skills/api/SKILL.md': skillMd({ name: 'api' }).replace('references/rubric.md', 'references/endpoints.md'),
+    'skills/api/references/endpoints.md': `| REST | MCP tool | Access | Notes |\n| --- | --- | --- | --- |\n${rows.join('\n')}\n`,
+    'README.md': readmeFor(['api', 'demo']),
+    'api-sync/openapi.snapshot.json': spec,
+    ...extra,
+  };
+}
+
+test('endpoint-map-openapi: no snapshot only warns that coverage is unchecked', () => {
+  const diagnostics = diagnosticsFor(apiRepo({ spec: null, rows: ['| `GET /anything` | `whatever` | R | x |'] }));
+  assert.deepEqual(diagnostics.map((d) => [d.rule, d.severity]), [['endpoint-map-openapi', 'warn']]);
+  assert.match(diagnostics[0].msg, /no OpenAPI snapshot/);
+});
+
+const openapiCases = [
+  ['map matches the spec (aliases, :params, discovery ops skipped)', apiRepo(), []],
+  ['missing operation', apiRepo({ rows: MAP_ROWS.slice(0, 2) }), ['endpoint-map-openapi']],
+  ['operation not in the spec', apiRepo({ rows: [...MAP_ROWS, '| `GET /setup` | `get_setup_status` | R | x |'] }), ['endpoint-map-openapi']],
+  ['discovery op listed in the map', apiRepo({ rows: [...MAP_ROWS, '| `GET /openapi.json` | `get_open_api_json` | R | x |'] }), ['endpoint-map-openapi']],
+  ['tool breaks the naming rule (alias ignored)', apiRepo({ rows: MAP_ROWS.map((r) => r.replace('get_requests_metrics', 'get_request_metrics')) }), ['endpoint-map-openapi']],
+  ['snapshot is not JSON', apiRepo({ spec: '{nope' }), ['endpoint-map-openapi']],
+  ['snapshot has no paths', apiRepo({ spec: '{"openapi":"3.1.0"}' }), ['endpoint-map-openapi']],
+  ['write-tools-named takes write tools from the snapshot', apiRepo({
+    spec: openapi([...SPEC_OPS, ['post', '/api/v1/widgets/{id}/archive', 'archiveWidget']]),
+    rows: [...MAP_ROWS, '| `POST /widgets/:id/archive` | `archive_widget` | W | x |'],
+    extra: { 'skills/demo/SKILL.md': skillMd({ body: `${defaultBody()}\n## Mutations\n\nFollow the write-on-confirm protocol.\n\n| \`POST /widgets/:id/archive\` | \`archive_widget\` | Archive |\n` }) },
+  }), []],
+  ['write-tools-named: a read tool is not a write tool', apiRepo({
+    extra: { 'skills/demo/SKILL.md': skillMd({ body: `${defaultBody()}\n## Mutations\n\nFollow the write-on-confirm protocol.\n\n| POST /webhooks | create_webhook |\n` }) },
+  }), ['write-tools-named']],
+];
+
+for (const [name, overrides, expected] of openapiCases) {
+  test(`endpoint-map-openapi: ${name}`, () => assert.deepEqual(ruleIds(overrides), expected));
+}
+
+test('endpoint-map-openapi: missing-row message names the expected tool', () => {
+  const msgs = diagnosticsFor(apiRepo({ rows: MAP_ROWS.slice(1) })).map((d) => d.msg);
+  assert.deepEqual(msgs.filter((m) => /missing from the map/.test(m)).length, 1);
+  assert.match(msgs.find((m) => /missing from the map/.test(m)), /`GET \/me`.*`get_me`/);
+});
+
+test('endpoint-map-openapi: API_SYNC_SPEC overrides the committed snapshot', () => {
+  const repo = makeRepo(apiRepo());
+  const live = path.join(repo.root, 'live.json');
+  writeFileSync(live, openapi([...SPEC_OPS, ['get', '/api/v1/setup', 'getSetupStatus']]));
+  process.env.API_SYNC_SPEC = live;
+  try {
+    const errors = validate({ root: repo.root }).diagnostics.filter((d) => d.severity === 'error');
+    assert.deepEqual(errors.map((d) => d.rule), ['endpoint-map-openapi']);
+    assert.match(errors[0].msg, /get_setup_status/);
+  } finally {
+    delete process.env.API_SYNC_SPEC;
+    repo.cleanup();
+  }
+});
+
+test('endpoint-map-openapi: naming rule and route spelling', () => {
+  assert.equal(toSnake('getSetupStatus'), 'get_setup_status');
+  assert.equal(toSnake('getDestinationDeliveryMetrics'), 'get_destination_delivery_metrics');
+  assert.equal(toSnake('getURLInfo'), 'get_url_info');
+  assert.equal(toSnake('list.webhook-deliveries'), 'list_webhook_deliveries');
+  assert.equal(toSnake('_getMe__'), 'get_me');
+  assert.equal(toSnake('get  Me!!Now'), 'get_me_now');
+  assert.equal(toolName('getSyncMetrics'), 'get_syncs_metrics');
+  assert.equal(toolName('listDestinationReplyRelays'), 'list_reply_relays');
+  assert.equal(mapRoute('post', '/api/v1/destinations/{id}/deliveries/{deliveryId}/replay'), 'POST /destinations/:id/deliveries/:deliveryId/replay');
 });
