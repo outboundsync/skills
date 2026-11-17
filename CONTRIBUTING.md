@@ -39,4 +39,4 @@ Automatic. On each release, `release-calver.yml` runs `release-calver.mjs --appl
 
 ## After merging
 
-Nothing to do by hand. A merge to `main` is live right away for `npx skills add outboundsync/skills`. Within 6 hours, the `Skills mirror sync` workflow in `outboundsync/website` copies the pack into `https://outboundsync.com/.well-known/skills/`, has Claude update the matching docs (`src/content/docs/docs/skills/<name>.mdx`, the catalog and the sample dialogs), and opens a `chore(skills): sync mirror and docs` PR. Review that PR and merge it. To sync sooner, run that workflow from the website repo's Actions tab.
+Nothing to do by hand. A merge to `main` is live right away for `npx skills add outboundsync/skills`. Within 6 hours, the `Skills mirror sync` workflow in `outboundsync/website` copies the pack into `https://outboundsync.com/.well-known/skills/`, has a Cursor CLI agent (Grok) update the matching docs (`src/content/docs/docs/skills/<name>.mdx`, the catalog and the sample dialogs), and opens a `chore(skills): sync mirror and docs` PR. Review that PR and merge it. To sync sooner, run that workflow from the website repo's Actions tab.
