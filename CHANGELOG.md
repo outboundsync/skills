@@ -10,6 +10,10 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+### Fixed
+
+- **sync-monitoring** (1.4.1): support batch-requeue covers HubSpot and Salesforce only. Close was listed, but the only batch requeue path in the API (`admin/services/webhooks.service.ts`) is HubSpot/Salesforce.
+
 ## [2026.11.17.3] - 2026-11-17
 
 - **api** (1.6.0): documents `GET /setup` (`get_setup_status`) and `POST /sources/:sourceId/syncs/retry` (`retry_source_syncs`). `/setup` reports wizard progress and plan entitlement (`syncEntitled`), not whether a connection can live-sync now (`/account/status`). The bulk source retry is a write this skill does not call.
