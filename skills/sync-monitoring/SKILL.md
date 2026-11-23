@@ -13,7 +13,7 @@ license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY (account-scoped for /webhooks*; write scope for mutations) and HTTPS access to app.outboundsync.com, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key. The account needs platform webhooks enabled.
 metadata:
   author: outboundsync
-  version: "1.4.1"
+  version: "1.4.2"
 ---
 
 # Sync Monitoring (OutboundSync Webhooks + events)
@@ -48,7 +48,7 @@ Run in order; one failed call makes only its own row UNVERIFIED.
 1. **Identity** — `get_me` → `apiKey.connectionScope`, `scopes`.
 2. **Endpoints** — `list_webhooks` (and `get_webhook` when targeting one). Classify each endpoint:
    - **healthy** — `isActive` and `autoDisabledAt` null
-   - **auto-disabled** — `autoDisabledAt` set (it failed 20 times in a row)
+   - **auto-disabled** — `autoDisabledAt` set (it failed 20 times in a row); `lastError` says why
    - **paused** — `isActive` false and `autoDisabledAt` null (a deliberate pause; advisory only)
    - **covers alerts** — `enabledEvents` empty (all subscribable) or includes `sync.failed`
 3. **Deliveries** — for each healthy endpoint, `list_webhook_deliveries` (`limit` 25, newest first) → sample of recent attempts. OK = `SUCCEEDED` or `PENDING`; failed = `FAILED` or `DEAD`.

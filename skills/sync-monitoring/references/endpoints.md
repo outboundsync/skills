@@ -29,7 +29,7 @@ Trimmed copy of the pack's full map (the `api` skill's `references/endpoints.md`
 
 | Resource | Fields |
 | --- | --- |
-| Webhook endpoint | `id` (`oswhk_…`), `url` (https only), `description`, `enabledEvents[]` (empty = all subscribable), `isActive`, `autoDisabledAt`, `createdAt`, `updatedAt` — never a secret |
+| Webhook endpoint | `id` (`oswhk_…`), `url` (https only), `description`, `enabledEvents[]` (empty = all subscribable), `isActive`, `consecutiveFailures`, `autoDisabledAt`, `lastError` (latest delivery error, or null), `createdAt`, `updatedAt` — never a secret. Re-enabling (`isActive: true`) clears `autoDisabledAt` and resets `consecutiveFailures` to 0 |
 | Delivery attempt | `id` (`oswhd_…`), `endpointId`, `status` (`PENDING`\|`SUCCEEDED`\|`FAILED`\|`DEAD`), `attemptCount`, `lastAttemptAt`, `lastHttpStatus`, `lastError`, `replayOfDeliveryId`, `createdAt` |
 | Event | `id` (`osevt_…`), `type`, `summary`, `data`, `connectionId`, `sourceId`, `delivered` (≥1 delivery `SUCCEEDED`), `createdAt`; `get_event` adds `deliveries[]` |
 | Signing secret | `oswhsec_…` — only in the create/rotate response |

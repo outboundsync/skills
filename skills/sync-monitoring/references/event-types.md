@@ -4,7 +4,7 @@
 
 | Type | When |
 | --- | --- |
-| `sync.failed` | Source→CRM sync transitions healthy → failing for a source × connection pair; one alert per incident, not per job. Fires on the **first** connection-breaking error (CRM auth, billing, app not installed) and after **3 consecutive** failures for anything else. Rate limits (429), CRM 5xx / network errors, update-only misses, and a missing sequencer API key never count. Exception: Salesforce record-lock errors still failing after their automatic retries count as failures. |
+| `sync.failed` | Source→CRM sync transitions healthy → failing for a source × connection pair; one alert per incident, not per job. Fires on the **first** connection-breaking error (CRM auth, billing, app not installed) and after **3 consecutive** failures for anything else. Rate limits (429), CRM 5xx / network errors, update-only misses, and a missing sequencer API key never count. Exceptions: Salesforce record-lock errors still failing after their automatic retries count as failures, and a Salesforce `INVALID_SESSION_ID` that fails again after a fresh-token retry counts as a connection-breaking `reconnect` error. |
 | `sync.recovered` | Previously failing sync starts succeeding again (the next successful sync, not the reconnect itself) |
 
 Empty / omitted `enabledEvents` on create = all **subscribable** active types (not `test.ping`, not reserved).
@@ -18,12 +18,12 @@ Empty / omitted `enabledEvents` on create = all **subscribable** active types (n
 
 | Category | Cause | Action |
 | --- | --- | --- |
-| `reconnect` | Auth expired, invalid or revoked tokens, app not installed | Reconnect the CRM in the dashboard |
+| `reconnect` | Auth expired, invalid or revoked tokens, app not installed, Salesforce `INVALID_SESSION_ID` that persists after a fresh-token retry | Reconnect the CRM in the dashboard |
 | `billing` | CRM HTTP 402 / plan or storage limit | Upgrade the CRM plan or free capacity |
 | `config` | Missing sequencer API key, required field mapping, unsupported event | Fix the source or field mapping |
 | `not_found` | Update-only mode and no record matched | Create the CRM record or turn off update-only |
 | `rate_limited` | CRM HTTP 429 | Check [automatic retries](#automatic-retries); a sync still `error` after them needs `retry_sync` or support |
-| `network_transient` | Provider 5xx, network errors, token-refresh or record lock, Salesforce `INVALID_SESSION_ID` | Same as `rate_limited` |
+| `network_transient` | Provider 5xx, network errors, token-refresh or record lock, a first Salesforce `INVALID_SESSION_ID` (retried once with a fresh token) | Same as `rate_limited` |
 | `unknown` | Unrecognized or internal error | Review recent syncs; contact support if it continues |
 
 The live `remediation` text for `rate_limited` and `network_transient` says "No action needed — the sync will retry automatically." That is only true for the cases in the table below. Because these errors don't count toward `sync.failed`, `rate_limited` never appears in a payload. `network_transient` appears only after repeated Salesforce record-lock failures that ran out of retries.
@@ -32,12 +32,13 @@ Full catalog with example strings: https://outboundsync.com/docs/api/v1/#sync-fa
 
 ## Automatic retries
 
-OutboundSync re-queues a failed CRM sync on its own only in these cases. Everything else (for example Salesforce rate limits, 5xx, or `INVALID_SESSION_ID`, and 5xx / network errors on Attio, Close, HighLevel, Pipedrive) is logged as an `error` sync and stays that way.
+OutboundSync re-queues a failed CRM sync on its own only in these cases. Everything else (for example Salesforce rate limits or 5xx, and 5xx / network errors on Attio, Close, HighLevel, Pipedrive) is logged as an `error` sync and stays that way.
 
 | CRM | Re-queued automatically | Budget |
 | --- | --- | --- |
-| HubSpot | 429, CRM 5xx, network errors | up to 7 retries, 1–6 min apart |
+| HubSpot | 429, CRM 5xx, network errors, a contact create that races another event for the same email ("already has that value"; the retry updates the existing contact) | up to 7 retries, 1–6 min apart |
 | Salesforce | Record lock (`UNABLE_TO_LOCK_ROW`) | up to 5 retries, 5–15 s apart |
+| Salesforce | Expired session (`INVALID_SESSION_ID`), with a fresh token | 1 retry, 5–15 s later; if it fails again the sync is `reconnect`, counts toward `sync.failed`, and pauses the connection |
 | Attio, Close, HighLevel, Pipedrive | 429 only | up to 7 retries, seconds apart (CRM `Retry-After`, max 60 s) |
 
 A sync whose retries run out stays `error`. When a retry succeeds, HubSpot, Salesforce, and Close update the original sync to `success`. Attio, HighLevel, and Pipedrive write a new `success` sync, and the original stays `error`, so don't count those leftover `error` rows as unresolved without checking for a later success. Manual `retry_sync` covers HubSpot and Salesforce only, one sync at a time, with no daily limit. `retry_source_syncs` (`POST /sources/:sourceId/syncs/retry`, `write`, via the `api` skill's caution list) enqueues that source's recorded errors from the last 30 days (warnings skipped) and allows one bulk retry per source per 24 hours. Support can batch-requeue HubSpot and Salesforce syncs.
