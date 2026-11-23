@@ -10,6 +10,10 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+### Fixed
+
+- sync-monitoring: webhook resources include `consecutiveFailures` and `lastError`; Salesforce `INVALID_SESSION_ID` is retried once with a fresh token (then `reconnect`), and HubSpot retries a contact create that races another event for the same email.
+
 ## [2026.11.17.4] - 2026-11-17
 
 ### Fixed
