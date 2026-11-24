@@ -10,12 +10,13 @@ description: >-
   preflight and sync-monitoring skills, or about prior outreach, already
   contacted, skip contacts I already reached, GET /contacts/outreach,
   blocklist syncs, GET /blocklists, setup wizard progress, GET /setup,
+  workspace members, invitations, allowed email domains,
   or a bulk retry of failed syncs for one source.
 license: MIT
 compatibility: Requires OUTBOUNDSYNC_API_KEY in the environment and HTTPS access to app.outboundsync.com for live calls, or OutboundSync MCP connected at https://mcp.outboundsync.com/mcp with the same Bearer key.
 metadata:
   author: outboundsync
-  version: "1.6.0"
+  version: "1.7.0"
 ---
 
 # OutboundSync API v1
@@ -42,9 +43,10 @@ Every REST path, its MCP tool, access rules, response fields, and error handling
 | --- | --- |
 | Header | `Authorization: Bearer osapi_…` (REST and MCP) |
 | `read` scope | Every GET |
-| `write` scope | `retry_sync`, `retry_source_syncs`, `replay_destination_delivery`, `pause_blocklist`, `resync_blocklist`, and the webhook mutations — **never from this skill** |
+| `write` scope | `retry_sync`, `retry_source_syncs`, `replay_destination_delivery`, `pause_blocklist`, `resync_blocklist`, the workspace mutations (`update_workspace`, `create_workspace_domain`, `update_workspace_domain`, `remove_workspace_domain`, `create_workspace_invitation`, `revoke_workspace_invitation`, `update_workspace_member`, `remove_workspace_member`), and the webhook mutations — **never from this skill** |
 | Account-scoped key | Sees all connections; **required** for `/webhooks*` |
-| Connection-scoped key | Sees exactly one connection everywhere — expected, not an error; `403` on `/webhooks*`; may read `/events` for its connection |
+| Connection-scoped key | Sees exactly one connection everywhere — expected, not an error; `403` on `/webhooks*`; may read `/events` for its connection; may `GET /workspace` only (`403` `FORBIDDEN` on every other `/workspace*` route) |
+| Legacy key | `GET /me` `workspace` is null and `links.workspace` is absent. Every `/workspace*` route returns `409` `WORKSPACE_REQUIRED`. Do not call them |
 | No API-enabled connection | Every authenticated route returns `403`. Customers can't turn API access on themselves: ask OutboundSync support to enable it for a connection |
 | `canUseWebhooks` | Account flag for Sync Monitoring. Off → `403` "Platform webhooks are not enabled for this account" on `/webhooks*` **and** `/events` reads. `/me` does not expose it; only the `403` reveals it. |
 | Rate limits | 120 / 60s per account; `/contacts/outreach` 600 / 60s. Read `X-RateLimit-Remaining` when present (not on `/contacts/outreach` or the per-IP `429`); on `429` wait `Retry-After`. |
@@ -61,12 +63,13 @@ On `401` / `403` / `429`, relay the response message and the shortest fix. Never
 | Prior-outreach lookup | **contacts/outreach** | `GET /contacts/outreach` |
 | CRM→SEP blocklist **sync configs** | **blocklists** | `GET /blocklists` — not the reserved `contacts/outreach` `blocklists.*` |
 | OutboundSync-emitted Sync Monitoring | **webhooks** + **events** | `/webhooks`, `/events` → `sync-monitoring` |
+| This key's workspace | **workspace** | `GET /me` `workspace`; members, invitations, and allowed email domains under `/workspace*` |
 
 Inbound `POST /webhooks/:code` is the Sources paste target — not Sync Monitoring. Forwarding `GET /destinations/:id/deliveries` is not Sync Monitoring `GET /webhooks/:id/deliveries`.
 
 ## Discovery
 
-1. `get_me` / `GET /me` — its `links` name the main related paths (not blocklists, webhooks, events, setup, or health).
+1. `get_me` / `GET /me` — its `links` name the main related paths (not blocklists, webhooks, events, setup, or health). `workspace` is `{ id, name, role }` or null. `links.workspace` is present exactly when `workspace` is not null.
 2. Auth-free `GET /openapi.json` / `GET /openapi.yaml` — authoritative, one operation per MCP tool.
 3. `/api/v1/*` responses carry `Link: rel="service-desc"` / `service-doc`.
 
@@ -101,6 +104,13 @@ When the user asks about blocklist syncs, suppression lists, pause, or resync:
 
 - `list_blocklists` / `GET /blocklists` (optional `connectionId`). Map each list to one mark (see Output contract). Pause/resync are `write` — describe the recipe under `### Plan` Caution; never call them.
 
+When the user asks about the workspace, its members, invitations, or allowed email domains — not launch readiness:
+
+- Read `workspace` from `get_me` first. Null means a legacy key: stop, and do not call `/workspace*`.
+- A connection-scoped key may call `get_workspace` / `GET /workspace` only.
+- Otherwise, for an account-scoped workspace key: `get_workspace`, then `list_workspace_members`, `list_workspace_domains`, and `list_workspace_invitations` for the parts the user asked about. `list_workspace_invitations` defaults to open invitations (`pending` and `expired`). Show member and invitation emails only when the user asked who those people are.
+- Workspace writes (`update_workspace`, domain create/update/remove, invitation create/revoke, member role change and remove) need `write` plus the role permission — describe them under `### Plan` Caution; never call them.
+
 Do **not** render the preflight launch gauge here — "am I ready to launch?" belongs to `preflight`. Do **not** call any webhook tool — hand off to `sync-monitoring`.
 
 ## Route to specialized skills
@@ -113,6 +123,7 @@ Do **not** render the preflight launch gauge here — "am I ready to launch?" be
 | Sync, request, or forwarding counts and records (GET) | this skill |
 | Already outreached? Skip / delay enrollment? | this skill |
 | CRM→SEP blocklist syncs (GET) | this skill |
+| Workspace, members, invitations, or allowed email domains (GET) | this skill |
 | Setup wizard, test succeeded, or live SEP traffic arrived? | this skill (`get_setup_status` — not `preflight`) |
 | Campaign replies / attribution from CRM fields | `crm-analysis` (no API key) |
 
@@ -125,6 +136,7 @@ List these under `### Plan` Caution only when relevant; never perform them:
 - `retry_sync` (`POST /syncs/:id/retry`) and `replay_destination_delivery` (`POST /destinations/:id/deliveries/:deliveryId/replay`).
 - `retry_source_syncs` (`POST /sources/:sourceId/syncs/retry`). HubSpot/Salesforce only. Enqueues recorded errors from the last 30 days (warnings skipped; a sync with no result stays on `retry_sync`). One bulk retry per source per 24 hours. A `409` inside that window returns `retryAvailableAt` and `retryAfterSeconds`. A non-HubSpot/Salesforce source, or a connection or source that is paused or not entitled to sync, is a plain `409` (`message` only) and does not start the window. The dashboard's **Retry failed** button on a source shares the same 24-hour window. `queued: true` means the batch was accepted, including when nothing was eligible. Retry one recorded error with `retry_sync` and read it back to success before the bulk call: the bulk call spends the 24-hour window even when the underlying issue is still broken. `POST /syncs/:id/retry` has no daily limit and stays available during that window.
 - `pause_blocklist` / `resync_blocklist` (`POST /blocklists/:id/pause|resync`). SEP push is additive — neither clears the sequencer. Scheduled-reload recipe: (1) `list_blocklists` → pick `id`; (2) optionally clear the list **in the sequencer**; (3) `resync_blocklist` (needs `write`); (4) on `409`, back off; (5) poll `list_blocklists` until `status` leaves `FETCHING`/`SYNCING`, or read `lastError`.
+- Workspace mutations: `update_workspace`, `create_workspace_domain`, `update_workspace_domain`, `remove_workspace_domain`, `create_workspace_invitation`, `revoke_workspace_invitation`, `update_workspace_member`, `remove_workspace_member`. Each needs `write` and the role permission named in [references/endpoints.md](references/endpoints.md). No skill in this pack calls them.
 - Webhook mutations → `sync-monitoring`.
 
 ## Output contract
@@ -132,13 +144,14 @@ List these under `### Plan` Caution only when relevant; never perform them:
 GitHub-flavored markdown only. Render only this shape; no prose outside it. It uses the pack's [status layout](https://github.com/outboundsync/skills/blob/main/CONVENTIONS.md#status-layout--required-for-readiness-health-and-audit-skills) card grammar: marks `✓` pass · `✗` blocker · `·` advisory or `UNVERIFIED — <reason>`; the mark leads every bullet; one check per line; blank line between blocks.
 
 1. `##` states the key's access, or `## API access unverified` when `get_me` fails.
-2. `### Access` always. `### Plan` always. `### Prior outreach`, `### Blocklists`, and `### Metrics` only when that lookup ran.
+2. `### Access` always. `### Plan` always. `### Workspace`, `### Prior outreach`, `### Blocklists`, and `### Metrics` only when that lookup ran.
 3. `### Next` only when the user has something to do (fix access, run a hand-off skill); each item maps to a `✗`, `UNVERIFIED`, or actionable `·` line above — a hand-off maps to the Plan card's `Hand off` line.
 4. A failed call replaces that card's lines with one `· UNVERIFIED — <status or timeout>` line. Never render a failed lookup as "not found".
 
 **Mark mapping:**
 
 - Blocklists: `✓` `SYNCED` and enabled · `·` `CREATED` / `FETCHING` / `SYNCING` / `SYNCING_NEW_CONTACTS` (in progress) · `·` paused (`isEnabled: false`) · `✗` `lastError` present.
+- Workspace: `·` lines only. A legacy key (`workspace` null / `409` `WORKSPACE_REQUIRED`) and a connection-scoped `403` `FORBIDDEN` are that answer, not `UNVERIFIED` and not an empty member list. `401`, non-JSON, and `5xx` stay `UNVERIFIED`.
 - Prior outreach, first line: `✗ Do not contact` when `doNotContact.value` is true; else `✓ Keep` or `✗ Skip` against the **user's** cadence; else `· No cadence given — not deciding`.
 - Metrics meter: the bar is the **OK share**, not a score — syncs count `success` + `warning` (warnings are benign skips, as in `sync-monitoring`; a sync that never recorded a result counts as `error`), deliveries count `success`; 20 cells. A family with zero attempts shows no bar.
 
@@ -152,16 +165,25 @@ GitHub-flavored markdown only. Render only this shape; no prose outside it. It u
 
 - ✓ Key valid
 - <✓ Account-scoped — sees every connection | · Connection-scoped — connection <id> only>
-- <✓ write scope | · read only — retry, bulk source retry, replay, pause, and resync need write (not this skill)>
+- <✓ write scope | · read only — retry, bulk source retry, replay, pause, resync, and workspace changes need write (not this skill)>
+- <· Workspace <name> · <role> · <ws_…> | · Legacy key — `workspace` is null>
 - · Sync Monitoring needs platform webhooks on (and an account-scoped key for `/webhooks`) — checked by sync-monitoring
 
 ### Plan
 `<intent in a few words>`
 
-- · Vocabulary: <sources | forwarding | reply relays | contacts/outreach | blocklists | observability | Sync Monitoring>
+- · Vocabulary: <sources | forwarding | reply relays | contacts/outreach | blocklists | workspace | observability | Sync Monitoring>
 - · Calls: <tool / METHOD /path, in order — or "none — hand off">
 - · Hand off: <skill — why>
 - · Caution: <write exists but not this skill | secrets | not shipped>
+
+### Workspace
+`<name> · <role> · <ws_…>`
+
+- · Members: <n — or one line per person when the user asked who they are: <email> · <role>>
+- · Domains: <domain> · verified <yes | no> · discoverable <yes | no> · auto-join <yes | no>
+- · Invitations: <n> <status filter> — or one line per invitation when the user asked: <email> · <role> · <status>
+- <· Legacy key — `workspace` is null; `/workspace*` returns 409 `WORKSPACE_REQUIRED` | · Connection-scoped — only `GET /workspace` (other routes are 403 `FORBIDDEN`)>
 
 ### Prior outreach
 `email <value | none> · profileUrl <value | none>`

@@ -10,6 +10,8 @@ Curated, human-written notes for the OutboundSync Agent Skills pack. The pack us
 
 ## Unreleased
 
+- **api** (1.7.0): documents workspace reads and writes (`/workspace`, members, invitations, allowed email domains) and `GET /me` `workspace` (`{ id, name, role }` or null). This skill calls the reads only.
+
 ## [2026.11.23.0] - 2026-11-23
 
 ### Fixed
