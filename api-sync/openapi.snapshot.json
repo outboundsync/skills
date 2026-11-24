@@ -1172,6 +1172,33 @@
         ],
         "type": "object"
       },
+      "CreateWorkspaceDomainRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "CreateWorkspaceInvitationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
       "CrmConnectionStatus": {
         "additionalProperties": false,
         "properties": {
@@ -1763,6 +1790,9 @@
           },
           "syncs": {
             "$ref": "#/components/schemas/MeRelatedLink"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/MeRelatedLink"
           }
         },
         "required": [
@@ -1813,13 +1843,46 @@
           },
           "links": {
             "$ref": "#/components/schemas/MeLinks"
+          },
+          "workspace": {
+            "description": "The key's workspace, or null for a legacy key.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MeWorkspace"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
           "account",
           "apiKey",
           "connections",
+          "workspace",
           "links"
+        ],
+        "type": "object"
+      },
+      "MeWorkspace": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Public workspace id (`ws_` plus 20 base62 characters).",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
         ],
         "type": "object"
       },
@@ -2763,6 +2826,42 @@
         },
         "type": "object"
       },
+      "UpdateWorkspaceDomainRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "autoJoinEnabled": {
+            "type": "boolean"
+          },
+          "discoverable": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateWorkspaceMemberRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "role"
+        ],
+        "type": "object"
+      },
+      "UpdateWorkspaceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
       "WarningCode": {
         "enum": [
           "destinations_not_configured",
@@ -2911,6 +3010,318 @@
           "eventId"
         ],
         "type": "object"
+      },
+      "WorkspaceDomainResource": {
+        "additionalProperties": false,
+        "properties": {
+          "autoJoinEnabled": {
+            "type": "boolean"
+          },
+          "discoverable": {
+            "type": "boolean"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "domain",
+          "verified",
+          "discoverable",
+          "autoJoinEnabled"
+        ],
+        "type": "object"
+      },
+      "WorkspaceDomainsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDomainResource"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "domains"
+        ],
+        "type": "object"
+      },
+      "WorkspaceError": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "description": "Machine-readable reason. The list is complete. `FORBIDDEN` means the\nkey owner's role lacks the permission, or the key is limited to one\nconnection: such a key reads `GET /api/v1/workspace` and no other\nworkspace route.\n",
+            "enum": [
+              "ALREADY_MEMBER",
+              "DOMAIN_NOT_ELIGIBLE",
+              "DOMAIN_NOT_FOUND",
+              "DOMAIN_PATCH_EMPTY",
+              "DOMAIN_TAKEN",
+              "DOMAIN_UNVERIFIED",
+              "EMAIL_REQUIRED",
+              "EMAIL_SEND_FAILED",
+              "EMAIL_UNAVAILABLE",
+              "FORBIDDEN",
+              "INVITATION_CHANGED",
+              "INVITATION_NOT_FOUND",
+              "INVITATION_NOT_PENDING",
+              "LAST_OWNER",
+              "MEMBER_AMBIGUOUS",
+              "MEMBER_NOT_FOUND",
+              "NAME_REQUIRED",
+              "NAME_RESERVED",
+              "NAME_TOO_LONG",
+              "RATE_LIMITED",
+              "RESEND_LIMIT",
+              "ROLE_CEILING",
+              "ROLE_INVALID",
+              "STATUS_INVALID",
+              "WORKSPACES_NOT_ENABLED",
+              "WORKSPACE_NOT_FOUND",
+              "WORKSPACE_REQUIRED"
+            ],
+            "type": "string"
+          },
+          "permission": {
+            "description": "With FORBIDDEN, the permission the caller's role lacks, when one is named.",
+            "type": "string"
+          },
+          "status": {
+            "description": "With INVITATION_NOT_PENDING, the state the invitation is in.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "WorkspaceInvitationResource": {
+        "additionalProperties": false,
+        "properties": {
+          "acceptedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "example": "wsi_0123456789abcdefghij",
+            "type": "string"
+          },
+          "invitedBy": {
+            "description": "Email of whoever sent it last.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastSentAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "revokedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          },
+          "sendCount": {
+            "type": "integer"
+          },
+          "status": {
+            "description": "`pending` can be accepted. `expired` can be sent again by inviting\nthe same address. `accepted` and `revoked` are final.\n",
+            "enum": [
+              "pending",
+              "expired",
+              "accepted",
+              "revoked"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "status",
+          "invitedBy",
+          "createdAt",
+          "lastSentAt",
+          "expiresAt",
+          "sendCount",
+          "acceptedAt",
+          "revokedAt"
+        ],
+        "type": "object"
+      },
+      "WorkspaceInvitationResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "description": "Invitation id. Use it to cancel the invitation.",
+            "example": "wsi_0123456789abcdefghij",
+            "type": "string"
+          },
+          "resent": {
+            "description": "True when an invitation to this address was already open and was sent again.",
+            "type": "boolean"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "resent",
+          "expiresAt"
+        ],
+        "type": "object"
+      },
+      "WorkspaceInvitationsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "invitations": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceInvitationResource"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "invitations"
+        ],
+        "type": "object"
+      },
+      "WorkspaceMemberResource": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "email",
+          "role"
+        ],
+        "type": "object"
+      },
+      "WorkspaceMembersResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceMemberResource"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "members"
+        ],
+        "type": "object"
+      },
+      "WorkspacePermission": {
+        "enum": [
+          "workspace.read",
+          "workspace.update",
+          "workspace.delete",
+          "members.invite",
+          "members.update_role",
+          "members.remove",
+          "domains.manage",
+          "ownership.transfer",
+          "connections.create",
+          "connections.manage",
+          "sources.write",
+          "sources.delete",
+          "blocklists.write",
+          "reply_relays.write",
+          "destinations.write",
+          "blocklists.delete",
+          "reply_relays.delete",
+          "destinations.delete",
+          "external_api_keys.read",
+          "external_api_keys.create",
+          "external_api_keys.manage",
+          "api_keys.manage",
+          "platform_webhooks.manage",
+          "billing.read",
+          "billing.manage",
+          "setup.write"
+        ],
+        "type": "string"
+      },
+      "WorkspaceResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspacePermission"
+            },
+            "type": "array"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "permissions"
+        ],
+        "type": "object"
+      },
+      "WorkspaceRole": {
+        "enum": [
+          "OWNER",
+          "ADMIN",
+          "MEMBER",
+          "VIEWER"
+        ],
+        "type": "string"
       }
     },
     "securitySchemes": {
@@ -3935,7 +4346,7 @@
     },
     "/api/v1/me": {
       "get": {
-        "description": "Returns account, API key metadata, accessible CRM connections, and links\nto related v1 endpoints. Use as the bootstrap call after authentication.\n",
+        "description": "Returns account, API key metadata, accessible CRM connections, and links\nto related v1 endpoints. Use as the bootstrap call after authentication.\n\n`workspace` is `{ id, name, role }` for a workspace key and `null` for a\nlegacy key. `id` is the public workspace id. `links.workspace` is present\nexactly when `workspace` is not null; follow it for members, invitations\nand allowed email domains.\n",
         "operationId": "getMe",
         "responses": {
           "200": {
@@ -5037,6 +5448,909 @@
         ]
       }
     },
+    "/api/v1/workspace": {
+      "get": {
+        "description": "The workspace this key belongs to, the key owner's role, and the\npermissions that role has. `id` is the public workspace id.\n\nA legacy key returns 409 `WORKSPACE_REQUIRED`. A workspace key still\nhas to authenticate: the creator must have `api_keys.manage`, and the\nworkspace must have at least one API-enabled connection.\n",
+        "operationId": "getWorkspace",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceResponse"
+                }
+              }
+            },
+            "description": "Workspace"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "`FORBIDDEN` when the key owner's role cannot read the workspace.\nMissing API access uses the standard error body.\n"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "The workspace was deleted (`WORKSPACE_NOT_FOUND`)."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "This key is not a workspace key (`WORKSPACE_REQUIRED`)."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Workspace for this API key",
+        "tags": [
+          "Workspace"
+        ]
+      },
+      "patch": {
+        "description": "Requires the `write` scope and `workspace.update`. A blank name is\n`NAME_REQUIRED`. The name `Create new workspace` is `NAME_RESERVED`.\nMore than 80 characters is `NAME_TOO_LONG`.\n",
+        "operationId": "updateWorkspace",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "name": "North Studio"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkspaceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceResponse"
+                }
+              }
+            },
+            "description": "Workspace after the rename"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`NAME_REQUIRED`, `NAME_RESERVED`, or `NAME_TOO_LONG`."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, or the role does not include `workspace.update`.\n"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "This key is not a workspace key (`WORKSPACE_REQUIRED`)."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Rename the workspace",
+        "tags": [
+          "Workspace"
+        ]
+      }
+    },
+    "/api/v1/workspace/domains": {
+      "get": {
+        "description": "Company email domains that can see this workspace. `autoJoinEnabled`\nlets people on that domain join as Members. Otherwise they email an owner.\nRequires `workspace.read`. The domain row id is not returned.\n",
+        "operationId": "listWorkspaceDomains",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDomainsResponse"
+                }
+              }
+            },
+            "description": "Allowed email domains"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "The key owner's role cannot read the workspace."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "This key is not a workspace key (`WORKSPACE_REQUIRED`)."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "List allowed email domains",
+        "tags": [
+          "Workspace"
+        ]
+      },
+      "post": {
+        "description": "Requires the `write` scope and `domains.manage`. The domain is\nstored only when the key owner's own email is on that domain.\nAnything else, including a free or consumer domain, is\n`DOMAIN_NOT_ELIGIBLE`. A domain already claimed by another\nworkspace is `DOMAIN_TAKEN`.\n",
+        "operationId": "createWorkspaceDomain",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "domain": "acme.com"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkspaceDomainRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDomainResource"
+                }
+              }
+            },
+            "description": "Allowed email domain"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`DOMAIN_NOT_ELIGIBLE`."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, or the role cannot manage domains."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`WORKSPACE_REQUIRED` or `DOMAIN_TAKEN`."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Allow an email domain",
+        "tags": [
+          "Workspace"
+        ]
+      }
+    },
+    "/api/v1/workspace/domains/{domain}": {
+      "delete": {
+        "description": "Requires the `write` scope and `domains.manage`. People who already\nbelong to the workspace stay members.\n",
+        "operationId": "removeWorkspaceDomain",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDomainResource"
+                }
+              }
+            },
+            "description": "Domain that was removed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, or the role cannot manage domains."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`DOMAIN_NOT_FOUND`."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "This key is not a workspace key (`WORKSPACE_REQUIRED`)."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Remove an allowed email domain",
+        "tags": [
+          "Workspace"
+        ]
+      },
+      "parameters": [
+        {
+          "description": "Registrable domain, such as `acme.com`.",
+          "in": "path",
+          "name": "domain",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "patch": {
+        "description": "Requires the `write` scope and `domains.manage`. Send `discoverable`,\n`autoJoinEnabled`, or both. `autoJoinEnabled` lets people on the domain\njoin as Members. Setting `discoverable` to false also turns that off.\nAn unverified domain cannot turn either flag on (`DOMAIN_UNVERIFIED`).\nRemoving the domain does not remove members.\n",
+        "operationId": "updateWorkspaceDomain",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "autoJoinEnabled": false,
+                "discoverable": true
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkspaceDomainRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDomainResource"
+                }
+              }
+            },
+            "description": "Allowed email domain"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`DOMAIN_PATCH_EMPTY` when neither flag is a boolean."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, or the role cannot manage domains."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`DOMAIN_NOT_FOUND`."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`WORKSPACE_REQUIRED` or `DOMAIN_UNVERIFIED`."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Change who on a domain can join",
+        "tags": [
+          "Workspace"
+        ]
+      }
+    },
+    "/api/v1/workspace/invitations": {
+      "get": {
+        "description": "Requires `members.invite`. Without `status`, returns the invitations\nthat still need someone to act: `pending` and `expired`. Newest first.\nThe accept token is never returned.\n",
+        "operationId": "listWorkspaceInvitations",
+        "parameters": [
+          {
+            "description": "`open` (the default) is pending and expired together. `all`\nincludes accepted and cancelled invitations.\n",
+            "example": "pending",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "open",
+                "pending",
+                "expired",
+                "accepted",
+                "revoked",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceInvitationsResponse"
+                }
+              }
+            },
+            "description": "Invitations"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`STATUS_INVALID`."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "The key owner's role cannot invite (`FORBIDDEN`)."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "This key is not a workspace key (`WORKSPACE_REQUIRED`)."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "List invitations",
+        "tags": [
+          "Workspace"
+        ]
+      },
+      "post": {
+        "description": "Requires the `write` scope and `members.invite`. `role` defaults to\n`MEMBER`. The invitation email is sent to `email`. The accept token\nis not returned. Inviting an address that already has an open\ninvitation sends it again with a new link (`resent` is true) and\nthe role in this call. An invitation is recorded only when its email\nwas sent.\n",
+        "operationId": "createWorkspaceInvitation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "email": "teammate@acme.com",
+                "role": "MEMBER"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkspaceInvitationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceInvitationResponse"
+                }
+              }
+            },
+            "description": "Invitation recorded"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`EMAIL_REQUIRED` or `ROLE_INVALID`."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, `FORBIDDEN`, or `ROLE_CEILING`."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`WORKSPACE_REQUIRED`, `ALREADY_MEMBER`, or `INVITATION_CHANGED`\n(the same invitation was changed by another call; try again).\n"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "`RESEND_LIMIT`, `RATE_LIMITED`, or the API key rate limit."
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`EMAIL_SEND_FAILED`. The invitation email could not be sent, and\nno invitation was recorded. Try again.\n"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`EMAIL_UNAVAILABLE`. This server cannot send email."
+          }
+        },
+        "summary": "Invite someone to the workspace",
+        "tags": [
+          "Workspace"
+        ]
+      }
+    },
+    "/api/v1/workspace/invitations/{invitationId}": {
+      "delete": {
+        "description": "Requires the `write` scope and `members.invite`. Cancels a pending or\nexpired invitation; its link stops working. The response is the\ninvitation that was cancelled.\n",
+        "operationId": "revokeWorkspaceInvitation",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceInvitationResource"
+                }
+              }
+            },
+            "description": "Invitation that was cancelled"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, or the role cannot invite (`FORBIDDEN`)."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`INVITATION_NOT_FOUND`."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`WORKSPACE_REQUIRED`, or `INVITATION_NOT_PENDING` when it was\nalready accepted or cancelled (`status` says which).\n"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Cancel an invitation",
+        "tags": [
+          "Workspace"
+        ]
+      },
+      "parameters": [
+        {
+          "description": "Invitation id (`wsi_…`) from the list or from the invite call.",
+          "in": "path",
+          "name": "invitationId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/api/v1/workspace/members": {
+      "get": {
+        "description": "Email and role for each member. Requires `workspace.read`. Integer\nlogin ids are not returned.\n",
+        "operationId": "listWorkspaceMembers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMembersResponse"
+                }
+              }
+            },
+            "description": "Members"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "The key owner's role cannot read the workspace."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "This key is not a workspace key (`WORKSPACE_REQUIRED`)."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "List workspace members",
+        "tags": [
+          "Workspace"
+        ]
+      }
+    },
+    "/api/v1/workspace/members/{email}": {
+      "delete": {
+        "description": "Requires the `write` scope and `members.remove`. Removing a domain\nlater does not remove members, and this call does not remove a domain.\nThe response is the member who was removed. Connection ids are not\nincluded.\n",
+        "operationId": "removeWorkspaceMember",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMemberResource"
+                }
+              }
+            },
+            "description": "Member who was removed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, or the role cannot remove this member."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`MEMBER_NOT_FOUND`."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`WORKSPACE_REQUIRED` or `LAST_OWNER`."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Remove a member",
+        "tags": [
+          "Workspace"
+        ]
+      },
+      "parameters": [
+        {
+          "description": "Member email, percent-encoded (`@` as `%40`).",
+          "in": "path",
+          "name": "email",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "patch": {
+        "description": "Requires the `write` scope and `members.update_role`. The same rules\nas the workspace page apply: `ROLE_CEILING` when the role outranks the\ncaller or when an admin tries to change an owner, and `LAST_OWNER` when\nthe change would leave the workspace with no owner. `FORBIDDEN` when\nthe key owner's role cannot change roles at all.\n",
+        "operationId": "updateWorkspaceMember",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "role": "ADMIN"
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkspaceMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMemberResource"
+                }
+              }
+            },
+            "description": "Member after the change"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`ROLE_INVALID`."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkspaceError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing `write` scope, `FORBIDDEN`, or `ROLE_CEILING`."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`MEMBER_NOT_FOUND`."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceError"
+                }
+              }
+            },
+            "description": "`WORKSPACE_REQUIRED`, `LAST_OWNER`, or `MEMBER_AMBIGUOUS`."
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        },
+        "summary": "Change a member's role",
+        "tags": [
+          "Workspace"
+        ]
+      }
+    },
     "/health/live": {
       "get": {
         "description": "Liveness probe. Returns 200 whenever the platform process is reachable\nand does no downstream checks. No API key required. Lives at the host\nroot, not under /api/v1.\n",
@@ -5117,6 +6431,10 @@
     {
       "description": "Identity and pipeline readiness",
       "name": "Account"
+    },
+    {
+      "description": "The workspace this API key belongs to",
+      "name": "Workspace"
     },
     {
       "description": "Wizard progress (test, waiting/live) — distinct from account/status live-sync readiness",

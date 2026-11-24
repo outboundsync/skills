@@ -14,7 +14,8 @@ Calls: `get_me` → `list_connections` → `get_account_status` → `list_source
 
 - ✓ Key valid
 - · Connection-scoped — connection 177 only
-- · read only — retry, bulk source retry, replay, pause, and resync need write (not this skill)
+- · read only — retry, bulk source retry, replay, pause, resync, and workspace changes need write (not this skill)
+- · Workspace North Studio · MEMBER · ws_0123456789abcdefghij
 - · Sync Monitoring needs platform webhooks on (and an account-scoped key for `/webhooks`) — checked by sync-monitoring
 
 ### Plan
@@ -37,7 +38,8 @@ Calls: `get_contact_outreach` with `email` and `profileUrl`.
 
 - ✓ Key valid
 - ✓ Account-scoped — sees every connection
-- · read only — retry, bulk source retry, replay, pause, and resync need write (not this skill)
+- · read only — retry, bulk source retry, replay, pause, resync, and workspace changes need write (not this skill)
+- · Workspace North Studio · OWNER · ws_0123456789abcdefghij
 
 ### Plan
 `Prior-outreach filter, 60-day cadence`
@@ -67,6 +69,7 @@ A timeout is not "never contacted". Nothing is decided.
 
 - ✓ Key valid
 - ✓ Account-scoped — sees every connection
+- · Workspace North Studio · OWNER · ws_0123456789abcdefghij
 
 ### Plan
 `Prior-outreach filter, 60-day cadence`
@@ -95,6 +98,7 @@ Calls: `get_account_metrics` (`2026-09-21T00:00:00Z` → `2026-09-28T00:00:00Z`)
 - ✓ Key valid
 - ✓ Account-scoped — sees every connection
 - ✓ write scope
+- · Workspace North Studio · OWNER · ws_0123456789abcdefghij
 
 ### Plan
 `Weekly pipeline volume and blocklist state`
@@ -123,4 +127,62 @@ Deliveries  ████████████████████  100% o
 ### Next
 1. Inspect the failed syncs: `list_syncs` with `status=error` for the same window
 2. Fix the rejected Competitor domains rows in Smartlead, then resync from the dashboard or with a write-scoped tool
+````
+
+## Workspace members — "who is in the workspace?"
+
+Calls: `get_me` → `get_workspace` → `list_workspace_members` → `list_workspace_domains` → `list_workspace_invitations`.
+
+````markdown
+## API access — account-scoped · read
+
+### Access
+`Ops · 1 connection · HubSpot @ acme.example.com`
+
+- ✓ Key valid
+- ✓ Account-scoped — sees every connection
+- · read only — retry, bulk source retry, replay, pause, resync, and workspace changes need write (not this skill)
+- · Workspace North Studio · OWNER · ws_0123456789abcdefghij
+
+### Plan
+`Who is in the workspace`
+
+- · Vocabulary: workspace
+- · Calls: get_me → get_workspace → list_workspace_members → list_workspace_domains → list_workspace_invitations
+- · Caution: invite, role change, and domain edits exist (write) but are not this skill
+
+### Workspace
+`North Studio · OWNER · ws_0123456789abcdefghij`
+
+- · dana@acme.example.com · OWNER
+- · sam@acme.example.com · MEMBER
+- · Domains: acme.example.com · verified yes · discoverable yes · auto-join no
+- · Invitations: 1 open
+- · teammate@acme.example.com · MEMBER · pending
+````
+
+## Legacy key — "who is in the workspace?"
+
+Calls: `get_me` only. `workspace` is null, so `/workspace*` is not called.
+
+````markdown
+## API access — account-scoped · read
+
+### Access
+`Ops · 1 connection · HubSpot @ acme.example.com`
+
+- ✓ Key valid
+- ✓ Account-scoped — sees every connection
+- · Legacy key — `workspace` is null
+
+### Plan
+`Who is in the workspace`
+
+- · Vocabulary: workspace
+- · Calls: get_me — stopped, legacy key
+
+### Workspace
+`legacy key`
+
+- · Legacy key — `workspace` is null; `/workspace*` returns 409 `WORKSPACE_REQUIRED`
 ````
